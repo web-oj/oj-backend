@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13.5
+    container_name: oj_db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  app:
+    container_name: oj_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/home/node/app
+      - /home/node/app/node_modules
+    command: ["npm", "run", "build:start"]
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - db
+volumes:
+  postgres_db:
+    driver: local
