@@ -2,12 +2,14 @@ init.sql -- Active: 1729235768493@@127.0.0.1@3306@ojdb
 
 -- Schema: https://drive.google.com/file/d/1LXLR8uFOKzCWZ5iASw4Rbs8xYwgfgVkW/view?usp=drive_link
 
+DROP DATABASE IF EXISTS ojdb;
+
 CREATE DATABASE ojdb;
 
 USE ojdb;
 
 CREATE TABLE Users (
-    user_id INT UNIQUE NOT NULL,
+    user_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_name VARCHAR(15) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password CHAR(31) NOT NULL,
@@ -19,8 +21,26 @@ CREATE TABLE Users (
     INDEX index_rating (rating)
 ) ENGINE = InnoDB CHARSET = utf8;
 
+INSERT INTO
+    users (
+        user_name,
+        email,
+        password,
+        role,
+        created_at,
+        rating
+    )
+VALUES (
+        "admin",
+        "admin@example.com",
+        "admin",
+        "AD,PS,CU",
+        NOW(),
+        0
+    );
+
 CREATE TABLE Contests (
-    contest_id INT UNIQUE NOT NULL,
+    contest_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
@@ -32,8 +52,27 @@ CREATE TABLE Contests (
     INDEX index_start_time (start_time)
 ) ENGINE = InnoDB CHARSET = utf8;
 
+INSERT INTO
+    contests (
+        title,
+        start_time,
+        end_time,
+        scoring_rule,
+        organizer_id
+    )
+VALUES (
+        "Outside Contest",
+        "2000-01-01 00:00:00",
+        "2000-01-01 00:10:00",
+        "IOI",
+        1
+    );
+
+ALTER TABLE Contests
+MODIFY contest_id INT UNIQUE NOT NULL AUTO_INCREMENT;
+
 CREATE TABLE Problems (
-    problem_id INT UNIQUE NOT NULL,
+    problem_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     statement MEDIUMTEXT NOT NULL,
     difficulty INT NOT NULL,
@@ -52,10 +91,10 @@ CREATE TABLE Problems (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Submissions (
-    submission_id INT UNIQUE NOT NULL,
+    submission_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     problem_id INT NOT NULL,
-    contest_id INT NOT NULL,
+    contest_id INT NOT NULL DEFAULT 1,
     submitted_at DATETIME NOT NULL,
     source_code_language VARCHAR(15) NOT NULL,
     source_code_file_id INT NOT NULL,
@@ -69,7 +108,7 @@ CREATE TABLE Submissions (
         "RTE",
         "CE",
         "D"
-    ) NOT NULL,
+    ) NOT NULL DEFAULT "P",
     PRIMARY KEY (submission_id),
     FOREIGN KEY (user_id) REFERENCES Users (user_id),
     FOREIGN KEY (problem_id) REFERENCES Problems (problem_id),
@@ -103,7 +142,7 @@ CREATE TABLE ContestProblems (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE TestCases (
-    test_case_id INT UNIQUE NOT NULL,
+    test_case_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     problem_id INT NOT NULL,
     input MEDIUMTEXT NOT NULL,
@@ -125,14 +164,14 @@ CREATE TABLE SubmissionResults (
         "RTE",
         "CE",
         "D"
-    ) NOT NULL,
+    ) NOT NULL DEFAULT "P",
     PRIMARY KEY (submission_id, test_case_id),
     FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id),
     FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id)
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Achievements (
-    achievement_id INT UNIQUE NOT NULL,
+    achievement_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     attachment MEDIUMBLOB,
     isVerified BOOL NOT NULL,
@@ -141,7 +180,7 @@ CREATE TABLE Achievements (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Notifications (
-    notification_id INT UNIQUE NOT NULL,
+    notification_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     receiver_id INT NOT NULL,
     content MEDIUMTEXT NOT NULL,
     PRIMARY KEY (notification_id),
@@ -149,7 +188,7 @@ CREATE TABLE Notifications (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE DiscussionMessages (
-    message_id INT UNIQUE NOT NULL,
+    message_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     sender_id INT NOT NULL,
     contest_id INT NOT NULL,
     parent_id INT NOT NULL,
@@ -161,7 +200,7 @@ CREATE TABLE DiscussionMessages (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Tags (
-    tag_id INT UNIQUE NOT NULL,
+    tag_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     tag_name VARCHAR(31) UNIQUE NOT NULL,
     tag_type ENUM("CATEGORY", "SOURCE") NOT NULL,
     PRIMARY KEY (tag_id),
@@ -177,7 +216,7 @@ CREATE TABLE TaggedProblems (
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE PlagiarismReports (
-    report_id INT UNIQUE NOT NULL,
+    report_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     submission_id INT NOT NULL,
     moss_dump_file VARCHAR(255) NOT NULL,
     PRIMARY KEY (report_id),
