@@ -1,5 +1,3 @@
--- Active: 1729062295212@@127.0.0.1@3306@ojdb
-
 -- Schema: https://drive.google.com/file/d/1LXLR8uFOKzCWZ5iASw4Rbs8xYwgfgVkW/view?usp=drive_link
 
 DROP DATABASE IF EXISTS ojdb;
@@ -20,6 +18,33 @@ CREATE TABLE Users (
     INDEX index_user_name (user_name),
     INDEX index_rating (rating)
 ) ENGINE = InnoDB CHARSET = utf8;
+
+DELIMITER $$
+
+CREATE TRIGGER trigger_before_update_users
+BEFORE UPDATE ON users
+FOR EACH ROW BEGIN
+    IF OLD.user_id = 1 THEN
+        IF (OLD.user_name != NEW.user_name)
+        OR (OLD.role != NEW.role)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot modify user_name and role of admin user';
+        END IF;
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_before_delete_users
+BEFORE DELETE ON users
+FOR EACH ROW BEGIN
+    IF OLD.user_id = 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete admin user';
+    END IF;
+END$$
+
+DELIMITER ;
+
 
 INSERT INTO
     users (
@@ -67,9 +92,6 @@ VALUES (
         "IOI",
         1
     );
-
-ALTER TABLE Contests
-MODIFY contest_id INT UNIQUE NOT NULL AUTO_INCREMENT;
 
 CREATE TABLE Problems (
     problem_id INT UNIQUE NOT NULL AUTO_INCREMENT,
