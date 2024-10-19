@@ -143,7 +143,19 @@ Gồm $1$ dòng chứa $2$ số nguyên $A$ và $B$ $(1\\leq A\\leq B \\leq 1000
 
 ## Output
 
-Ghi ra tổng $A + B$.',
+Ghi ra tổng $A + B$.
+
+## Sample input
+
+```
+3 4
+```
+
+## Sample output
+
+```
+7
+```',
         800,
         1000,
         512,
@@ -188,7 +200,19 @@ Gồm $1$ dòng chứa $2$ số nguyên $A$ và $B$ $(1\\leq A\\leq B \\leq 10^{
 
 ## Output
 
-Ghi ra tổng $A + B$.',
+Ghi ra tổng $A + B$.
+
+## Sample input
+
+```
+3 4
+```
+
+## Sample output
+
+```
+7
+```',
         1000,
         1000,
         512,
@@ -498,63 +522,236 @@ INSERT INTO
         input,
         expected_output
     )
+VALUES ("Test #1", 3, "a", "b");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (4, 3, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (4, 4, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (4, 5, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (3, 3, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (3, 4, "WA");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (5, 1, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (3, 1, "AC")
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (3, 2, "AC");
+
+INSERT INTO
+    submissionresults (
+        submission_id,
+        test_case_id,
+        status
+    )
+VALUES (3, 6, "TLE");
+
+INSERT INTO
+    achievements (
+        title,
+        user_id,
+        attachment,
+        isVerified
+    )
 VALUES (
-        "Test #1",
+        "Giải Nhất HSG Quốc gia môn ORZ",
         3,
-        "a",
-        "b"
+        NULL,
+        TRUE
     );
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    4, 3, "AC"
-);
+INSERT INTO
+    achievements (
+        title,
+        user_id,
+        attachment,
+        isVerified
+    )
+VALUES (
+        "Giải Nhì HSG Quốc gia môn Khủng",
+        3,
+        NULL,
+        TRUE
+    );
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    4, 4, "AC"
-)
+INSERT INTO
+    achievements (
+        title,
+        user_id,
+        attachment,
+        isVerified
+    )
+VALUES (
+        "Giải Nhì HSG Quốc gia môn Khủng",
+        4,
+        NULL,
+        TRUE
+    );
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    4, 5, "AC"
-)
+INSERT INTO
+    notifications (receiver_id, content)
+VALUES (3, "**orz**");
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    3, 3, "AC"
-)
+INSERT INTO
+    notifications (receiver_id, content)
+VALUES (4, "bayer leverkusen -0.25");
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    3, 4, "WA"
-)
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (
+        4,
+        2,
+        NULL,
+        "Chấm pen ai vẽ mà tròn"
+    )
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    5, 1, "AC"
-)
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (
+        5,
+        2,
+        1,
+        "**Cỏ này ai cắt mà còn hơi cao**"
+    )
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    3, 1, "AC"
-)
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (
+        4,
+        2,
+        2,
+        "## Cỏ cao thì mặc cỏ cao"
+    )
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    3, 2, "AC"
-)
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (
+        5,
+        2,
+        3,
+        "_Vấp vào ngã quỵ kêu gào đòi pen_"
+    )
 
-INSERT INTO submissionresults (
-    submission_id,test_case_id, status
-) VALUES (
-    3, 6, "TLE"
-)
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (3, 2, NULL, "tôi khủng vl")
+
+INSERT INTO
+    discussionmessages (
+        sender_id,
+        contest_id,
+        parent_id,
+        content
+    )
+VALUES (1, 3, NULL, "sample text")
+
+INSERT INTO
+    tags (tag_name, tag_type)
+VALUES ("Basic", "CATEGORY")
+
+INSERT INTO
+    tags (tag_name, tag_type)
+VALUES ("Implementation", "CATEGORY")
+
+INSERT INTO
+    tags (tag_name, tag_type)
+VALUES ("OC", "SOURCE")
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (1, 1)
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (1, 2)
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (1, 3)
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (2, 1)
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (2, 2)
+
+INSERT INTO
+    taggedproblems (problem_id, tag_id)
+VALUES (2, 3)

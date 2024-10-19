@@ -1,4 +1,4 @@
-init.sql -- Active: 1729235768493@@127.0.0.1@3306@ojdb
+-- Active: 1729062295212@@127.0.0.1@3306@ojdb
 
 -- Schema: https://drive.google.com/file/d/1LXLR8uFOKzCWZ5iASw4Rbs8xYwgfgVkW/view?usp=drive_link
 
@@ -172,6 +172,7 @@ CREATE TABLE SubmissionResults (
 
 CREATE TABLE Achievements (
     achievement_id INT UNIQUE NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
     attachment MEDIUMBLOB,
     isVerified BOOL NOT NULL,
@@ -191,7 +192,7 @@ CREATE TABLE DiscussionMessages (
     message_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     sender_id INT NOT NULL,
     contest_id INT NOT NULL,
-    parent_id INT NOT NULL,
+    parent_id INT,
     content MEDIUMTEXT NOT NULL,
     PRIMARY KEY (message_id),
     FOREIGN KEY (sender_id) REFERENCES Users (user_id),
