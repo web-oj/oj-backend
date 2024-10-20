@@ -72,8 +72,8 @@ CREATE TABLE Contests (
     organizer_id INT NOT NULL,
     PRIMARY KEY (contest_id),
     FOREIGN KEY (organizer_id) REFERENCES Users (user_id),
-    INDEX index_title (title),
-    INDEX index_start_time (start_time)
+    INDEX index_start_time (start_time),
+    FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
 
 DELIMITER $$
@@ -128,9 +128,9 @@ CREATE TABLE Problems (
     creator_id INT NOT NULL,
     PRIMARY KEY (problem_id),
     FOREIGN KEY (creator_id) REFERENCES Users (user_id),
-    INDEX index_title (title),
     INDEX index_difficulty (difficulty),
-    INDEX index_created_at (created_at)
+    INDEX index_created_at (created_at),
+    FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Submissions (
