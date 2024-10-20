@@ -23,7 +23,7 @@ app.use(
     swaggerOptions: {
       url: "/swagger.json",
     },
-  })
+  }),
 );
 
 app.listen(PORT, () => {
