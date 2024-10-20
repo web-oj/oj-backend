@@ -43,8 +43,7 @@ FOR EACH ROW BEGIN
     END IF;
 END$$
 
-DELIMITER ;
-
+DELIMITER;
 
 INSERT INTO
     users (
@@ -76,6 +75,28 @@ CREATE TABLE Contests (
     INDEX index_title (title),
     INDEX index_start_time (start_time)
 ) ENGINE = InnoDB CHARSET = utf8;
+
+DELIMITER $$
+
+CREATE TRIGGER trigger_before_update_contests
+BEFORE UPDATE ON contests
+FOR EACH ROW BEGIN
+    IF OLD.contest_id = 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot modify special contest';
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_before_delete_contests
+BEFORE DELETE ON contests
+FOR EACH ROW BEGIN
+    IF OLD.contest_id = 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete special contest';
+    END IF;
+END$$
+
+DELIMITER;
 
 INSERT INTO
     contests (
@@ -137,6 +158,40 @@ CREATE TABLE Submissions (
     FOREIGN KEY (contest_id) REFERENCES Contests (contest_id),
     INDEX index_status (status)
 ) ENGINE = InnoDB CHARSET = utf8;
+
+DELIMITER $$
+
+CREATE TRIGGER trigger_after_insert_submissions
+AFTER INSERT ON submissions
+FOR EACH ROW BEGIN 
+    IF NEW.status NOT IN ('CE', 'P') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Only CE and P are allowed for inserting';
+    ELSEIF NEW.contest_id != 1 THEN 
+        IF ((SELECT COUNT(*) FROM contestsparticipated 
+        WHERE user_id = NEW.user_id 
+        AND contest_id = NEW.contest_id) = 0) 
+        THEN
+            INSERT INTO contestsparticipated (user_id, contest_id)
+            VALUES (NEW.user_id, NEW.contest_id);
+        END IF;
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_after_update_submissions
+AFTER UPDATE ON submissions
+FOR EACH ROW BEGIN 
+    IF NEW.status = "AC" THEN
+        IF ((SELECT COUNT(*) FROM problemssolved
+        WHERE user_id = NEW.user_id
+        AND problem_id = NEW.problem_id) = 0) THEN
+            INSERT INTO problemssolved (user_id, problem_id)
+            VALUES (NEW.user_id, NEW.problem_id);
+        END IF;
+    END IF;
+END$$
+
+DELIMITER;
 
 CREATE TABLE ContestsParticipated (
     user_id INT NOT NULL,

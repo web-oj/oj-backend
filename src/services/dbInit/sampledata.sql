@@ -318,8 +318,10 @@ VALUES (
         NOW(),
         "C++",
         123,
-        "AC"
+        "P"
     );
+
+UPDATE submissions SET status = "AC" WHERE submission_id = 1
 
 INSERT INTO
     submissions (
@@ -338,8 +340,10 @@ VALUES (
         NOW(),
         "Python",
         124,
-        "WA"
+        "P"
     );
+
+UPDATE submissions SET status = "WA" WHERE submission_id = 2
 
 INSERT INTO
     submissions (
@@ -398,8 +402,10 @@ VALUES (
         NOW(),
         "C++",
         127,
-        "AC"
+        "P"
     );
+
+UPDATE submissions SET status = "AC" WHERE submission_id = 5
 
 INSERT INTO
     submissions (
@@ -418,32 +424,33 @@ VALUES (
         NOW(),
         "C++",
         127,
-        "TLE"
+        "P"
     );
 
-INSERT INTO
-    contestsparticipated (user_id, contest_id)
-VALUES (4, 2);
+UPDATE submissions SET status = "TLE" WHERE submission_id = 6
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (4, 2);
 
-INSERT INTO
-    contestsparticipated (user_id, contest_id)
-VALUES (3, 2);
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (3, 2);
 
-INSERT INTO
-    contestsparticipated (user_id, contest_id)
-VALUES (5, 3);
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (5, 3);
 
-INSERT INTO
-    contestsparticipated (user_id, contest_id)
-VALUES (3, 3);
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (3, 3);
 
-INSERT INTO problemssolved VALUES (4, 2);
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (5, 2);
 
-INSERT INTO problemssolved VALUES (3, 1);
+-- INSERT INTO problemssolved VALUES (4, 2);
 
-INSERT INTO
-    contestsparticipated (user_id, contest_id)
-VALUES (5, 2);
+-- INSERT INTO problemssolved VALUES (3, 1);
 
 INSERT INTO
     contestproblems (problem_id, contest_id, point)
@@ -728,30 +735,16 @@ INSERT INTO
     tags (tag_name, tag_type)
 VALUES ("Implementation", "CATEGORY")
 
-INSERT INTO
-    tags (tag_name, tag_type)
-VALUES ("OC", "SOURCE")
+INSERT INTO tags (tag_name, tag_type) VALUES ("OC", "SOURCE")
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (1, 1)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (1, 1)
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (1, 2)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (1, 2)
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (1, 3)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (1, 3)
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (2, 1)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (2, 1)
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (2, 2)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (2, 2)
 
-INSERT INTO
-    taggedproblems (problem_id, tag_id)
-VALUES (2, 3)
+INSERT INTO taggedproblems (problem_id, tag_id) VALUES (2, 3)
