@@ -2,6 +2,16 @@ import mysql from "mysql2";
 import "dotenv/config";
 import { time } from "console";
 
+const sqlString = (val: string | number | null): string | number | null => {
+  if (val === null || (val as string).length === 0) {
+    return "NULL";
+  }
+  if (typeof val === "string") {
+    return `'${val}'`;
+  }
+  return val;
+};
+
 class Database {
   connPool: mysql.Pool;
 
@@ -32,7 +42,7 @@ class Database {
       enableKeepAlive: true,
       keepAliveInitialDelay: 0,
     });
-    console.log("Connection pool created.");
+    console.log("MySQL connection pool created.");
   }
 
   /**
@@ -57,24 +67,73 @@ class Database {
     memoryLimit: number,
     inputFormat: string,
     outputFormat: string,
-    solutionText: string,
+    solutionText: string | null,
     creatorId: number,
   ): Promise<boolean> {
-    if (solutionText.length === 0) {
-      solutionText = "NULL";
-    } else {
-      solutionText = `'${solutionText}'`;
-    }
     this.connPool.execute(
-      ` CALL procedure_insert_problems('${title}',
-        '${statement}',
-        ${difficulty},
-        ${timeLimit},
-        ${memoryLimit},
-        '${inputFormat}',
-        '${outputFormat}',
-        ${solutionText},
-        ${creatorId})`,
+      ` CALL procedure_insert_problems(${sqlString(title)},
+        ${sqlString(statement)},
+        ${sqlString(difficulty)},
+        ${sqlString(timeLimit)},
+        ${sqlString(memoryLimit)},
+        ${sqlString(inputFormat)},
+        ${sqlString(outputFormat)},
+        ${sqlString(solutionText)},
+        ${sqlString(creatorId)})`,
+      (err, result) => {
+        if (err !== null) {
+          console.log(err);
+          return false;
+        }
+      },
+    );
+    return true;
+  }
+
+  /**
+   * Update the attributes of a problem in the database.
+   *
+   * @param problem_id The unique ID of the problem. Can be acquired from querySelectProblem
+   * @param title Title of the problem. Set to null to keep old value
+   * @param statement Statement of the problem in Mardown text. Set to null to keep old value
+   * @param difficulty Difficulty of the problem in number. Set to null to keep old value
+   * @param timeLimit Time limit (maximum amount of time available for code executing) in milliseconds. 
+   * Set to null to keep old value
+   * @param memoryLimit Memory limit (maximum amount of memory available for code executing) in MB. 
+   * Set to null to keep old value
+   * @param inputFormat The input format for the problem, can be like "stdin" or "x.inp", ...
+   *  Set to null to keep old value
+   * @param outputFormat The output format for the problem, can be like "stdout" or "x.out", ... 
+   * Set to null to keep old value
+   * @param solutionText The solution for the problem in Markdown text. Can be empty string. 
+   * Set to null to keep old value
+   * @param creatorId ID of the user who created the problem. Set to null to keep old value
+   * @returns true if successful, false otherwise
+   */
+  async queryUpdateProblem(
+    problemId: number,
+    title: string | null,
+    statement: string | null,
+    difficulty: number | null,
+    timeLimit: number | null,
+    memoryLimit: number | null,
+    inputFormat: string | null,
+    outputFormat: string | null,
+    solutionText: string | null,
+    creatorId: number | null,
+  ): Promise<boolean> {
+    this.connPool.execute(
+      ` CALL procedure_update_problems(
+        ${sqlString(problemId)},
+        ${sqlString(title)},
+        ${sqlString(statement)},
+        ${sqlString(difficulty)},
+        ${sqlString(timeLimit)},
+        ${sqlString(memoryLimit)},
+        ${sqlString(inputFormat)},
+        ${sqlString(outputFormat)},
+        ${sqlString(solutionText)},
+        ${sqlString(creatorId)})`,
       (err, result) => {
         if (err !== null) {
           console.log(err);

@@ -136,15 +136,15 @@ CREATE TABLE Problems (
 DELIMITER $$
 
 CREATE PROCEDURE procedure_insert_problems(
-    __title VARCHAR(255),
-    __statement MEDIUMTEXT,
-    __difficulty INT,
-    __time_limit INT,
-    __memory_limit INT,
-    __input_format VARCHAR(15),
-    __output_format VARCHAR(15),
-    __solution_text mediumtext,
-    __creator_id int
+    IN __title VARCHAR(255),
+    IN __statement MEDIUMTEXT,
+    IN __difficulty INT,
+    IN __time_limit INT,
+    IN __memory_limit INT,
+    IN __input_format VARCHAR(15),
+    IN __output_format VARCHAR(15),
+    IN __solution_text mediumtext,
+    IN __creator_id int
 )
 BEGIN
     START TRANSACTION;
@@ -173,6 +173,35 @@ BEGIN
             NOW(), 
             __creator_id
     );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_update_problems(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __statement MEDIUMTEXT,
+    IN __difficulty INT,
+    IN __time_limit INT,
+    IN __memory_limit INT,
+    IN __input_format VARCHAR(15),
+    IN __solution_text mediumtext,
+    IN __output_format VARCHAR(15),
+    IN __creator_id int
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE problems
+    SET 
+        title = COALESCE(__title, title),
+        statement = COALESCE(__statement, statement),
+        difficulty = COALESCE(__difficulty, difficulty),
+        time_limit = COALESCE(__time_limit, time_limit),
+        memory_limit = COALESCE(__memory_limit, memory_limit),
+        input_format = COALESCE(__input_format, input_format),
+        output_format = COALESCE(__output_format, output_format),
+        solution_text = COALESCE(__solution_text, solution_text),
+        creator_id = COALESCE(__creator_id, creator_id)
+    WHERE problem_id = __problem_id;
     COMMIT;
 END$$
 
