@@ -133,6 +133,51 @@ CREATE TABLE Problems (
     FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
 
+DELIMITER $$
+
+CREATE PROCEDURE procedure_insert_problems(
+    __title VARCHAR(255),
+    __statement MEDIUMTEXT,
+    __difficulty INT,
+    __time_limit INT,
+    __memory_limit INT,
+    __input_format VARCHAR(15),
+    __output_format VARCHAR(15),
+    __solution_text mediumtext,
+    __creator_id int
+)
+BEGIN
+    START TRANSACTION;
+    INSERT INTO 
+        problems(
+            title, 
+            statement, 
+            difficulty, 
+            time_limit, 
+            memory_limit, 
+            input_format, 
+            output_format, 
+            solution_text, 
+            created_at, 
+            creator_id
+        )
+    VALUES (
+            __title, 
+            __statement, 
+            __difficulty, 
+            __time_limit, 
+            __memory_limit,
+            __input_format, 
+            __output_format, 
+            __solution_text, 
+            NOW(), 
+            __creator_id
+    );
+    COMMIT;
+END$$
+
+DELIMITER;
+
 CREATE TABLE Submissions (
     submission_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
