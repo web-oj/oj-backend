@@ -43,6 +43,8 @@ app.listen(PORT, () => {
 //   2,
 // );
 
+// db.queryDeleteProblem(7);
+
 // db.queryUpdateProblem(
 //   6,
 //   "test",
@@ -56,11 +58,11 @@ app.listen(PORT, () => {
 //   null,
 // );
 
-const f = async () => {
-  let t: Object[] | null = await db.queryFindProblem("a cộng");
-  if (t !== null) {
-    console.log(t[0]);
-  }
-};
+// const f = async () => {
+//   let t: Object[] | null = await db.queryFindProblem("a cộng");
+//   if (t !== null) {
+//     console.log(t[0]);
+//   }
+// };
 
-f();
+// f();

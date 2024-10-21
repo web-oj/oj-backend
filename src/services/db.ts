@@ -60,7 +60,7 @@ class Database {
    *
    * @throws An error if fail
    */
-  async queryInsertProblem(
+  async queryAddProblem(
     title: string,
     statement: string,
     difficulty: number,
@@ -73,7 +73,7 @@ class Database {
   ): Promise<boolean> {
     try {
       let result = this.connPool.promise().execute<ResultSetHeader>(
-        ` CALL procedure_insert_problems(${sqlString(title)},
+        ` CALL procedure_add_problem(${sqlString(title)},
         ${sqlString(statement)},
         ${sqlString(difficulty)},
         ${sqlString(timeLimit)},
@@ -90,7 +90,8 @@ class Database {
   }
 
   /**
-   * Update the attributes of a problem in the database.
+   * Update the attributes of a problem in the database. Not including updating associated
+   * tags and tests
    *
    * @param problem_id The unique ID of the problem. Can be acquired from querySelectProblem
    * @param title Title of the problem. Set to null to keep old value
@@ -111,7 +112,7 @@ class Database {
    *
    * @throws An error if fail
    */
-  async queryUpdateProblem(
+  async queryEditProblemAttr(
     problemId: number,
     title: string | null,
     statement: string | null,
@@ -125,7 +126,7 @@ class Database {
   ): Promise<boolean> {
     try {
       let result = await this.connPool.promise().execute<ResultSetHeader>(
-        ` CALL procedure_update_problems(
+        ` CALL procedure_edit_problem_attr(
           ${sqlString(problemId)},
           ${sqlString(title)},
           ${sqlString(statement)},
@@ -163,7 +164,7 @@ class Database {
   * 
   * @throws An error if fail
   */
-  async queryFindProblem(
+  async queryFindProblems(
     title: string | null,
     problemId: number | null = null,
     difficultyLow: number | null = null,
@@ -175,7 +176,7 @@ class Database {
   ): Promise<Array<Object>> {
     try {
       let res = await this.connPool.promise().execute<RowDataPacket[]>(
-        `CALL procedure_select_problems(
+        `CALL procedure_find_problems(
           ${sqlString(problemId)},
           ${sqlString(title)},
           ${sqlString(difficultyLow)},
@@ -186,6 +187,28 @@ class Database {
           ${sqlString(resultLimitSize)})`,
       );
       return res[0][0] as Object[];
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  /**
+   * Remove a problem from the database.
+   * 
+   * @param problemId The ID of the problem
+   * @returns true if successful
+   * 
+   * @throws An error if fail
+   */
+  async queryDeleteProblem(
+    problemId: number,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        `CALL procedure_delete_problem(
+          ${sqlString(problemId)})`,
+      );
+      return true;
     } catch (err) {
       throw err;
     }
