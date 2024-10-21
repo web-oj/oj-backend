@@ -11,7 +11,7 @@ CREATE TABLE Users (
     user_name VARCHAR(15) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password CHAR(31) NOT NULL,
-    role SET("AD", "PS", "CU") NOT NULL,
+    role SET('AD', 'PS', 'CU') NOT NULL,
     created_at DATETIME NOT NULL,
     rating INT NOT NULL,
     PRIMARY KEY (user_id),
@@ -55,10 +55,10 @@ INSERT INTO
         rating
     )
 VALUES (
-        "admin",
-        "admin@example.com",
-        "admin",
-        "AD,PS,CU",
+        'admin',
+        'admin__example.com',
+        'admin',
+        'AD,PS,CU',
         NOW(),
         0
     );
@@ -68,7 +68,7 @@ CREATE TABLE Contests (
     title VARCHAR(255) NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
-    scoring_rule ENUM("IOI", "ICPC") NOT NULL,
+    scoring_rule ENUM('IOI', 'ICPC') NOT NULL,
     organizer_id INT NOT NULL,
     PRIMARY KEY (contest_id),
     FOREIGN KEY (organizer_id) REFERENCES Users (user_id),
@@ -107,10 +107,10 @@ INSERT INTO
         organizer_id
     )
 VALUES (
-        "Outside Contest",
-        "2000-01-01 00:00:00",
-        "2000-01-01 00:10:00",
-        "IOI",
+        'Outside Contest',
+        '2000-01-01 00:00:00',
+        '2000-01-01 00:10:00',
+        'IOI',
         1
     );
 
@@ -205,6 +205,34 @@ BEGIN
     COMMIT;
 END$$
 
+CREATE PROCEDURE procedure_select_problems(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __difficulty_low INT,
+    IN __difficulty_high INT,
+    IN __created_at_low DATETIME,
+    IN __created_at_high DATETIME,
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+)
+BEGIN
+    SELECT * FROM problems
+    WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
+    AND IF(
+        __title IS NOT NULL, 
+        title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
+        TRUE
+    )
+    AND difficulty 
+    BETWEEN IF(__difficulty_low IS NOT NULL, __difficulty_low, 0) 
+    AND IF(__difficulty_high IS NOT NULL, __difficulty_high, 10000) 
+    AND created_at
+    BETWEEN IF(__created_at_low IS NOT NULL, __created_at_low, '2000-01-01 00:00:00') 
+    AND IF(__created_at_high IS NOT NULL, __created_at_high, NOW())
+    ORDER BY created_at DESC
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
 DELIMITER;
 
 CREATE TABLE Submissions (
@@ -216,16 +244,16 @@ CREATE TABLE Submissions (
     source_code_language VARCHAR(15) NOT NULL,
     source_code_file_id INT NOT NULL,
     status ENUM(
-        "AC",
-        "P",
-        "J",
-        "WA",
-        "TLE",
-        "MLE",
-        "RTE",
-        "CE",
-        "D"
-    ) NOT NULL DEFAULT "P",
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    ) NOT NULL DEFAULT 'P',
     PRIMARY KEY (submission_id),
     FOREIGN KEY (user_id) REFERENCES Users (user_id),
     FOREIGN KEY (problem_id) REFERENCES Problems (problem_id),
@@ -255,7 +283,7 @@ END$$
 CREATE TRIGGER trigger_after_update_submissions
 AFTER UPDATE ON submissions
 FOR EACH ROW BEGIN 
-    IF NEW.status = "AC" THEN
+    IF NEW.status = 'AC' THEN
         IF ((SELECT COUNT(*) FROM problemssolved
         WHERE user_id = NEW.user_id
         AND problem_id = NEW.problem_id) = 0) THEN
@@ -306,16 +334,16 @@ CREATE TABLE SubmissionResults (
     submission_id INT NOT NULL,
     test_case_id INT NOT NULL,
     status ENUM(
-        "AC",
-        "P",
-        "J",
-        "WA",
-        "TLE",
-        "MLE",
-        "RTE",
-        "CE",
-        "D"
-    ) NOT NULL DEFAULT "P",
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    ) NOT NULL DEFAULT 'P',
     PRIMARY KEY (submission_id, test_case_id),
     FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id),
     FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id)
@@ -354,7 +382,7 @@ CREATE TABLE DiscussionMessages (
 CREATE TABLE Tags (
     tag_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     tag_name VARCHAR(31) UNIQUE NOT NULL,
-    tag_type ENUM("CATEGORY", "SOURCE") NOT NULL,
+    tag_type ENUM('CATEGORY', 'SOURCE') NOT NULL,
     PRIMARY KEY (tag_id),
     INDEX index_tag_name (tag_name)
 ) ENGINE = InnoDB CHARSET = utf8;

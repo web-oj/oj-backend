@@ -43,15 +43,24 @@ app.listen(PORT, () => {
 //   2,
 // );
 
-db.queryUpdateProblem(
-  6,
-  null,
-  null,
-  null,
-  2000,
-  null,
-  null,
-  null,
-  null,
-  null,
-);
+// db.queryUpdateProblem(
+//   6,
+//   "test",
+//   null,
+//   null,
+//   2000,
+//   null,
+//   null,
+//   null,
+//   null,
+//   null,
+// );
+
+const f = async () => {
+  let t: Object[] | null = await db.queryFindProblem("a cộng");
+  if (t !== null) {
+    console.log(t[0]);
+  }
+};
+
+f();
