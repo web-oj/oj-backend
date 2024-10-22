@@ -218,6 +218,33 @@ CREATE TABLE PlagiarismReports (
 
 DELIMITER $$
 
+CREATE FUNCTION is_submission_official(
+    __submission_id INT
+) RETURNS BOOLEAN DETERMINISTIC BEGIN
+    DECLARE __contest_id INT;
+    DECLARE __submitted_at DATETIME;
+    DECLARE __contest_start_time DATETIME;
+    DECLARE __contest_end_time DATETIME;
+
+    SET __contest_id = (
+        SELECT contest_id FROM submissions
+        WHERE submission_id = __submission_id
+    );
+    SET __submitted_at = (
+        SELECT submitted_at FROM submissions
+        WHERE submission_id = __submission_id
+    );
+    SET __contest_start_time = (
+        SELECT start_time FROM contests
+        WHERE contest_id = __contest_id
+    );
+    SET __contest_end_time = (
+        SELECT end_time FROM contests
+        WHERE contest_id = __contest_id
+    );
+    RETURN (__submitted_at BETWEEN __contest_start_time AND __contest_end_time);
+END$$
+
 CREATE PROCEDURE procedure_add_problem(
     IN __title VARCHAR(255),
     IN __statement MEDIUMTEXT,
@@ -675,6 +702,198 @@ CREATE PROCEDURE procedure_get_problems_in_contest_ex (
     WHERE contest_id = __contest_id;
 END$$
 
+CREATE PROCEDURE procedure_add_submission (
+    IN __user_id INT,
+    IN __problem_id INT,
+    IN __contest_id INT,
+    IN __source_code_language VARCHAR(15),
+    IN __source_code_file_id INT,
+    IN __status ENUM(
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    ),
+    IN __compiler_message MEDIUMTEXT
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO submissions (
+        user_id,
+        problem_id,
+        contest_id,
+        submitted_at,
+        source_code_language,
+        source_code_file_id,
+        status,
+        compiler_message
+    ) VALUES (
+        __user_id,
+        __problem_id,
+        __contest_id,
+        NOW(),
+        __source_code_language,
+        __source_code_file_id,
+        __status,
+        __compiler_message
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_submission (
+    IN __submission_id INT,
+    IN __user_id INT,
+    IN __problem_id INT,
+    IN __contest_id INT,
+    IN __source_code_language VARCHAR(15),
+    IN __source_code_file_id INT,
+    IN __status ENUM(
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    ),
+    IN __compiler_message MEDIUMTEXT
+) BEGIN
+    START TRANSACTION;
+    UPDATE submissions 
+    SET user_id = COALESCE(__user_id, user_id),
+    problem_id = COALESCE(__problem_id, problem_id),
+    contest_id = COALESCE(__contest_id, contest_id),
+    source_code_language = COALESCE(__source_code_language, source_code_language),
+    source_code_file_id = COALESCE(__source_code_file_id, source_code_file_id),
+    status = COALESCE(__status, status),
+    compiler_message = COALESCE(__compiler_message, compiler_message)
+    WHERE submission_id = __submission_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_submission (
+    IN __submission_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM submissions
+    WHERE submission_id = __submission_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_submission_by_id (
+    IN __submission_id INT
+) BEGIN
+    SELECT * FROM submissions
+    WHERE submission_id = __submission_id;
+END$$
+
+CREATE PROCEDURE procedure_find_submissions(
+    IN __submission_id INT,
+    IN __user_id INT,
+    IN __problem_id INT,
+    IN __contest_id INT,
+    IN __source_code_language VARCHAR(15),
+    IN __source_code_file_id INT,
+    IN __status ENUM(
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    )
+) BEGIN
+    SELECT submission_id, user_id, problem_id, 
+    contest_id, submitted_at, source_code_language, status
+    FROM submissions 
+    WHERE submission_id = __submission_id
+    AND user_id = COALESCE(__user_id, user_id)
+    AND problem_id = COALESCE(__problem_id, problem_id)
+    AND contest_id = COALESCE(__contest_id, contest_id)
+    AND source_code_language = COALESCE(__source_code_language, source_code_language)
+    AND source_code_file_id = COALESCE(__source_code_file_id, source_code_file_id)
+    AND status = COALESCE(__status, status);
+END$$
+
+CREATE PROCEDURE procedure_find_official_submissions_in_contest (
+    IN __contest_id INT
+) BEGIN
+    SELECT submission_id, user_id, problem_id, 
+    contest_id, submitted_at,
+    source_code_language, status FROM submissions
+    WHERE contest_id = __contest_id 
+    AND is_submission_official(submission_id);
+END$$
+
+DROP TABLE IF EXISTS solved_problems_in_contest;
+CREATE TEMPORARY TABLE solved_problems_in_contest (
+    user_id INT,
+    problem_id INT,
+    solved_at DATETIME,
+    number_of_submissions INT
+)$$
+
+DROP PROCEDURE procedure_get_contest_ranking;
+CREATE PROCEDURE procedure_get_contest_ranking (
+    IN __contest_id INT
+) BEGIN
+    DECLARE __scoring_rule ENUM("IOI", "ICPC");
+    DECLARE __user_id INT;
+    DECLARE score INT;
+    DECLARE __contest_start_time DATETIME;
+
+    SET __scoring_rule = (
+        SELECT scoring_rule FROM contests
+        WHERE contest_id = __contest_id
+    );
+    SET __contest_start_time = (
+        SELECT start_time FROM contests
+        WHERE contest_id = __contest_id
+    );
+    
+    START TRANSACTION;
+    INSERT INTO solved_problems_in_contest
+    SELECT problemssolved.user_id AS user_id,
+    current_contest_official_accepted_submissions.problem_id AS problem_id,
+    current_contest_official_accepted_submissions.solved_at AS solved_at,
+    current_contest_number_of_official_submissions.number_of_submissions AS number_of_submissions
+    FROM (
+        SELECT problem_id, MAX(submitted_at) AS solved_at FROM submissions
+        WHERE contest_id = __contest_id
+        AND is_submission_official(submission_id)
+        AND status = "AC"
+        GROUP BY problem_id
+    ) AS current_contest_official_accepted_submissions
+    JOIN (
+        SELECT problem_id, COUNT(*) AS number_of_submissions FROM submissions
+        WHERE contest_id = __contest_id
+        AND is_submission_official(submission_id)
+        GROUP BY problem_id
+    ) AS current_contest_number_of_official_submissions USING (problem_id)
+    JOIN problemssolved USING(problem_id);
+    IF (__scoring_rule = "IOI") THEN
+        SET score = 0;
+    ELSE
+        SELECT user_id, COUNT(problem_id) * 10000 +
+        SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) +
+        (SUM(number_of_submissions) - COUNT(problem_id) * 20)
+        FROM solved_problems_in_contest
+        GROUP BY user_id;
+    END IF;
+    -- SELECT * FROM solved_problems_in_contest;
+    DELETE FROM solved_problems_in_contest;
+    COMMIT;
+END$$
+
 CREATE TRIGGER trigger_after_insert_submissions
 AFTER INSERT ON submissions
 FOR EACH ROW BEGIN 
@@ -684,7 +903,8 @@ FOR EACH ROW BEGIN
     ELSE
         IF ((SELECT COUNT(*) FROM contestsparticipated 
         WHERE user_id = NEW.user_id 
-        AND contest_id = NEW.contest_id) = 0) 
+        AND contest_id = NEW.contest_id) = 0 AND 
+        is_submission_official(NEW.submission_id)) 
         THEN
             INSERT INTO contestsparticipated (user_id, contest_id)
             VALUES (NEW.user_id, NEW.contest_id);
