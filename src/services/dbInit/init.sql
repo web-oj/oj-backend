@@ -104,6 +104,7 @@ CREATE TABLE Submissions (
         'CE',
         'D'
     ) NOT NULL DEFAULT 'P',
+    compiler_message MEDIUMTEXT,
     PRIMARY KEY (submission_id),
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
@@ -142,6 +143,7 @@ CREATE TABLE TestCases (
     problem_id INT NOT NULL,
     input MEDIUMTEXT NOT NULL,
     expected_output MEDIUMTEXT NOT NULL,
+    is_hidden BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (test_case_id),
     FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
@@ -149,6 +151,10 @@ CREATE TABLE TestCases (
 CREATE TABLE SubmissionResults (
     submission_id INT NOT NULL,
     test_case_id INT NOT NULL,
+    time_elapsed INT NOT NULL,
+    memory_used INT NOT NULL,
+    output MEDIUMTEXT,
+    judge_message MEDIUMTEXT DEFAULT NULL,
     status ENUM(
         'AC',
         'P',
@@ -162,7 +168,8 @@ CREATE TABLE SubmissionResults (
     ) NOT NULL DEFAULT 'P',
     PRIMARY KEY (submission_id, test_case_id),
     FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id) ON DELETE CASCADE,
-    FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id) ON DELETE CASCADE
+    FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id) ON DELETE CASCADE,
+    INDEX index_status (status)
 ) ENGINE = InnoDB CHARSET = utf8;
 
 CREATE TABLE Achievements (
@@ -293,6 +300,46 @@ FOR EACH ROW BEGIN
     END IF;
 END$$
 
+CREATE TRIGGER trigger_after_insert_submission_results
+AFTER INSERT ON submissionresults
+FOR EACH ROW BEGIN
+    IF (NEW.status != "AC") THEN
+        UPDATE submissions 
+        SET status = NEW.STATUS
+        WHERE submission_id = NEW.submission_id;
+    ELSE
+        IF (
+            (
+                SELECT COUNT(*) FROM submissionresults
+                WHERE submission_id = NEW.submission_id
+                AND status = "AC"
+            ) = (
+                SELECT COUNT(*) FROM testcases
+                WHERE testcases.problem_id = (
+                    SELECT problem_id FROM submissions
+                    WHERE submission_id = NEW.submission_id
+                )
+            )
+        ) THEN
+            UPDATE submissions 
+            SET status = "AC"
+            WHERE submission_id = NEW.submission_id;
+        ELSE 
+            UPDATE submissions 
+            SET status = "J"
+            WHERE submission_id = NEW.submission_id;
+        END IF;
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_after_update_submission_results
+AFTER UPDATE ON submissionresults
+FOR EACH ROW BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Submission results for each test case should not be edited. 
+    Please delete all related submission and insert again instead.';
+END$$
+
 CREATE PROCEDURE procedure_add_problem(
     IN __title VARCHAR(255),
     IN __statement MEDIUMTEXT,
@@ -364,6 +411,34 @@ BEGIN
 END$$
 
 CREATE PROCEDURE procedure_find_problems(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __difficulty_low INT,
+    IN __difficulty_high INT,
+    IN __created_at_low DATETIME,
+    IN __created_at_high DATETIME,
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+)
+BEGIN
+    SELECT * FROM problems
+    WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
+    AND IF(
+        __title IS NOT NULL, 
+        title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
+        TRUE
+    )
+    AND difficulty 
+    BETWEEN COALESCE(__difficulty_low, 0) 
+    AND COALESCE(__difficulty_high, 10000) 
+    AND created_at
+    BETWEEN COALESCE(__created_at_low, '2000-01-01 00:00:00') 
+    AND COALESCE(__created_at_high, NOW())
+    ORDER BY created_at DESC
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
+CREATE PROCEDURE procedure_find_problems_with_tags(
     IN __problem_id INT,
     IN __title VARCHAR(255),
     IN __difficulty_low INT,
@@ -489,7 +564,8 @@ CREATE PROCEDURE procedure_add_test_case  (
     IN __title VARCHAR(255),
     IN __problem_id VARCHAR(255),
     IN __input MEDIUMTEXT,
-    IN __expected_output MEDIUMTEXT
+    IN __expected_output MEDIUMTEXT,
+    IN __is_hidden BOOLEAN
 )
 BEGIN
     START TRANSACTION;
@@ -497,12 +573,14 @@ BEGIN
         title,
         problem_id,
         input,
-        expected_output
+        expected_output,
+        is_hidden
     ) VALUES (
         __title,
         __problem_id,
         __input,
-        __expected_output
+        __expected_output,
+        __is_hidden
     );
     COMMIT;
 END$$
@@ -512,7 +590,8 @@ CREATE PROCEDURE procedure_edit_test_case  (
     IN __title VARCHAR(255),
     IN __problem_id VARCHAR(255),
     IN __input MEDIUMTEXT,
-    IN __expected_output MEDIUMTEXT
+    IN __expected_output MEDIUMTEXT,
+    IN __is_hidden BOOLEAN
 )
 BEGIN
     START TRANSACTION;
@@ -520,7 +599,8 @@ BEGIN
     SET title = COALESCE(__title, title),
     problem_id = COALESCE(__problem_id, problem_id),
     input = COALESCE(__input, input),
-    expected_output = COALESCE(__expected_output, expected_output)
+    expected_output = COALESCE(__expected_output, expected_output),
+    is_hidden = COALESCE(__is_hidden, is_hidden)
     WHERE test_case_id = __test_case_id;
     COMMIT;
 END$$

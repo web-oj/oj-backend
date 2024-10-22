@@ -321,7 +321,7 @@ VALUES (
         "P"
     );
 
-UPDATE submissions SET status = "AC" WHERE submission_id = 1
+-- UPDATE submissions SET status = "AC" WHERE submission_id = 1
 
 INSERT INTO
     submissions (
@@ -343,7 +343,7 @@ VALUES (
         "P"
     );
 
-UPDATE submissions SET status = "WA" WHERE submission_id = 2
+-- UPDATE submissions SET status = "WA" WHERE submission_id = 2
 
 INSERT INTO
     submissions (
@@ -353,7 +353,8 @@ INSERT INTO
         submitted_at,
         source_code_language,
         source_code_file_id,
-        status
+        status,
+        compiler_message
     )
 VALUES (
         3,
@@ -362,7 +363,8 @@ VALUES (
         NOW(),
         "Brainfuck",
         125,
-        "CE"
+        "CE",
+        "code ngu vl"
     );
 
 INSERT INTO
@@ -405,7 +407,7 @@ VALUES (
         "P"
     );
 
-UPDATE submissions SET status = "AC" WHERE submission_id = 5
+-- UPDATE submissions SET status = "AC" WHERE submission_id = 5
 
 INSERT INTO
     submissions (
@@ -427,11 +429,14 @@ VALUES (
         "P"
     );
 
-UPDATE submissions SET status = "TLE" WHERE submission_id = 6
--- INSERT INTO
---     contestsparticipated (user_id, contest_id)
--- VALUES (4, 2);
-
+-- UPDATE submissions
+-- SET
+--     status = "TLE"
+-- WHERE
+--     submission_id = 6
+    -- INSERT INTO
+    --     contestsparticipated (user_id, contest_id)
+    -- VALUES (4, 2);
 -- INSERT INTO
 --     contestsparticipated (user_id, contest_id)
 -- VALUES (3, 2);
@@ -535,73 +540,133 @@ INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (4, 3, "AC");
+VALUES (1, 3, 500, 100, 3, "ok", "AC");
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (4, 4, "AC");
+VALUES (1, 4, 500, 100, 5, "ok", "AC");
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (4, 5, "AC");
+VALUES (
+        1,
+        5,
+        500,
+        100,
+        "333333333333333333333333333",
+        "ok",
+        "AC"
+    );
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (3, 3, "AC");
+VALUES (2, 3, 500, 100, 3, "ok", "AC");
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (3, 4, "WA");
+VALUES (
+        2,
+        4,
+        500,
+        100,
+        7,
+        "okn't",
+        "WA"
+    );
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (5, 1, "AC");
+VALUES (4, 1, 500, 100, 4, "ok", "AC");
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (3, 1, "AC")
+VALUES (5, 1, 500, 100, 3, "ok", "AC")
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (3, 2, "AC");
+VALUES (5, 2, 500, 100, 5, "ok", "AC");
 
 INSERT INTO
     submissionresults (
         submission_id,
         test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
         status
     )
-VALUES (3, 6, "TLE");
+VALUES (
+        6,
+        6,
+        1000,
+        500,
+        NULL,
+        NULL,
+        "TLE"
+    );
 
 INSERT INTO
     achievements (
