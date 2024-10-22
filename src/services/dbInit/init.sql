@@ -834,21 +834,12 @@ CREATE PROCEDURE procedure_find_official_submissions_in_contest (
     AND is_submission_official(submission_id);
 END$$
 
-DROP TABLE IF EXISTS solved_problems_in_contest;
-CREATE TEMPORARY TABLE solved_problems_in_contest (
-    user_id INT,
-    problem_id INT,
-    solved_at DATETIME,
-    number_of_submissions INT
-)$$
-
-DROP PROCEDURE procedure_get_contest_ranking;
 CREATE PROCEDURE procedure_get_contest_ranking (
-    IN __contest_id INT
+    IN __contest_id INT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
 ) BEGIN
     DECLARE __scoring_rule ENUM("IOI", "ICPC");
-    DECLARE __user_id INT;
-    DECLARE score INT;
     DECLARE __contest_start_time DATETIME;
 
     SET __scoring_rule = (
@@ -860,38 +851,57 @@ CREATE PROCEDURE procedure_get_contest_ranking (
         WHERE contest_id = __contest_id
     );
     
-    START TRANSACTION;
-    INSERT INTO solved_problems_in_contest
-    SELECT problemssolved.user_id AS user_id,
-    current_contest_official_accepted_submissions.problem_id AS problem_id,
-    current_contest_official_accepted_submissions.solved_at AS solved_at,
-    current_contest_number_of_official_submissions.number_of_submissions AS number_of_submissions
+    SELECT current_contest_official_accepted_submissions.user_id 
+    AS user_id,
+    (COUNT(problem_id) * 10000 -
+    SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) -
+    (SUM(number_of_submissions) - COUNT(problem_id) * 20))
+    AS score
     FROM (
-        SELECT problem_id, MAX(submitted_at) AS solved_at FROM submissions
+        SELECT user_id, problem_id, 
+        MAX(submitted_at) AS solved_at FROM submissions
         WHERE contest_id = __contest_id
+        AND is_submission_official(submission_id)
+        AND status = "AC"
+        GROUP BY user_id, problem_id
+    ) AS current_contest_official_accepted_submissions
+    JOIN (
+        SELECT user_id, problem_id, COUNT(*) AS number_of_submissions FROM submissions
+        WHERE contest_id = __contest_id
+        AND is_submission_official(submission_id)
+        GROUP BY user_id, problem_id
+    ) AS current_contest_number_of_official_submissions USING (user_id, problem_id)
+    GROUP BY user_id
+    ORDER BY score DESC
+    LIMIT __limit_range_start, __limit_range_size;
+END$$
+
+CREATE PROCEDURE procedure_get_solved_problems_in_contest_by_user (
+    IN __contest_id INT,
+    IN __user_id INT
+) BEGIN
+    SELECT current_contest_official_accepted_submissions.problem_id
+    AS problem_id,
+    current_contest_official_accepted_submissions.solved_at 
+    AS solved_at,
+    current_contest_number_of_official_submissions.number_of_submissions 
+    AS number_of_submissions
+    FROM (
+        SELECT problem_id, 
+        MAX(submitted_at) AS solved_at FROM submissions
+        WHERE user_id = __user_id
+        AND contest_id = __contest_id
         AND is_submission_official(submission_id)
         AND status = "AC"
         GROUP BY problem_id
     ) AS current_contest_official_accepted_submissions
     JOIN (
         SELECT problem_id, COUNT(*) AS number_of_submissions FROM submissions
-        WHERE contest_id = __contest_id
+        WHERE user_id = __user_id
+        AND contest_id = __contest_id
         AND is_submission_official(submission_id)
-        GROUP BY problem_id
-    ) AS current_contest_number_of_official_submissions USING (problem_id)
-    JOIN problemssolved USING(problem_id);
-    IF (__scoring_rule = "IOI") THEN
-        SET score = 0;
-    ELSE
-        SELECT user_id, COUNT(problem_id) * 10000 +
-        SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) +
-        (SUM(number_of_submissions) - COUNT(problem_id) * 20)
-        FROM solved_problems_in_contest
-        GROUP BY user_id;
-    END IF;
-    -- SELECT * FROM solved_problems_in_contest;
-    DELETE FROM solved_problems_in_contest;
-    COMMIT;
+        GROUP BY user_id, problem_id
+    ) AS current_contest_number_of_official_submissions USING (problem_id);
 END$$
 
 CREATE TRIGGER trigger_after_insert_submissions
