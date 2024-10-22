@@ -40,31 +40,18 @@ VALUES (
 CREATE TABLE Contests (
     contest_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
+    description MEDIUMTEXT,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     scoring_rule ENUM('IOI', 'ICPC') NOT NULL,
     organizer_id INT NOT NULL,
+    is_published BOOLEAN NOT NULL DEFAULT FALSE,
+    is_plagiarism_check_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (contest_id),
     FOREIGN KEY (organizer_id) REFERENCES Users (user_id) ON DELETE CASCADE,
     INDEX index_start_time (start_time),
     FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
-
-INSERT INTO
-    contests (
-        title,
-        start_time,
-        end_time,
-        scoring_rule,
-        organizer_id
-    )
-VALUES (
-        'Outside Contest',
-        '2000-01-01 00:00:00',
-        '2000-01-01 00:10:00',
-        'IOI',
-        1
-    );
 
 CREATE TABLE Problems (
     problem_id INT UNIQUE NOT NULL AUTO_INCREMENT,
@@ -73,11 +60,12 @@ CREATE TABLE Problems (
     difficulty INT NOT NULL,
     time_limit INT NOT NULL,
     memory_limit INT NOT NULL,
-    input_format VARCHAR(15) NOT NULL,
-    output_format VARCHAR(15) NOT NULL,
+    input_format VARCHAR(15) NOT NULL DEFAULT "stdin",
+    output_format VARCHAR(15) NOT NULL DEFAULT "stdout",
     solution_text MEDIUMTEXT,
     created_at DATETIME NOT NULL,
     creator_id INT NOT NULL,
+    is_published BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (problem_id),
     FOREIGN KEY (creator_id) REFERENCES Users (user_id) ON DELETE CASCADE,
     INDEX index_difficulty (difficulty),
@@ -89,7 +77,7 @@ CREATE TABLE Submissions (
     submission_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     problem_id INT NOT NULL,
-    contest_id INT NOT NULL DEFAULT 1,
+    contest_id INT,
     submitted_at DATETIME NOT NULL,
     source_code_language VARCHAR(15) NOT NULL,
     source_code_file_id INT NOT NULL,
@@ -230,13 +218,470 @@ CREATE TABLE PlagiarismReports (
 
 DELIMITER $$
 
+CREATE PROCEDURE procedure_add_problem(
+    IN __title VARCHAR(255),
+    IN __statement MEDIUMTEXT,
+    IN __difficulty INT,
+    IN __time_limit INT,
+    IN __memory_limit INT,
+    IN __input_format VARCHAR(15),
+    IN __output_format VARCHAR(15),
+    IN __solution_text MEDIUMTEXT,
+    IN __creator_id INT,
+    IN __is_published BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO 
+        problems(
+            title, 
+            statement, 
+            difficulty, 
+            time_limit, 
+            memory_limit, 
+            input_format, 
+            output_format, 
+            solution_text, 
+            created_at, 
+            creator_id,
+            is_published
+        )
+    VALUES (
+            __title, 
+            __statement, 
+            __difficulty, 
+            __time_limit, 
+            __memory_limit,
+            COALESCE(__input_format, "stdin"),
+            COALESCE(__output_format, "stdout"),
+            __solution_text, 
+            NOW(), 
+            __creator_id,
+            COALESCE(__is_published, is_published)
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_problem_attr(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __statement MEDIUMTEXT,
+    IN __difficulty INT,
+    IN __time_limit INT,
+    IN __memory_limit INT,
+    IN __input_format VARCHAR(15),
+    IN __output_format VARCHAR(15),
+    IN __solution_text mediumtext,
+    IN __creator_id INT,
+    IN __is_published BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    UPDATE problems
+    SET 
+        title = COALESCE(__title, title),
+        statement = COALESCE(__statement, statement),
+        difficulty = COALESCE(__difficulty, difficulty),
+        time_limit = COALESCE(__time_limit, time_limit),
+        memory_limit = COALESCE(__memory_limit, memory_limit),
+        input_format = COALESCE(__input_format, input_format),
+        output_format = COALESCE(__output_format, output_format),
+        solution_text = COALESCE(__solution_text, solution_text),
+        creator_id = COALESCE(__creator_id, creator_id),
+        is_published = COALESCE(__is_published, is_published)
+    WHERE problem_id = __problem_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_problem_by_id(
+    IN __problem_id INT
+) BEGIN
+    SELECT * FROM problem WHERE problem_id = __problem_id;
+END$$
+
+CREATE PROCEDURE procedure_find_problems(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __difficulty_low INT,
+    IN __difficulty_high INT,
+    IN __created_at_low DATETIME,
+    IN __created_at_high DATETIME,
+    IN __creator_id INT,
+    IN __is_published BOOLEAN,
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+) BEGIN
+    SELECT problem_id, title, difficulty, created_at, creator_id, is_published
+    FROM problems
+    WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
+    AND IF(
+        __title IS NOT NULL, 
+        title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
+        TRUE
+    )
+    AND difficulty 
+    BETWEEN COALESCE(__difficulty_low, 0) 
+    AND COALESCE(__difficulty_high, 10000) 
+    AND created_at
+    BETWEEN COALESCE(__created_at_low, '2000-01-01 00:00:00') 
+    AND COALESCE(__created_at_high, NOW())
+    AND creator_id = COALESCE(__creator_id, creator_id)
+    AND is_published = COALESCE(__is_published, is_published)
+    ORDER BY created_at DESC
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
+CREATE PROCEDURE procedure_find_problems_with_tags(
+    IN __problem_id INT,
+    IN __title VARCHAR(255),
+    IN __difficulty_low INT,
+    IN __difficulty_high INT,
+    IN __created_at_low DATETIME,
+    IN __created_at_high DATETIME,
+    IN __creator_id INT,
+    IN __is_published BOOLEAN,
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+) BEGIN
+    SELECT DISTINCT 
+        problems_filter_result.problem_id,
+        problems_filter_result.title,
+        problems_filter_result.difficulty,
+        problems_filter_result.created_at,
+        problems_filter_result.creator_id,
+        problems_filter_result.is_published
+    FROM (
+        SELECT * FROM problems
+        WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
+        AND IF(
+            __title IS NOT NULL, 
+            title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
+            TRUE
+        )
+        AND difficulty 
+        BETWEEN COALESCE(__difficulty_low, 0) 
+        AND COALESCE(__difficulty_high, 10000) 
+        AND created_at
+        BETWEEN COALESCE(__created_at_low, '2000-01-01 00:00:00') 
+        AND COALESCE(__created_at_high, NOW())
+        AND creator_id = COALESCE(__creator_id, creator_id)
+        AND is_published = COALESCE(__is_published, is_published)
+    ) AS problems_filter_result
+    JOIN (
+        SELECT * FROM taggedproblems JOIN (
+            SELECT tag_id FROM tags 
+            WHERE is_selected = TRUE
+            OR (SELECT COUNT(*) FROM tags WHERE is_selected = TRUE) = 0
+        ) AS activated_tags USING (tag_id)
+    ) AS active_tagged_problems USING (problem_id)
+    ORDER BY created_at DESC
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
+CREATE PROCEDURE procedure_delete_problem(
+    IN __problem_id INT
+) BEGIN 
+    START TRANSACTION;
+    DELETE FROM problems
+    WHERE problem_id = __problem_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_add_tag (
+    IN __tag_name VARCHAR(31),
+    IN __tag_type ENUM('CATEGORY', 'SOURCE')
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO tags (tag_name, tag_type, is_selected)
+    VALUES (__tag_name, __tag_type, FALSE);
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_tag_attr (
+    IN __tag_id INT,
+    IN __tag_name VARCHAR(31),
+    IN __tag_type ENUM('CATEGORY', 'SOURCE'),
+    IN __is_selected BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    UPDATE tags 
+    SET tag_name = COALESCE(__tag_name, tag_name),
+    tag_type = COALESCE(__tag_type, tag_type),
+    is_selected = COALESCE(__is_selected, is_selected)
+    WHERE tag_id = __tag_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_tag (
+    IN __tag_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM tags
+    WHERE tag_id = __tag_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_find_tags (
+    IN __tag_id INT,
+    IN __tag_name VARCHAR(31),
+    IN __tag_type ENUM('CATEGORY', 'SOURCE'),
+    IN __is_selected BOOLEAN
+) BEGIN
+    SELECT * FROM tags
+    WHERE tag_id = COALESCE(__tag_id, tag_id)
+    AND tag_name LIKE CONCAT(COALESCE(__tag_name, tag_name))
+    AND tag_type = COALESCE(__tag_type, tag_type)
+    AND is_selected = COALESCE(__is_selected, is_selected)
+    ORDER BY tag_name
+    LIMIT 0, 100;
+END$$
+
+CREATE PROCEDURE procedure_add_tagged_problem(
+    IN __problem_id INT,
+    IN __tag_id INT
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO taggedproblems VALUES (__problem_id, __tag_id);
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_tagged_problem(
+    IN __problem_id INT,
+    IN __tag_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM taggedproblems 
+    WHERE problem_id = __problem_id
+    AND tag_id = __tag_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_add_test_case  (
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __input MEDIUMTEXT,
+    IN __expected_output MEDIUMTEXT,
+    IN __is_hidden BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO testcases (
+        title,
+        problem_id,
+        input,
+        expected_output,
+        is_hidden
+    ) VALUES (
+        __title,
+        __problem_id,
+        __input,
+        __expected_output,
+        __is_hidden
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_test_case  (
+    IN __test_case_id INT,
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __input MEDIUMTEXT,
+    IN __expected_output MEDIUMTEXT,
+    IN __is_hidden BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    UPDATE testcases
+    SET title = COALESCE(__title, title),
+    problem_id = COALESCE(__problem_id, problem_id),
+    input = COALESCE(__input, input),
+    expected_output = COALESCE(__expected_output, expected_output),
+    is_hidden = COALESCE(__is_hidden, is_hidden)
+    WHERE test_case_id = __test_case_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_test_case (
+    IN __test_case_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM testcases 
+    WHERE test_case_id = __test_case_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_test_case_by_id (
+    IN __test_case_id INT
+) BEGIN
+    SELECT * FROM testcases 
+    WHERE test_case_id = __test_case_id;
+END$$
+
+CREATE PROCEDURE procedure_find_test_cases (
+    IN __test_case_id INT,
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __is_hidden BOOL,
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+) BEGIN
+    SELECT test_case_id, title, problem_id, is_hidden FROM testcases 
+    WHERE test_case_id = COALESCE(__test_case_id, test_case_id)
+    AND title = COALESCE(__title, title)
+    AND problem_id = COALESCE(__problem_id, problem_id)
+    AND is_hidden = COALESCE(__is_hidden, is_hidden)
+    ORDER BY test_case_id
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
+CREATE PROCEDURE procedure_add_contest (
+    IN __title VARCHAR(255),
+    IN __description MEDIUMTEXT,
+    IN __start_time DATETIME,
+    IN __end_time DATETIME,
+    IN __scoring_rule ENUM('IOI', 'ICPC'),
+    IN __organizer_id INT,
+    IN __is_published BOOLEAN,
+    IN __is_plagiarism_check_enabled BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO contests (
+        title,
+        description,
+        start_time,
+        end_time,
+        scoring_rule,
+        organizer_id,
+        is_published,
+        is_plagiarism_check_enabled
+    ) VALUES (
+        __title,
+        __description,
+        __start_time,
+        __end_time,
+        __scoring_rule,
+        __organizer_id,
+        __is_published,
+        __is_plagiarism_check_enabled
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_contest  (
+    IN __contest_id INT,
+    IN __title VARCHAR(255),
+    IN __description MEDIUMTEXT,
+    IN __start_time DATETIME,
+    IN __end_time DATETIME,
+    IN __scoring_rule ENUM('IOI', 'ICPC'),
+    IN __organizer_id INT,
+    IN __is_published BOOLEAN,
+    IN __is_plagiarism_check_enabled BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    UPDATE contests
+    SET title = COALESCE(__title, title),
+    description = COALESCE(__description, description),
+    start_time = COALESCE(__start_time, start_time),
+    end_time = COALESCE(__end_time, end_time),
+    scoring_rule = COALESCE(__scoring_rule, scoring_rule),
+    organizer_id = COALESCE(__organizer_id, organizer_id),
+    is_published = COALESCE(__is_published, is_published),
+    is_plagiarism_check_enabled = COALESCE(__is_plagiarism_check_enabled, is_plagiarism_check_enabled)
+    WHERE contest_id = __contest_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_contest (
+    IN __contest_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM contests 
+    WHERE contest_id = __contest_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_contest_by_id (
+    IN __contest_id INT
+) BEGIN
+    SELECT * FROM contest 
+    WHERE contest_id = __contest_id;
+END$$
+
+CREATE PROCEDURE procedure_find_contests  (
+    IN __contest_id INT,
+    IN __title VARCHAR(255),
+    IN __start_time DATETIME,
+    IN __scoring_rule ENUM('IOI', 'ICPC'),
+    IN __organizer_id INT
+) BEGIN
+    SELECT contest_id, title, start_time, end_time, is_published FROM contests
+    WHERE IF(
+        __title IS NOT NULL,
+        title LIKE CONCAT(__title, "%") OR 
+        MATCH(title) AGAINST (__title IN BOOLEAN MODE),
+        TRUE
+    )
+    AND start_time = COALESCE(__start_time, start_time)
+    AND scoring_rule = COALESCE(__scoring_rule, scoring_rule)
+    AND organizer_id = COALESCE(__organizer_id, organizer_id);
+END$$
+
+CREATE PROCEDURE procedure_add_problem_to_contest (
+    IN __contest_id INT,
+    IN __problem_id INT,
+    IN __point INT
+) BEGIN 
+    START TRANSACTION;
+    INSERT INTO contestproblems (contest_id, problem_id, point)
+    VALUES (__contest_id, __problem_id, __point);
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_problem_point_in_contest (
+    IN __contest_id INT,
+    IN __problem_id INT,
+    IN __point INT
+) BEGIN 
+    START TRANSACTION;
+    UPDATE contestproblems
+    SET point = __point
+    WHERE contest_id = __contest_id
+    AND problem_id = __problem_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_problem_from_contest (
+    IN __contest_id INT,
+    IN __problem_id INT
+) BEGIN 
+    START TRANSACTION;
+    DELETE FROM contestproblems
+    WHERE contest_id = __contest_id
+    AND problem_id = __problem_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_problems_in_contest (
+    IN __contest_id INT
+) BEGIN
+    SELECT problem_id FROM contestproblems
+    WHERE contest_id = __contest_id;
+END$$
+
+CREATE PROCEDURE procedure_get_problems_in_contest_ex (
+    IN __contest_id INT
+) BEGIN
+    SELECT problems.problem_id, problems.title,
+    problems.difficulty, contestproblems.point
+    FROM contestproblems
+    JOIN problems USING (problem_id)
+    WHERE contest_id = __contest_id;
+END$$
+
 CREATE TRIGGER trigger_after_insert_submissions
 AFTER INSERT ON submissions
 FOR EACH ROW BEGIN 
     IF NEW.status NOT IN ('CE', 'P') THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Only CE and P are allowed for inserting';
-    ELSEIF NEW.contest_id != 1 THEN 
+    ELSE
         IF ((SELECT COUNT(*) FROM contestsparticipated 
         WHERE user_id = NEW.user_id 
         AND contest_id = NEW.contest_id) = 0) 
@@ -257,24 +702,6 @@ FOR EACH ROW BEGIN
             INSERT INTO problemssolved (user_id, problem_id)
             VALUES (NEW.user_id, NEW.problem_id);
         END IF;
-    END IF;
-END$$
-
-CREATE TRIGGER trigger_before_update_contests
-BEFORE UPDATE ON contests
-FOR EACH ROW BEGIN
-    IF OLD.contest_id = 1 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot modify special contest';
-    END IF;
-END$$
-
-CREATE TRIGGER trigger_before_delete_contests
-BEFORE DELETE ON contests
-FOR EACH ROW BEGIN
-    IF OLD.contest_id = 1 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot delete special contest';
     END IF;
 END$$
 
@@ -338,297 +765,6 @@ FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'Submission results for each test case should not be edited. 
     Please delete all related submission and insert again instead.';
-END$$
-
-CREATE PROCEDURE procedure_add_problem(
-    IN __title VARCHAR(255),
-    IN __statement MEDIUMTEXT,
-    IN __difficulty INT,
-    IN __time_limit INT,
-    IN __memory_limit INT,
-    IN __input_format VARCHAR(15),
-    IN __output_format VARCHAR(15),
-    IN __solution_text mediumtext,
-    IN __creator_id int
-)
-BEGIN
-    START TRANSACTION;
-    INSERT INTO 
-        problems(
-            title, 
-            statement, 
-            difficulty, 
-            time_limit, 
-            memory_limit, 
-            input_format, 
-            output_format, 
-            solution_text, 
-            created_at, 
-            creator_id
-        )
-    VALUES (
-            __title, 
-            __statement, 
-            __difficulty, 
-            __time_limit, 
-            __memory_limit,
-            __input_format, 
-            __output_format, 
-            __solution_text, 
-            NOW(), 
-            __creator_id
-    );
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_edit_problem_attr(
-    IN __problem_id INT,
-    IN __title VARCHAR(255),
-    IN __statement MEDIUMTEXT,
-    IN __difficulty INT,
-    IN __time_limit INT,
-    IN __memory_limit INT,
-    IN __input_format VARCHAR(15),
-    IN __solution_text mediumtext,
-    IN __output_format VARCHAR(15),
-    IN __creator_id int
-)
-BEGIN
-    START TRANSACTION;
-    UPDATE problems
-    SET 
-        title = COALESCE(__title, title),
-        statement = COALESCE(__statement, statement),
-        difficulty = COALESCE(__difficulty, difficulty),
-        time_limit = COALESCE(__time_limit, time_limit),
-        memory_limit = COALESCE(__memory_limit, memory_limit),
-        input_format = COALESCE(__input_format, input_format),
-        output_format = COALESCE(__output_format, output_format),
-        solution_text = COALESCE(__solution_text, solution_text),
-        creator_id = COALESCE(__creator_id, creator_id)
-    WHERE problem_id = __problem_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_find_problems(
-    IN __problem_id INT,
-    IN __title VARCHAR(255),
-    IN __difficulty_low INT,
-    IN __difficulty_high INT,
-    IN __created_at_low DATETIME,
-    IN __created_at_high DATETIME,
-    IN __result_limit_start INT,
-    IN __result_limit_size INT
-)
-BEGIN
-    SELECT * FROM problems
-    WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
-    AND IF(
-        __title IS NOT NULL, 
-        title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
-        TRUE
-    )
-    AND difficulty 
-    BETWEEN COALESCE(__difficulty_low, 0) 
-    AND COALESCE(__difficulty_high, 10000) 
-    AND created_at
-    BETWEEN COALESCE(__created_at_low, '2000-01-01 00:00:00') 
-    AND COALESCE(__created_at_high, NOW())
-    ORDER BY created_at DESC
-    LIMIT __result_limit_start, __result_limit_size;
-END$$
-
-CREATE PROCEDURE procedure_find_problems_with_tags(
-    IN __problem_id INT,
-    IN __title VARCHAR(255),
-    IN __difficulty_low INT,
-    IN __difficulty_high INT,
-    IN __created_at_low DATETIME,
-    IN __created_at_high DATETIME,
-    IN __result_limit_start INT,
-    IN __result_limit_size INT
-)
-BEGIN
-    SELECT DISTINCT problems_filter_result.* FROM (
-        SELECT * FROM problems
-        WHERE IF(__problem_id IS NOT NULL, problem_id = __problem_id, TRUE)
-        AND IF(
-            __title IS NOT NULL, 
-            title LIKE CONCAT(__title, '%') OR MATCH(title) AGAINST (__title IN BOOLEAN MODE), 
-            TRUE
-        )
-        AND difficulty 
-        BETWEEN COALESCE(__difficulty_low, 0) 
-        AND COALESCE(__difficulty_high, 10000) 
-        AND created_at
-        BETWEEN COALESCE(__created_at_low, '2000-01-01 00:00:00') 
-        AND COALESCE(__created_at_high, NOW())
-    ) AS problems_filter_result
-    JOIN (
-        SELECT * FROM taggedproblems JOIN (
-            SELECT tag_id FROM tags 
-            WHERE is_selected = TRUE
-            OR (SELECT COUNT(*) FROM tags WHERE is_selected = TRUE) = 0
-        ) AS activated_tags USING (tag_id)
-    ) AS active_tagged_problems USING (problem_id)
-    ORDER BY created_at DESC
-    LIMIT __result_limit_start, __result_limit_size;
-END$$
-
-CREATE PROCEDURE procedure_delete_problem(
-    IN __problem_id INT
-)
-BEGIN 
-    START TRANSACTION;
-    DELETE FROM problems
-    WHERE problem_id = __problem_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_add_tag (
-    IN __tag_name VARCHAR(31),
-    IN __tag_type ENUM('CATEGORY', 'SOURCE')
-)
-BEGIN
-    START TRANSACTION;
-    INSERT INTO tags (tag_name, tag_type, is_selected)
-    VALUES (__tag_name, __tag_type, FALSE);
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_edit_tag_attr (
-    IN __tag_id INT,
-    IN __tag_name VARCHAR(31),
-    IN __tag_type ENUM('CATEGORY', 'SOURCE'),
-    IN __is_selected BOOLEAN
-)
-BEGIN
-    START TRANSACTION;
-    UPDATE tags 
-    SET tag_name = COALESCE(__tag_name, tag_name),
-    tag_type = COALESCE(__tag_type, tag_type),
-    is_selected = COALESCE(__is_selected, is_selected)
-    WHERE tag_id = __tag_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_delete_tag (
-    IN __tag_id INT
-)
-BEGIN
-    START TRANSACTION;
-    DELETE FROM tags
-    WHERE tag_id = __tag_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_get_tags (
-    IN __tag_id INT,
-    IN __tag_name VARCHAR(31),
-    IN __tag_type ENUM('CATEGORY', 'SOURCE'),
-    IN __is_selected BOOLEAN
-)
-BEGIN
-    SELECT * FROM tags
-    WHERE tag_id = COALESCE(__tag_id, tag_id)
-    AND tag_name LIKE CONCAT(COALESCE(__tag_name, tag_name))
-    AND tag_type = COALESCE(__tag_type, tag_type)
-    AND is_selected = COALESCE(__is_selected, is_selected)
-    ORDER BY tag_name
-    LIMIT 0, 100;
-END$$
-
-CREATE PROCEDURE procedure_add_tagged_problem(
-    IN __problem_id INT,
-    IN __tag_id INT
-)
-BEGIN
-    START TRANSACTION;
-    INSERT INTO taggedproblems VALUES (__problem_id, __tag_id);
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_delete_tagged_problem(
-    IN __problem_id INT,
-    IN __tag_id INT
-)
-BEGIN
-    START TRANSACTION;
-    DELETE FROM taggedproblems 
-    WHERE problem_id = __problem_id
-    AND tag_id = __tag_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_add_test_case  (
-    IN __title VARCHAR(255),
-    IN __problem_id VARCHAR(255),
-    IN __input MEDIUMTEXT,
-    IN __expected_output MEDIUMTEXT,
-    IN __is_hidden BOOLEAN
-)
-BEGIN
-    START TRANSACTION;
-    INSERT INTO testcases (
-        title,
-        problem_id,
-        input,
-        expected_output,
-        is_hidden
-    ) VALUES (
-        __title,
-        __problem_id,
-        __input,
-        __expected_output,
-        __is_hidden
-    );
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_edit_test_case  (
-    IN __test_case_id INT,
-    IN __title VARCHAR(255),
-    IN __problem_id VARCHAR(255),
-    IN __input MEDIUMTEXT,
-    IN __expected_output MEDIUMTEXT,
-    IN __is_hidden BOOLEAN
-)
-BEGIN
-    START TRANSACTION;
-    UPDATE testcases
-    SET title = COALESCE(__title, title),
-    problem_id = COALESCE(__problem_id, problem_id),
-    input = COALESCE(__input, input),
-    expected_output = COALESCE(__expected_output, expected_output),
-    is_hidden = COALESCE(__is_hidden, is_hidden)
-    WHERE test_case_id = __test_case_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_delete_test_case (
-    IN __test_case_id INT
-)
-BEGIN
-    START TRANSACTION;
-    DELETE FROM testcases 
-    WHERE test_case_id = __test_case_id;
-    COMMIT;
-END$$
-
-CREATE PROCEDURE procedure_find_test_cases (
-    IN __test_case_id INT,
-    IN __title VARCHAR(255),
-    IN __problem_id VARCHAR(255),
-    IN __result_limit_start INT,
-    IN __result_limit_size INT
-)
-BEGIN
-    SELECT * FROM testcases 
-    WHERE test_case_id = COALESCE(__test_case_id, test_case_id)
-    AND title = COALESCE(__title, title)
-    AND problem_id = COALESCE(__problem_id, problem_id)
-    ORDER BY test_case_id
-    LIMIT __result_limit_start, __result_limit_size;
 END$$
 
 DELIMITER;

@@ -53,8 +53,10 @@ class Database {
    * @param timeLimit Time limit (maximum amount of time available for code executing) in milliseconds
    * @param memoryLimit Memory limit (maximum amount of memory available for code executing) in MB
    * @param inputFormat The input format for the problem, can be like "stdin" or "x.inp", ...
+   * Set to null to use "stdin"
    * @param outputFormat The output format for the problem, can be like "stdout" or "x.out", ...
-   * @param solutionText The solution for the problem in Markdown text. Can be empty string
+   * Set to null to use "stdout"
+   * @param solutionText The solution for the problem in Markdown text. Can be empty string or null
    * @param creatorId ID of the user who created the problem
    * @returns true if successful
    *
@@ -66,8 +68,8 @@ class Database {
     difficulty: number,
     timeLimit: number,
     memoryLimit: number,
-    inputFormat: string,
-    outputFormat: string,
+    inputFormat: string | null,
+    outputFormat: string | null,
     solutionText: string | null,
     creatorId: number,
   ): Promise<boolean> {

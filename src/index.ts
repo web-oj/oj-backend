@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
-import db from "./services/db";
+import db from "./services/Database";
 
 const PORT = process.env.PORT || 8000;
 

@@ -314,7 +314,7 @@ INSERT INTO
 VALUES (
         4,
         2,
-        2,
+        1,
         NOW(),
         "C++",
         123,
@@ -336,7 +336,7 @@ INSERT INTO
 VALUES (
         3,
         2,
-        2,
+        1,
         NOW(),
         "Python",
         124,
@@ -359,7 +359,7 @@ INSERT INTO
 VALUES (
         3,
         2,
-        2,
+        1,
         NOW(),
         "Brainfuck",
         125,
@@ -380,7 +380,7 @@ INSERT INTO
 VALUES (
         5,
         1,
-        3,
+        2,
         NOW(),
         "C++",
         126,
@@ -400,7 +400,7 @@ INSERT INTO
 VALUES (
         3,
         1,
-        3,
+        2,
         NOW(),
         "C++",
         127,
@@ -459,7 +459,15 @@ VALUES (
 
 INSERT INTO
     contestproblems (problem_id, contest_id, point)
-VALUES (1, 2, 100);
+VALUES (1, 1, 100);
+
+INSERT INTO
+    contestproblems (problem_id, contest_id, point)
+VALUES (2, 1, 300);
+
+INSERT INTO
+    contestproblems (problem_id, contest_id, point)
+VALUES (3, 1, 1000);
 
 INSERT INTO
     contestproblems (problem_id, contest_id, point)
@@ -467,15 +475,7 @@ VALUES (2, 2, 300);
 
 INSERT INTO
     contestproblems (problem_id, contest_id, point)
-VALUES (3, 2, 1000);
-
-INSERT INTO
-    contestproblems (problem_id, contest_id, point)
-VALUES (2, 3, 300);
-
-INSERT INTO
-    contestproblems (problem_id, contest_id, point)
-VALUES (4, 3, 69);
+VALUES (4, 2, 69);
 
 INSERT INTO
     testcases (
@@ -727,7 +727,7 @@ INSERT INTO
     )
 VALUES (
         4,
-        2,
+        1,
         NULL,
         "Chấm pen ai vẽ mà tròn"
     )
@@ -741,7 +741,7 @@ INSERT INTO
     )
 VALUES (
         5,
-        2,
+        1,
         1,
         "**Cỏ này ai cắt mà còn hơi cao**"
     )
@@ -755,7 +755,7 @@ INSERT INTO
     )
 VALUES (
         4,
-        2,
+        1,
         2,
         "## Cỏ cao thì mặc cỏ cao"
     )
@@ -769,7 +769,7 @@ INSERT INTO
     )
 VALUES (
         5,
-        2,
+        1,
         3,
         "_Vấp vào ngã quỵ kêu gào đòi pen_"
     )
@@ -781,7 +781,7 @@ INSERT INTO
         parent_id,
         content
     )
-VALUES (3, 2, NULL, "tôi khủng vl")
+VALUES (3, 1, NULL, "tôi khủng vl")
 
 INSERT INTO
     discussionmessages (
@@ -790,7 +790,7 @@ INSERT INTO
         parent_id,
         content
     )
-VALUES (1, 3, NULL, "sample text")
+VALUES (1, 2, NULL, "sample text")
 
 INSERT INTO
     tags (tag_name, tag_type)
