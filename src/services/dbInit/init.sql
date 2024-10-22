@@ -391,7 +391,9 @@ BEGIN
     ) AS problems_filter_result
     JOIN (
         SELECT * FROM taggedproblems JOIN (
-            SELECT tag_id FROM tags WHERE is_selected = TRUE
+            SELECT tag_id FROM tags 
+            WHERE is_selected = TRUE
+            OR (SELECT COUNT(*) FROM tags WHERE is_selected = TRUE) = 0
         ) AS activated_tags USING (tag_id)
     ) AS active_tagged_problems USING (problem_id)
     ORDER BY created_at DESC
@@ -483,4 +485,70 @@ BEGIN
     COMMIT;
 END$$
 
-DELIMITER ;
+CREATE PROCEDURE procedure_add_test_case  (
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __input MEDIUMTEXT,
+    IN __expected_output MEDIUMTEXT
+)
+BEGIN
+    START TRANSACTION;
+    INSERT INTO testcases (
+        title,
+        problem_id,
+        input,
+        expected_output
+    ) VALUES (
+        __title,
+        __problem_id,
+        __input,
+        __expected_output
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_test_case  (
+    IN __test_case_id INT,
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __input MEDIUMTEXT,
+    IN __expected_output MEDIUMTEXT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE testcases
+    SET title = COALESCE(__title, title),
+    problem_id = COALESCE(__problem_id, problem_id),
+    input = COALESCE(__input, input),
+    expected_output = COALESCE(__expected_output, expected_output)
+    WHERE test_case_id = __test_case_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_test_case (
+    IN __test_case_id INT
+)
+BEGIN
+    START TRANSACTION;
+    DELETE FROM testcases 
+    WHERE test_case_id = __test_case_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_find_test_cases (
+    IN __test_case_id INT,
+    IN __title VARCHAR(255),
+    IN __problem_id VARCHAR(255),
+    IN __result_limit_start INT,
+    IN __result_limit_size INT
+)
+BEGIN
+    SELECT * FROM testcases 
+    WHERE test_case_id = COALESCE(__test_case_id, test_case_id)
+    AND title = COALESCE(__title, title)
+    AND problem_id = COALESCE(__problem_id, problem_id)
+    ORDER BY test_case_id
+    LIMIT __result_limit_start, __result_limit_size;
+END$$
+
+DELIMITER;
