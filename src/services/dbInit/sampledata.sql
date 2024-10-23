@@ -673,7 +673,7 @@ INSERT INTO
         title,
         user_id,
         attachment,
-        isVerified
+        is_verified
     )
 VALUES (
         "Giải Nhất HSG Quốc gia môn ORZ",
@@ -687,7 +687,7 @@ INSERT INTO
         title,
         user_id,
         attachment,
-        isVerified
+        is_verified
     )
 VALUES (
         "Giải Nhì HSG Quốc gia môn Khủng",
@@ -701,7 +701,7 @@ INSERT INTO
         title,
         user_id,
         attachment,
-        isVerified
+        is_verified
     )
 VALUES (
         "Giải Nhì HSG Quốc gia môn Khủng",

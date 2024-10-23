@@ -165,7 +165,7 @@ CREATE TABLE Achievements (
     title VARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
     attachment MEDIUMBLOB,
-    isVerified BOOL NOT NULL,
+    is_verified BOOL NOT NULL,
     PRIMARY KEY (achievement_id),
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
@@ -835,6 +835,7 @@ CREATE PROCEDURE procedure_find_official_submissions_in_contest (
 END$$
 
 DROP PROCEDURE IF EXISTS procedure_get_contest_ranking;
+
 CREATE PROCEDURE procedure_get_contest_ranking (
     IN __contest_id INT,
     IN __limit_range_start INT,
@@ -923,6 +924,143 @@ CREATE PROCEDURE procedure_get_solved_problems_in_contest_by_user (
         AND is_submission_official(submission_id)
         GROUP BY user_id, problem_id
     ) AS current_contest_number_of_official_submissions USING (problem_id);
+END$$
+
+CREATE PROCEDURE procedure_add_user (
+    IN __user_name VARCHAR(15),
+    IN __email VARCHAR(255),
+    IN __password VARCHAR(31),
+    IN __role SET("AD", "PS", "CU")
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO users (
+        user_name,
+        email,
+        password,
+        role,
+        created_at,
+        rating
+    ) VALUES (
+        __user_name,
+        __email,
+        __password,
+        __role,
+        NOW(),
+        0
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_user_attr (
+    IN __user_id INT,
+    IN __user_name VARCHAR(15),
+    IN __email VARCHAR(255),
+    IN __password VARCHAR(31),
+    IN __role SET("AD", "PS", "CU"),
+    IN __rating INT
+) BEGIN
+    START TRANSACTION;
+    UPDATE users
+    SET user_name = COALESCE(__user_name, user_name),
+    email = COALESCE(__email, email),
+    password = COALESCE(__password, password),
+    role = COALESCE(__role, role),
+    rating = COALESCE(__rating, rating)
+    WHERE user_id = COALESCE(__user_id, user_id);
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_user(
+    IN __user_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM users
+    WHERE user_id = __user;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_user_by_id(
+    IN __user_id INT
+) BEGIN
+    SELECT * FROM users
+    WHERE user_id = __user_id;
+END$$
+
+CREATE PROCEDURE procedure_find_users(
+    IN __user_id INT,
+    IN __user_name VARCHAR(15),
+    IN __email VARCHAR(255),
+    IN __role SET("AD", "PS", "CU"),
+    IN __rating_low INT,
+    IN __rating_high INT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
+) BEGIN
+    SELECT user_id, user_name, role, rating FROM users
+    WHERE user_id = COALESCE(__user_id, user_id)
+    AND user_name = COALESCE(__user_name, user_name)
+    AND email = COALESCE(__email, email)
+    AND role = COALESCE(__role, role)
+    AND rating BETWEEN COALESCE(__rating_low, 0)
+    AND COALESCE(__rating_high, 1000000)
+    ORDER BY rating DESC
+    LIMIT __limit_range_start, __limit_range_size;
+END$$
+
+CREATE PROCEDURE procedure_add_achievement(
+    IN __user_id INT,
+    IN __title VARCHAR(255)
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO achievements(
+        user_id, 
+        title,
+        is_verified
+    )
+    VALUES (
+        __user_id,
+        __title,
+        FALSE
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_achievement_attr(
+    IN __achievement_id INT,
+    IN __title VARCHAR(255),
+    IN __attachment MEDIUMBLOB,
+    IN __is_verified BOOLEAN
+) BEGIN
+    START TRANSACTION;
+    UPDATE achievements
+    SET title = COALESCE(__title, title),
+    attachment = COALESCE(__attachment, attachment),
+    is_verified = COALESCE(__is_verified, is_verified)
+    WHERE achievement_id = __achievement_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_achievement(
+    IN __achievement_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM achievements
+    WHERE achievement_id = __achievement_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_get_achievement_by_id(
+    IN __achievement_id INT
+) BEGIN 
+    SELECT * FROM achievements
+    WHERE achievement_id = __achievement_id;
+END$$
+
+CREATE PROCEDURE procedure_get_achievements_by_user(
+    IN __user_id INT
+) BEGIN
+    SELECT achievement_id, title, is_verified FROM achievements
+    WHERE user_id = __user_id;
 END$$
 
 CREATE TRIGGER trigger_after_insert_submissions
