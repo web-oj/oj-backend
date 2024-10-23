@@ -834,6 +834,7 @@ CREATE PROCEDURE procedure_find_official_submissions_in_contest (
     AND is_submission_official(submission_id);
 END$$
 
+DROP PROCEDURE IF EXISTS procedure_get_contest_ranking;
 CREATE PROCEDURE procedure_get_contest_ranking (
     IN __contest_id INT,
     IN __limit_range_start INT,
@@ -841,6 +842,8 @@ CREATE PROCEDURE procedure_get_contest_ranking (
 ) BEGIN
     DECLARE __scoring_rule ENUM("IOI", "ICPC");
     DECLARE __contest_start_time DATETIME;
+    DECLARE __contest_end_time DATETIME;
+    DECLARE __contest_duration INT;
 
     SET __scoring_rule = (
         SELECT scoring_rule FROM contests
@@ -850,13 +853,26 @@ CREATE PROCEDURE procedure_get_contest_ranking (
         SELECT start_time FROM contests
         WHERE contest_id = __contest_id
     );
+    SET __contest_end_time = (
+        SELECT end_time FROM contests
+        WHERE contest_id = __contest_id
+    );
+    SET __contest_duration = 
+    TIMESTAMPDIFF(MINUTE, __contest_start_time, __contest_end_time);
     
     SELECT current_contest_official_accepted_submissions.user_id 
     AS user_id,
-    (COUNT(problem_id) * 10000 -
-    SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) -
-    (SUM(number_of_submissions) - COUNT(problem_id) * 20))
-    AS score
+    IF(
+        __scoring_rule = "ICPC", 
+        COUNT(problem_id) * 10000 -
+        SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) -
+        (SUM(number_of_submissions) - COUNT(problem_id)) * 20, 
+        SUM(
+            problem_score * 
+            (TIMESTAMPDIFF(MINUTE, solved_at, __contest_end_time)
+            - 10 * (number_of_submissions - 1))
+        ) DIV __contest_duration
+    ) AS score
     FROM (
         SELECT user_id, problem_id, 
         MAX(submitted_at) AS solved_at FROM submissions
@@ -866,11 +882,16 @@ CREATE PROCEDURE procedure_get_contest_ranking (
         GROUP BY user_id, problem_id
     ) AS current_contest_official_accepted_submissions
     JOIN (
-        SELECT user_id, problem_id, COUNT(*) AS number_of_submissions FROM submissions
+        SELECT user_id, problem_id, COUNT(*) AS number_of_submissions 
+        FROM submissions
         WHERE contest_id = __contest_id
         AND is_submission_official(submission_id)
         GROUP BY user_id, problem_id
     ) AS current_contest_number_of_official_submissions USING (user_id, problem_id)
+    JOIN (
+        SELECT problem_id, point AS problem_score FROM contestproblems
+        WHERE contest_id = __contest_id
+    ) AS current_contest_problem_score USING (problem_id) 
     GROUP BY user_id
     ORDER BY score DESC
     LIMIT __limit_range_start, __limit_range_size;
