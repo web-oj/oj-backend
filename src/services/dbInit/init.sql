@@ -154,6 +154,7 @@ CREATE TABLE SubmissionResults (
         'CE',
         'D'
     ) NOT NULL DEFAULT 'P',
+    judged_at DATETIME NOT NULL,
     PRIMARY KEY (submission_id, test_case_id),
     FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id) ON DELETE CASCADE,
     FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id) ON DELETE CASCADE,
@@ -174,6 +175,7 @@ CREATE TABLE Notifications (
     notification_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     receiver_id INT NOT NULL,
     content MEDIUMTEXT NOT NULL,
+    send_at DATETIME NOT NULL,
     PRIMARY KEY (notification_id),
     FOREIGN KEY (receiver_id) REFERENCES Users (user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
@@ -181,12 +183,13 @@ CREATE TABLE Notifications (
 CREATE TABLE DiscussionMessages (
     message_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     sender_id INT NOT NULL,
-    contest_id INT NOT NULL,
+    problem_id INT NOT NULL,
     parent_id INT,
     content MEDIUMTEXT NOT NULL,
+    send_at DATETIME,
     PRIMARY KEY (message_id),
     FOREIGN KEY (sender_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (contest_id) REFERENCES Contests (contest_id) ON DELETE CASCADE,
+    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
     INDEX index_parent_id (parent_id)
 ) ENGINE = InnoDB CHARSET = utf8;
 
@@ -834,8 +837,6 @@ CREATE PROCEDURE procedure_find_official_submissions_in_contest (
     AND is_submission_official(submission_id);
 END$$
 
-DROP PROCEDURE IF EXISTS procedure_get_contest_ranking;
-
 CREATE PROCEDURE procedure_get_contest_ranking (
     IN __contest_id INT,
     IN __limit_range_start INT,
@@ -933,6 +934,7 @@ CREATE PROCEDURE procedure_add_submission_results_by_submission(
     IN __memory_used INT,
     IN __output MEDIUMTEXT,
     IN __judge_message MEDIUMTEXT,
+    IN __judged_at DATETIME,
     IN __status ENUM(
         'AC',
         'P',
@@ -953,7 +955,8 @@ CREATE PROCEDURE procedure_add_submission_results_by_submission(
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     ) VALUES (
         __submission_id,
         __test_case_id,
@@ -961,15 +964,21 @@ CREATE PROCEDURE procedure_add_submission_results_by_submission(
         __memory_used,
         __output,
         __judge_message,
-        __status
+        __judged_at,
+        NOW()
     );
     COMMIT;
-END
+END$$
 
-CREATE PROCEDURE procedure_delete_all_submission_results_of_problem_by_submission (
-    IN __submission_id INT,
-    IN __problem_id INT
+CREATE PROCEDURE procedure_delete_all_submission_results_by_submission (
+    IN __submission_id INT
 ) BEGIN
+    DECLARE __problem_id INT;
+    
+    SET __problem_id = (
+        SELECT problem_id FROM submissions
+        WHERE submission_id = __submission_id
+    );
     START TRANSACTION;
     DELETE FROM submissionresults
     WHERE submission_id = __submission_id
@@ -1122,6 +1131,139 @@ CREATE PROCEDURE procedure_get_achievements_by_user(
 ) BEGIN
     SELECT achievement_id, title, is_verified FROM achievements
     WHERE user_id = __user_id;
+END$$
+
+CREATE PROCEDURE procedure_add_notification(
+    IN __receiver_id INT,
+    IN __content MEDIUMTEXT
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO notifications (
+        receiver_id,
+        content,
+        send_at
+    ) VALUES (
+        __receiver_id,
+        __content,
+        NOW()
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_notification_attr(
+    IN __notification_id INT,
+    IN __receiver_id INT,
+    IN __content MEDIUMTEXT
+) BEGIN
+    START TRANSACTION;
+    UPDATE notifications
+    SET receiver_id = COALESCE(__receiver_id, receiver_id),
+    content = COALESCE(__content, content)
+    WHERE notification_id = __notification_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_notification(
+    IN __notification_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM notifications
+    WHERE notification_id = __notification_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_find_notification(
+    IN __notification_id INT,
+    IN __receiver_id INT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
+) BEGIN
+    SELECT * FROM notifications
+    WHERE notification_id = COALESCE(__notification_id, notification_id)
+    AND receiver_id = COALESCE(__receiver_id, receiver_id)
+    LIMIT __limit_range_start, __limit_range_size;
+END$$
+
+CREATE PROCEDURE procedure_add_discussion_message(
+    IN __sender_id INT,
+    IN __problem_id INT,
+    IN __parent_id INT,
+    IN __content MEDIUMTEXT
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO discussionmessages (
+        sender_id,
+        problem_id,
+        parent_id,
+        content,
+        send_at
+    ) VALUES (
+        __sender_id,
+        __problem_id,
+        __parent_id,
+        __content,
+        __send_at
+    );
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_edit_disscussion_message_content (
+    IN __message_id INT,
+    IN __sender_id INT,
+    IN __problem_id INT,
+    IN __parent_id INT,
+    IN __content MEDIUMTEXT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
+) BEGIN
+    START TRANSACTION;
+    UPDATE discussionmessages
+    SET sender_id = COALESCE(__sender_id, sender_id),
+    problem_id = COALESCE(__problem_id, problem_id),
+    parent_id = COALESCE(__parent_id, parent_id),
+    content = COALESCE(__content, content)
+    WHERE message_id = __message_id;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE procedure_delete_disscussion_message (
+    IN __message_id INT
+) BEGIN
+    DELETE FROM discussionmessages
+    WHERE message_id = __message_id;
+END$$
+
+CREATE PROCEDURE procedure_find_discussion_messages (
+    IN __message_id INT,
+    IN __sender_id INT,
+    IN __problem_id INT,
+    IN __parent_id INT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
+) BEGIN
+    SELECT * FROM discussionmessages
+    WHERE message_id = COALESCE(__message_id, message_id)
+    AND sender_id = COALESCE(__sender_id, sender_id)
+    AND problem_id = COALESCE(__problem_id, problem_id)
+    AND parent_id = COALESCE(__parent_id, parent_id)
+    AND content = COALESCE(__content, content)
+    LIMIT __limit_range_start, __limit_range_size;
+END$$
+
+CREATE PROCEDURE procedure_find_root_discussion_messages (
+    IN __message_id INT,
+    IN __sender_id INT,
+    IN __problem_id INT,
+    IN __limit_range_start INT,
+    IN __limit_range_size INT
+) BEGIN
+    SELECT * FROM discussionmessages
+    WHERE message_id = COALESCE(__message_id, message_id)
+    AND sender_id = COALESCE(__sender_id, sender_id)
+    AND problem_id = COALESCE(__problem_id, problem_id)
+    AND parent_id = NULL
+    AND content = COALESCE(__content, content)
+    LIMIT __limit_range_start, __limit_range_size;
 END$$
 
 CREATE TRIGGER trigger_after_insert_submissions

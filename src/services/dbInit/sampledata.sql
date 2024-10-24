@@ -544,9 +544,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (1, 3, 500, 100, 3, "ok", "AC");
+VALUES (1, 3, 500, 100, 3, "ok", "AC", NOW());
 
 INSERT INTO
     submissionresults (
@@ -556,9 +557,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (1, 4, 500, 100, 5, "ok", "AC");
+VALUES (1, 4, 500, 100, 5, "ok", "AC", NOW());
 
 INSERT INTO
     submissionresults (
@@ -568,7 +570,8 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
 VALUES (
         1,
@@ -577,7 +580,8 @@ VALUES (
         100,
         "333333333333333333333333333",
         "ok",
-        "AC"
+        "AC",
+        NOW()
     );
 
 INSERT INTO
@@ -588,9 +592,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (2, 3, 500, 100, 3, "ok", "AC");
+VALUES (2, 3, 500, 100, 3, "ok", "AC", NOW());
 
 INSERT INTO
     submissionresults (
@@ -600,7 +605,8 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
 VALUES (
         2,
@@ -609,7 +615,8 @@ VALUES (
         100,
         7,
         "okn't",
-        "WA"
+        "WA",
+        NOW()
     );
 
 INSERT INTO
@@ -620,9 +627,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (4, 1, 500, 100, 4, "ok", "AC");
+VALUES (4, 1, 500, 100, 4, "ok", "AC", NOW());
 
 INSERT INTO
     submissionresults (
@@ -632,9 +640,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (5, 1, 500, 100, 3, "ok", "AC")
+VALUES (5, 1, 500, 100, 3, "ok", "AC", NOW())
 
 INSERT INTO
     submissionresults (
@@ -644,9 +653,10 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
-VALUES (5, 2, 500, 100, 5, "ok", "AC");
+VALUES (5, 2, 500, 100, 5, "ok", "AC", NOW());
 
 INSERT INTO
     submissionresults (
@@ -656,7 +666,8 @@ INSERT INTO
         memory_used,
         output,
         judge_message,
-        status
+        status,
+        judged_at
     )
 VALUES (
         6,
@@ -665,7 +676,8 @@ VALUES (
         500,
         NULL,
         NULL,
-        "TLE"
+        "TLE",
+        NOW()
     );
 
 INSERT INTO
@@ -711,86 +723,96 @@ VALUES (
     );
 
 INSERT INTO
-    notifications (receiver_id, content)
-VALUES (3, "**orz**");
+    notifications (receiver_id, content, send_at)
+VALUES (3, "**orz**", NOW());
 
 INSERT INTO
-    notifications (receiver_id, content)
-VALUES (4, "bayer leverkusen -0.25");
+    notifications (receiver_id, content, send_at)
+VALUES (4, "liverpool 7-0 manchester united", NOW());
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
 VALUES (
         4,
         1,
         NULL,
-        "Chấm pen ai vẽ mà tròn"
+        "Chấm pen ai vẽ mà tròn",
+        NOW()
     )
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
 VALUES (
         5,
         1,
         1,
-        "**Cỏ này ai cắt mà còn hơi cao**"
+        "**Cỏ này ai cắt mà còn hơi cao**",
+        NOW()
     )
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
 VALUES (
         4,
         1,
         2,
-        "## Cỏ cao thì mặc cỏ cao"
+        "## Cỏ cao thì mặc cỏ cao",
+        NOW()
     )
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
 VALUES (
         5,
         1,
         3,
-        "_Vấp vào ngã quỵ kêu gào đòi pen_"
+        "_Vấp vào ngã quỵ kêu gào đòi pen_",
+        NOW()
     )
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
-VALUES (3, 1, NULL, "tôi khủng vl")
+VALUES (3, 1, NULL, "tôi khủng vl", NOW())
 
 INSERT INTO
     discussionmessages (
         sender_id,
-        contest_id,
+        problem_id,
         parent_id,
-        content
+        content,
+        send_at
     )
-VALUES (1, 2, NULL, "sample text")
+VALUES (1, 2, NULL, "sample text", NOW())
 
 INSERT INTO
     tags (tag_name, tag_type)
