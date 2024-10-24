@@ -1,7 +1,9 @@
 import mysql, { ResultSetHeader, RowDataPacket } from "mysql2";
 import "dotenv/config";
 
-const sqlString = (val: string | number | null): string | number | null => {
+const sqlString = (
+  val: string | number | boolean | null,
+): string | number | boolean | null => {
   if (val === null || (val as string).length === 0) {
     return "NULL";
   }
@@ -14,14 +16,6 @@ const sqlString = (val: string | number | null): string | number | null => {
 class Database {
   connPool: mysql.Pool;
 
-  /**
-   * Start a database connection with constructor parameters.
-   *
-   * @param __host Database host
-   * @param __user Database user
-   * @param __password Database password (not encrypted)
-   * @param __database Database name
-   */
   constructor(
     __host: string,
     __user: string,
@@ -44,24 +38,6 @@ class Database {
     console.log("MySQL connection pool created.");
   }
 
-  /**
-   * Add a new problem into the database.
-   *
-   * @param title Title of the problem
-   * @param statement Statement of the problem in Mardown text
-   * @param difficulty Difficulty of the problem in number
-   * @param timeLimit Time limit (maximum amount of time available for code executing) in milliseconds
-   * @param memoryLimit Memory limit (maximum amount of memory available for code executing) in MB
-   * @param inputFormat The input format for the problem, can be like "stdin" or "x.inp", ...
-   * Set to null to use "stdin"
-   * @param outputFormat The output format for the problem, can be like "stdout" or "x.out", ...
-   * Set to null to use "stdout"
-   * @param solutionText The solution for the problem in Markdown text. Can be empty string or null
-   * @param creatorId ID of the user who created the problem
-   * @returns true if successful
-   *
-   * @throws An error if fail
-   */
   async queryAddProblem(
     title: string,
     statement: string,
@@ -72,6 +48,7 @@ class Database {
     outputFormat: string | null,
     solutionText: string | null,
     creatorId: number,
+    isPublished: boolean | null = false,
   ): Promise<boolean> {
     try {
       let result = this.connPool.promise().execute<ResultSetHeader>(
@@ -83,7 +60,8 @@ class Database {
         ${sqlString(inputFormat)},
         ${sqlString(outputFormat)},
         ${sqlString(solutionText)},
-        ${sqlString(creatorId)})`,
+        ${sqlString(creatorId)},
+        ${sqlString(isPublished)})`,
       );
       return true;
     } catch (err) {
@@ -91,40 +69,18 @@ class Database {
     }
   }
 
-  /**
-   * Update the attributes of a problem in the database. Not including updating associated
-   * tags and tests
-   *
-   * @param problem_id The unique ID of the problem. Can be acquired from querySelectProblem
-   * @param title Title of the problem. Set to null to keep old value
-   * @param statement Statement of the problem in Mardown text. Set to null to keep old value
-   * @param difficulty Difficulty of the problem in number. Set to null to keep old value
-   * @param timeLimit Time limit (maximum amount of time available for code executing) in milliseconds.
-   * Set to null to keep old value
-   * @param memoryLimit Memory limit (maximum amount of memory available for code executing) in MB.
-   * Set to null to keep old value
-   * @param inputFormat The input format for the problem, can be like "stdin" or "x.inp", ...
-   *  Set to null to keep old value
-   * @param outputFormat The output format for the problem, can be like "stdout" or "x.out", ...
-   * Set to null to keep old value
-   * @param solutionText The solution for the problem in Markdown text. Can be empty string.
-   * Set to null to keep old value
-   * @param creatorId ID of the user who created the problem. Set to null to keep old value
-   * @returns true if successful
-   *
-   * @throws An error if fail
-   */
   async queryEditProblemAttr(
     problemId: number,
-    title: string | null,
-    statement: string | null,
-    difficulty: number | null,
-    timeLimit: number | null,
-    memoryLimit: number | null,
-    inputFormat: string | null,
-    outputFormat: string | null,
-    solutionText: string | null,
-    creatorId: number | null,
+    title: string | null = null,
+    statement: string | null = null,
+    difficulty: number | null = null,
+    timeLimit: number | null = null,
+    memoryLimit: number | null = null,
+    inputFormat: string | null = null,
+    outputFormat: string | null = null,
+    solutionText: string | null = null,
+    creatorId: number | null = null,
+    isPublished: boolean | null = null,
   ): Promise<boolean> {
     try {
       let result = await this.connPool.promise().execute<ResultSetHeader>(
@@ -138,7 +94,8 @@ class Database {
           ${sqlString(inputFormat)},
           ${sqlString(outputFormat)},
           ${sqlString(solutionText)},
-          ${sqlString(creatorId)})`,
+          ${sqlString(creatorId)},
+          ${sqlString(isPublished)})`,
       );
       return true;
     } catch (err) {
@@ -146,38 +103,44 @@ class Database {
     }
   }
 
- /**
-  * Find the attributes of problems that match a list of provided conditions
-  * 
-  * @param title The title of the problem. Set to null to ignore the condition.
-  * @param problemId The ID of the problem. Set to null or truncate to ignore the condition.
-  * @param difficultyLow The lower bound for the difficulty of the problem.
-  * Set to null or truncate to ignore the condition (take the default value of 0)
-  * @param difficultyHigh The upper bound for the difficulty of the problem.
-  * Set to null or truncate to ignore the condition (take the default value of 10000)
-  * @param createdAtLow The lower bound for the difficulty of the problem in YYYY-MM-DD HH:MM:SS form.
-  * Set to null or truncate to ignore the condition (take the default value of 2000-01-01 00:00:00)
-  * @param createdAtHigh The upper bound for the difficulty of the problem in YYYY-MM-DD HH:MM:SS form.
-  * Set to null or truncate to ignore the condition (take the default value of NOW())
-  * @param resultLimitStart First parameter of SQL LIMIT x, y. Truncate to use the default value of 0
-  * @param resultLimitSize Second parameter of SQL LIMIT x, y. Truncate to use the default value of 100
-  * 
-  * @returns A Object[] object, containing the result of the query in JSON form if successful
-  * 
-  * @throws An error if fail
-  */
+  async queryDeleteProblem(problemId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        `CALL procedure_delete_problem(
+          ${sqlString(problemId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetProblemById(problemId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_problem_by_id(
+          ${sqlString(problemId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async queryFindProblems(
-    title: string | null,
     problemId: number | null = null,
+    title: string | null = null,
     difficultyLow: number | null = null,
     difficultyHigh: number | null = null,
     createdAtLow: string | null = null,
     createdAtHigh: string | null = null,
+    creatorId: number | null = null,
+    isPublished: boolean | null = null,
     resultLimitStart: number = 0,
     resultLimitSize: number = 50,
-  ): Promise<Array<Object>> {
+  ): Promise<string> {
     try {
-      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+      let res = await this.connPool.promise().query<RowDataPacket[]>(
         `CALL procedure_find_problems(
           ${sqlString(problemId)},
           ${sqlString(title)},
@@ -185,32 +148,533 @@ class Database {
           ${sqlString(difficultyHigh)},
           ${sqlString(createdAtLow)},
           ${sqlString(createdAtHigh)},
+          ${sqlString(creatorId)},
+          ${sqlString(isPublished)},
           ${sqlString(resultLimitStart)},
           ${sqlString(resultLimitSize)})`,
       );
-      return res[0][0] as Object[];
+      return JSON.stringify(res[0][0]);
     } catch (err) {
       throw err;
     }
   }
 
-  /**
-   * Remove a problem from the database.
-   * 
-   * @param problemId The ID of the problem
-   * @returns true if successful
-   * 
-   * @throws An error if fail
-   */
-  async queryDeleteProblem(
+  async queryFindProblemsWithTags(
+    problemId: number | null = null,
+    title: string | null = null,
+    difficultyLow: number | null = null,
+    difficultyHigh: number | null = null,
+    createdAtLow: string | null = null,
+    createdAtHigh: string | null = null,
+    creatorId: number | null = null,
+    isPublished: boolean | null = null,
+    resultLimitStart: number | null = 0,
+    resultLimitSize: number | null = 50,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().query<RowDataPacket[]>(
+        `CALL procedure_find_problems_with_tags(
+          ${sqlString(problemId)},
+          ${sqlString(title)},
+          ${sqlString(difficultyLow)},
+          ${sqlString(difficultyHigh)},
+          ${sqlString(createdAtLow)},
+          ${sqlString(createdAtHigh)},
+          ${sqlString(creatorId)},
+          ${sqlString(isPublished)},
+          ${sqlString(resultLimitStart)},
+          ${sqlString(resultLimitSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddTag(tagName: string, tagType: string): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_tag(
+        ${sqlString(tagName)},
+        ${sqlString(tagType)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditTagAttr(
+    tagId: number,
+    tagName: string | null = null,
+    tagType: string | null = null,
+    isSelected: boolean | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_tag_attr(
+        ${sqlString(tagId)},
+        ${sqlString(tagName)},
+        ${sqlString(tagType)},
+        ${sqlString(isSelected)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteTag(tagId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        `CALL procedure_delete_tag(
+          ${sqlString(tagId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindTags(
+    tagId: number | null = null,
+    tagName: string | null = null,
+    tagType: string | null = null,
+    isSelected: boolean | null = null,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().query<RowDataPacket[]>(
+        ` CALL procedure_find_tags(
+        ${sqlString(tagId)},
+        ${sqlString(tagName)},
+        ${sqlString(tagType)},
+        ${sqlString(isSelected)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddTaggedProblem(
+    problemId: number,
+    tagId: number,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_tagged_problem(
+        ${sqlString(problemId)},
+        ${sqlString(tagId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteTaggedProblem(
+    problemId: number,
+    tagId: number,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_tagged_problem(
+        ${sqlString(problemId)},
+        ${sqlString(tagId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindTagsByProblem(problemId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().query<RowDataPacket[]>(
+        ` CALL procedure_find_tags_by_problem(
+        ${sqlString(problemId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddTestCase(
+    title: string,
+    problemId: number,
+    input: string,
+    expectedOutput: string,
+    isHidden: boolean = false,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_test_case(
+        ${sqlString(title)},
+        ${sqlString(problemId)},
+        ${sqlString(input)},
+        ${sqlString(expectedOutput)},
+        ${sqlString(isHidden)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditTestCase(
+    testCaseId: number,
+    title: string | null = null,
+    problemId: number | null = null,
+    input: string | null = null,
+    expectedOutput: string | null = null,
+    isHidden: boolean | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_test_case(
+        ${sqlString(testCaseId)},
+        ${sqlString(title)},
+        ${sqlString(problemId)},
+        ${sqlString(input)},
+        ${sqlString(expectedOutput)},
+        ${sqlString(isHidden)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteTestCase(testCaseId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_test_case(
+        ${sqlString(testCaseId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetTestCaseById(testCaseId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_test_case_by_id(
+          ${sqlString(testCaseId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindTestCases(
+    testCaseId: number | null = null,
+    title: string | null = null,
+    problemId: number | null = null,
+    isHidden: boolean | null = null,
+    resultLimitStart: number = 0,
+    resultLimitSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_find_test_cases(
+          ${sqlString(testCaseId)},
+          ${sqlString(title)},
+          ${sqlString(problemId)},
+          ${sqlString(isHidden)},
+          ${sqlString(resultLimitStart)},
+          ${sqlString(resultLimitSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddContest(
+    title: string,
+    description: string | null,
+    startTime: string,
+    endTime: string,
+    scoringRule: string,
+    organizerId: number,
+    isPublished: boolean = false,
+    isPlagiarismCheckEnabled: boolean = false,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_contest(
+        ${sqlString(title)},
+        ${sqlString(description)},
+        ${sqlString(startTime)},
+        ${sqlString(endTime)},
+        ${sqlString(scoringRule)},
+        ${sqlString(organizerId)},
+        ${sqlString(isPublished)},
+        ${sqlString(isPlagiarismCheckEnabled)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditContest(
+    contestId: number,
+    title: string | null = null,
+    description: string | null = null,
+    startTime: string | null = null,
+    endTime: string | null = null,
+    scoringRule: string | null = null,
+    organizerId: number | null = null,
+    isPublished: boolean | null = null,
+    isPlagiarismCheckEnabled: boolean | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_contest(
+        ${sqlString(contestId)},
+        ${sqlString(title)},
+        ${sqlString(description)},
+        ${sqlString(startTime)},
+        ${sqlString(endTime)},
+        ${sqlString(scoringRule)},
+        ${sqlString(organizerId)},
+        ${sqlString(isPublished)},
+        ${sqlString(isPlagiarismCheckEnabled)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteContest(contestId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_contest(
+        ${sqlString(contestId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetContestById(contestId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_contest_by_id(
+          ${sqlString(contestId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindContests(
+    contestId: number | null = null,
+    title: string | null = null,
+    scoringRule: string | null = null,
+    organizerId: number | null = null,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_find_contests(
+          ${sqlString(contestId)},
+          ${sqlString(title)},
+          ${sqlString(scoringRule)},
+          ${sqlString(organizerId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddProblemToContest(
+    contestId: number,
+    problemId: number,
+    point: number,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_problem_to_contest(
+        ${sqlString(contestId)},
+        ${sqlString(problemId)},
+        ${sqlString(point)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditProblemPointInContest(
+    contestId: number,
+    problemId: number,
+    point: number | null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_problem_point_in_contest(
+        ${sqlString(contestId)},
+        ${sqlString(problemId)},
+        ${sqlString(point)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteProblemFromContest(
+    contestId: number,
     problemId: number,
   ): Promise<boolean> {
     try {
       let res = await this.connPool.promise().execute<ResultSetHeader>(
-        `CALL procedure_delete_problem(
-          ${sqlString(problemId)})`,
+        ` CALL procedure_delete_problem_from_contest(
+        ${sqlString(contestId)},
+        ${sqlString(problemId)})`,
       );
       return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetProblemsInContest(contestId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_problems_in_contest(
+          ${sqlString(contestId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddSubmission(
+    userId: number,
+    problemId: number,
+    contestId: number,
+    sourceCodeLanguage: string,
+    sourceCodeFileId: number,
+    status: string,
+    compilerMessage: string | null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_submission(
+        ${sqlString(userId)},
+        ${sqlString(problemId)},
+        ${sqlString(contestId)},
+        ${sqlString(sourceCodeLanguage)},
+        ${sqlString(sourceCodeFileId)},
+        ${sqlString(status)},
+        ${sqlString(compilerMessage)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditSubmission(
+    submissionId: number,
+    userId: number | null = null,
+    problemId: number | null = null,
+    contestId: number | null = null,
+    sourceCodeLanguage: string | null = null,
+    sourceCodeFileId: number | null = null,
+    status: string | null = null,
+    compilerMessage: string | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_submission(
+        ${sqlString(submissionId)},
+        ${sqlString(userId)},
+        ${sqlString(problemId)},
+        ${sqlString(contestId)},
+        ${sqlString(sourceCodeLanguage)},
+        ${sqlString(sourceCodeFileId)},
+        ${sqlString(status)},
+        ${sqlString(compilerMessage)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteSubmission(submissionId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_submission(
+        ${sqlString(submissionId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetSubmissionById(submissionId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_submission_by_id(
+          ${sqlString(submissionId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindSubmissions(
+    submissionId: number | null = null,
+    userId: number | null = null,
+    problemId: number | null = null,
+    contestId: number | null = null,
+    sourceCodeLanguage: string | null = null,
+    sourceCodeFileId: number | null = null,
+    status: string | null = null,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_find_submissions(
+          ${sqlString(submissionId)},
+        ${sqlString(userId)},
+        ${sqlString(problemId)},
+        ${sqlString(contestId)},
+        ${sqlString(sourceCodeLanguage)},
+        ${sqlString(sourceCodeFileId)},
+        ${sqlString(status)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindOfficialSubmissionsInContests(
+    contestId: number,
+    userId: number | null = null,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_find_official_submissions_in_contest(
+          ${sqlString(contestId)},
+          ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
     } catch (err) {
       throw err;
     }

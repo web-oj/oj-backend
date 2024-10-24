@@ -286,7 +286,7 @@ CREATE PROCEDURE procedure_add_problem(
             __solution_text, 
             NOW(), 
             __creator_id,
-            COALESCE(__is_published, is_published)
+            COALESCE(__is_published, FALSE)
     );
     COMMIT;
 END$$
@@ -324,7 +324,7 @@ END$$
 CREATE PROCEDURE procedure_get_problem_by_id(
     IN __problem_id INT
 ) BEGIN
-    SELECT * FROM problem WHERE problem_id = __problem_id;
+    SELECT * FROM problems WHERE problem_id = __problem_id;
 END$$
 
 CREATE PROCEDURE procedure_find_problems(
@@ -484,6 +484,17 @@ CREATE PROCEDURE procedure_delete_tagged_problem(
     COMMIT;
 END$$
 
+CREATE PROCEDURE procedure_find_tags_by_problem(
+    IN __problem_id INT
+) BEGIN
+    SELECT tags.* FROM (
+        SELECT * FROM problems
+        WHERE problem_id = __problem_id
+    ) AS current_problem
+    JOIN taggedproblems USING (problem_id)
+    JOIN tags USING (tag_id);
+END$$
+
 CREATE PROCEDURE procedure_add_test_case  (
     IN __title VARCHAR(255),
     IN __problem_id VARCHAR(255),
@@ -553,7 +564,7 @@ CREATE PROCEDURE procedure_find_test_cases (
 ) BEGIN
     SELECT test_case_id, title, problem_id, is_hidden FROM testcases 
     WHERE test_case_id = COALESCE(__test_case_id, test_case_id)
-    AND title = COALESCE(__title, title)
+    AND title LIKE CONCAT(COALESCE(__title, title), "%")
     AND problem_id = COALESCE(__problem_id, problem_id)
     AND is_hidden = COALESCE(__is_hidden, is_hidden)
     ORDER BY test_case_id
@@ -630,25 +641,24 @@ END$$
 CREATE PROCEDURE procedure_get_contest_by_id (
     IN __contest_id INT
 ) BEGIN
-    SELECT * FROM contest 
+    SELECT * FROM contests
     WHERE contest_id = __contest_id;
 END$$
 
 CREATE PROCEDURE procedure_find_contests  (
     IN __contest_id INT,
     IN __title VARCHAR(255),
-    IN __start_time DATETIME,
     IN __scoring_rule ENUM('IOI', 'ICPC'),
     IN __organizer_id INT
 ) BEGIN
-    SELECT contest_id, title, start_time, end_time, is_published FROM contests
+    SELECT contest_id, title, start_time, end_time, scoring_rule,
+    organizer, is_published FROM contests
     WHERE IF(
         __title IS NOT NULL,
         title LIKE CONCAT(__title, "%") OR 
         MATCH(title) AGAINST (__title IN BOOLEAN MODE),
         TRUE
     )
-    AND start_time = COALESCE(__start_time, start_time)
     AND scoring_rule = COALESCE(__scoring_rule, scoring_rule)
     AND organizer_id = COALESCE(__organizer_id, organizer_id);
 END$$
@@ -689,13 +699,6 @@ CREATE PROCEDURE procedure_delete_problem_from_contest (
 END$$
 
 CREATE PROCEDURE procedure_get_problems_in_contest (
-    IN __contest_id INT
-) BEGIN
-    SELECT problem_id FROM contestproblems
-    WHERE contest_id = __contest_id;
-END$$
-
-CREATE PROCEDURE procedure_get_problems_in_contest_ex (
     IN __contest_id INT
 ) BEGIN
     SELECT problems.problem_id, problems.title,
@@ -818,7 +821,7 @@ CREATE PROCEDURE procedure_find_submissions(
     SELECT submission_id, user_id, problem_id, 
     contest_id, submitted_at, source_code_language, status
     FROM submissions 
-    WHERE submission_id = __submission_id
+    WHERE submission_id = COALESCE(__submission_id, submission_id)
     AND user_id = COALESCE(__user_id, user_id)
     AND problem_id = COALESCE(__problem_id, problem_id)
     AND contest_id = COALESCE(__contest_id, contest_id)
@@ -828,12 +831,14 @@ CREATE PROCEDURE procedure_find_submissions(
 END$$
 
 CREATE PROCEDURE procedure_find_official_submissions_in_contest (
-    IN __contest_id INT
+    IN __contest_id INT,
+    IN __user_id INT
 ) BEGIN
     SELECT submission_id, user_id, problem_id, 
     contest_id, submitted_at,
     source_code_language, status FROM submissions
     WHERE contest_id = __contest_id 
+    AND user_id = COALESCE(__user_id, user_id)
     AND is_submission_official(submission_id);
 END$$
 
@@ -1357,6 +1362,68 @@ FOR EACH ROW BEGIN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'Submission results for each test case should not be edited. 
     Please delete all related submission and insert again instead.';
+END$$
+
+CREATE TRIGGER trigger_before_insert_problem
+BEFORE INSERT ON problems
+FOR EACH ROW BEGIN
+    DECLARE __user_roles SET("AD", "PS", "CU");
+    
+    SET __user_roles = (
+        SELECT role FROM users
+        WHERE user_id = NEW.creator_id
+    );
+    IF (FIND_IN_SET("PS", __user_roles) = 0
+    AND FIND_IN_SET("AD", __user_roles) = 0) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The creator of this problem does not have Problem Setter or Admin role.';
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_before_update_problem
+BEFORE UPDATE ON problems
+FOR EACH ROW BEGIN
+    DECLARE __user_roles SET("AD", "PS", "CU");
+    
+    SET __user_roles = (
+        SELECT role FROM users
+        WHERE user_id = NEW.creator_id
+    );
+    IF (FIND_IN_SET("PS", __user_roles) = 0
+    AND FIND_IN_SET("AD", __user_roles) = 0) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The creator of this problem does not have Problem Setter or Admin role.';
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_before_insert_contest
+BEFORE INSERT ON contests
+FOR EACH ROW BEGIN
+    DECLARE __user_roles SET("AD", "PS", "CU");
+    
+    SET __user_roles = (
+        SELECT role FROM users
+        WHERE user_id = NEW.organizer_id
+    );
+    IF (FIND_IN_SET("AD", __user_roles) = 0) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The creator of this contest does not have Admin role.';
+    END IF;
+END$$
+
+CREATE TRIGGER trigger_before_update_contest
+BEFORE UPDATE ON contests
+FOR EACH ROW BEGIN
+    DECLARE __user_roles SET("AD", "PS", "CU");
+    
+    SET __user_roles = (
+        SELECT role FROM users
+        WHERE user_id = NEW.organizer_id
+    );
+    IF (FIND_IN_SET("AD", __user_roles) = 0) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'The creator of this contest does not have Admin role.';
+    END IF;
 END$$
 
 DELIMITER;

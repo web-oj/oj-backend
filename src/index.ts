@@ -31,38 +31,19 @@ app.listen(PORT, () => {
   console.log("Server is running on port", PORT);
 });
 
-// db.queryInsertProblem(
-//   "test2",
-//   "test",
-//   1000,
-//   2000,
-//   512,
-//   "stdin",
-//   "stdout",
-//   null,
-//   2,
+// db.queryAddSubmission(
+//   4, 1, 1, "C++", 9299, "AC", "warning: none"
 // );
 
-// db.queryDeleteProblem(7);
+// db.queryDeleteSubmission(7);
 
-// db.queryUpdateProblem(
-//   6,
-//   "test",
-//   null,
-//   null,
-//   2000,
-//   null,
-//   null,
-//   null,
-//   null,
-//   null,
-// );
+// db.queryProblemById(1);
 
-// const f = async () => {
-//   let t: Object[] | null = await db.queryFindProblem("a cộng");
-//   if (t !== null) {
-//     console.log(t[0]);
-//   }
-// };
+// db.queryEditSubmission(7, null, null, null, null, null, "AC");
 
-// f();
+const f = async () => {
+  let t: string = await db.queryFindOfficialSubmissionsInContests(1, 4);
+  console.log(JSON.parse(t));
+};
+
+f();

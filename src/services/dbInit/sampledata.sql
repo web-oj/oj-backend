@@ -73,6 +73,24 @@ VALUES (
     );
 
 INSERT INTO
+    users (
+        user_name,
+        email,
+        password,
+        role,
+        created_at,
+        rating
+    )
+VALUES (
+        "deptrai2k7",
+        "deptrai2k7@example.com",
+        "password",
+        "AD,PS,CU",
+        NOW(),
+        69
+    );
+
+INSERT INTO
     contests (
         title,
         start_time,
@@ -85,7 +103,7 @@ VALUES (
         "2024-10-10 00:00:00",
         "2024-11-11 03:00:00",
         "IOI",
-        2
+        6
     );
 
 INSERT INTO
@@ -117,7 +135,7 @@ VALUES (
         "2025-12-10 00:00:00",
         "2025-12-10 03:00:00",
         "IOI",
-        2
+        6
     );
 
 INSERT INTO
@@ -434,29 +452,23 @@ VALUES (
 --     status = "TLE"
 -- WHERE
 --     submission_id = 6
-    -- INSERT INTO
-    --     contestsparticipated (user_id, contest_id)
-    -- VALUES (4, 2);
+-- INSERT INTO
+--     contestsparticipated (user_id, contest_id)
+-- VALUES (4, 2);
 -- INSERT INTO
 --     contestsparticipated (user_id, contest_id)
 -- VALUES (3, 2);
-
 -- INSERT INTO
 --     contestsparticipated (user_id, contest_id)
 -- VALUES (5, 3);
-
 -- INSERT INTO
 --     contestsparticipated (user_id, contest_id)
 -- VALUES (3, 3);
-
 -- INSERT INTO
 --     contestsparticipated (user_id, contest_id)
 -- VALUES (5, 2);
-
 -- INSERT INTO problemssolved VALUES (4, 2);
-
 -- INSERT INTO problemssolved VALUES (3, 1);
-
 INSERT INTO
     contestproblems (problem_id, contest_id, point)
 VALUES (1, 1, 100);
@@ -547,7 +559,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (1, 3, 500, 100, 3, "ok", "AC", NOW());
+VALUES (
+        1,
+        3,
+        500,
+        100,
+        3,
+        "ok",
+        "AC",
+        NOW()
+    );
 
 INSERT INTO
     submissionresults (
@@ -560,7 +581,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (1, 4, 500, 100, 5, "ok", "AC", NOW());
+VALUES (
+        1,
+        4,
+        500,
+        100,
+        5,
+        "ok",
+        "AC",
+        NOW()
+    );
 
 INSERT INTO
     submissionresults (
@@ -595,7 +625,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (2, 3, 500, 100, 3, "ok", "AC", NOW());
+VALUES (
+        2,
+        3,
+        500,
+        100,
+        3,
+        "ok",
+        "AC",
+        NOW()
+    );
 
 INSERT INTO
     submissionresults (
@@ -630,7 +669,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (4, 1, 500, 100, 4, "ok", "AC", NOW());
+VALUES (
+        4,
+        1,
+        500,
+        100,
+        4,
+        "ok",
+        "AC",
+        NOW()
+    );
 
 INSERT INTO
     submissionresults (
@@ -643,7 +691,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (5, 1, 500, 100, 3, "ok", "AC", NOW())
+VALUES (
+        5,
+        1,
+        500,
+        100,
+        3,
+        "ok",
+        "AC",
+        NOW()
+    )
 
 INSERT INTO
     submissionresults (
@@ -656,7 +713,16 @@ INSERT INTO
         status,
         judged_at
     )
-VALUES (5, 2, 500, 100, 5, "ok", "AC", NOW());
+VALUES (
+        5,
+        2,
+        500,
+        100,
+        5,
+        "ok",
+        "AC",
+        NOW()
+    );
 
 INSERT INTO
     submissionresults (
@@ -728,7 +794,11 @@ VALUES (3, "**orz**", NOW());
 
 INSERT INTO
     notifications (receiver_id, content, send_at)
-VALUES (4, "liverpool 7-0 manchester united", NOW());
+VALUES (
+        4,
+        "liverpool 7-0 manchester united",
+        NOW()
+    );
 
 INSERT INTO
     discussionmessages (
@@ -802,7 +872,13 @@ INSERT INTO
         content,
         send_at
     )
-VALUES (3, 1, NULL, "tôi khủng vl", NOW())
+VALUES (
+        3,
+        1,
+        NULL,
+        "tôi khủng vl",
+        NOW()
+    )
 
 INSERT INTO
     discussionmessages (
@@ -812,7 +888,13 @@ INSERT INTO
         content,
         send_at
     )
-VALUES (1, 2, NULL, "sample text", NOW())
+VALUES (
+        1,
+        2,
+        NULL,
+        "sample text",
+        NOW()
+    )
 
 INSERT INTO
     tags (tag_name, tag_type)
