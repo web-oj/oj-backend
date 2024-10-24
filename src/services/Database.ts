@@ -136,8 +136,8 @@ class Database {
     createdAtHigh: string | null = null,
     creatorId: number | null = null,
     isPublished: boolean | null = null,
-    resultLimitStart: number = 0,
-    resultLimitSize: number = 50,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 50,
   ): Promise<string> {
     try {
       let res = await this.connPool.promise().query<RowDataPacket[]>(
@@ -150,8 +150,8 @@ class Database {
           ${sqlString(createdAtHigh)},
           ${sqlString(creatorId)},
           ${sqlString(isPublished)},
-          ${sqlString(resultLimitStart)},
-          ${sqlString(resultLimitSize)})`,
+          ${sqlString(limitRangeStart)},
+          ${sqlString(limitRangeSize)})`,
       );
       return JSON.stringify(res[0][0]);
     } catch (err) {
@@ -168,8 +168,8 @@ class Database {
     createdAtHigh: string | null = null,
     creatorId: number | null = null,
     isPublished: boolean | null = null,
-    resultLimitStart: number | null = 0,
-    resultLimitSize: number | null = 50,
+    limitRangeStart: number | null = 0,
+    limitRangeSize: number | null = 50,
   ): Promise<string> {
     try {
       let res = await this.connPool.promise().query<RowDataPacket[]>(
@@ -182,8 +182,8 @@ class Database {
           ${sqlString(createdAtHigh)},
           ${sqlString(creatorId)},
           ${sqlString(isPublished)},
-          ${sqlString(resultLimitStart)},
-          ${sqlString(resultLimitSize)})`,
+          ${sqlString(limitRangeStart)},
+          ${sqlString(limitRangeSize)})`,
       );
       return JSON.stringify(res[0][0]);
     } catch (err) {
@@ -375,8 +375,8 @@ class Database {
     title: string | null = null,
     problemId: number | null = null,
     isHidden: boolean | null = null,
-    resultLimitStart: number = 0,
-    resultLimitSize: number = 100,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
   ): Promise<string> {
     try {
       let res = await this.connPool.promise().execute<RowDataPacket[]>(
@@ -385,8 +385,8 @@ class Database {
           ${sqlString(title)},
           ${sqlString(problemId)},
           ${sqlString(isHidden)},
-          ${sqlString(resultLimitStart)},
-          ${sqlString(resultLimitSize)})`,
+          ${sqlString(limitRangeStart)},
+          ${sqlString(limitRangeSize)})`,
       );
       return JSON.stringify(res[0][0]);
     } catch (err) {
@@ -673,6 +673,427 @@ class Database {
         `CALL procedure_find_official_submissions_in_contest(
           ${sqlString(contestId)},
           ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetContestRanking(
+    contestId: number,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_contest_ranking(
+          ${sqlString(contestId)},
+          ${sqlString(limitRangeStart)},
+          ${sqlString(limitRangeSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetSolvedProblemsInContestByUser(
+    contestId: number,
+    userId: number,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_solved_problems_in_contest_by_user(
+          ${sqlString(contestId)},
+          ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddSubmissionResultBySubmission(
+    submissionId: number,
+    testCaseId: number,
+    timeElapsed: number,
+    memoryUsed: number,
+    output: string | null,
+    judgeMessage: string | null,
+    judgedAt: string,
+    status: string,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_submission_result_by_submission(
+        ${sqlString(submissionId)},
+        ${sqlString(testCaseId)},
+        ${sqlString(timeElapsed)},
+        ${sqlString(memoryUsed)},
+        ${sqlString(output)},
+        ${sqlString(judgeMessage)},
+        ${sqlString(judgedAt)},
+        ${sqlString(status)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteAllSubmissionResultsBySubmission(
+    submissionId: number,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_all_submission_results_by_submission(
+        ${sqlString(submissionId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetSubmissionResultBySubmission(
+    submissionId: number,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_submission_results_by_submission(
+          ${sqlString(submissionId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddUser(
+    userName: string,
+    email: string,
+    password: string,
+    role: string[],
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_user(
+        ${sqlString(userName)},
+        ${sqlString(email)},
+        ${sqlString(password)},
+        ${sqlString(Array.from(role).join(","))})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditUserAttr(
+    userId: number,
+    userName: string | null = null,
+    email: string | null = null,
+    password: string | null = null,
+    role: string[] = [],
+    rating: number | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_user_attr(
+        ${sqlString(userId)},
+        ${sqlString(userName)},
+        ${sqlString(email)},
+        ${sqlString(password)},
+        ${sqlString(Array.from(role).join(","))},
+        ${sqlString(rating)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteUser(userId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_user(
+        ${sqlString(userId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetUserById(userId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_user_by_id(
+          ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindUsers(
+    userId: number | null = null,
+    userName: string | null = null,
+    email: string | null = null,
+    role: string | null = null,
+    ratingLow: number | null = null,
+    ratingHigh: number | null = null,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_find_users(
+        ${sqlString(userId)},
+        ${sqlString(userName)},
+        ${sqlString(email)},
+        ${sqlString(role)},
+        ${sqlString(ratingLow)},
+        ${sqlString(ratingHigh)},
+        ${sqlString(limitRangeStart)},
+        ${sqlString(limitRangeSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddAchievement(userId: number, title: string): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_achievement(
+        ${sqlString(userId)},
+        ${sqlString(title)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditAchievementAttr(
+    achievementId: number,
+    title: string | null = null,
+    attachment: string | null = null,
+    isVerified: boolean | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_achievement_attr(
+        ${sqlString(achievementId)},
+        ${sqlString(title)},
+        ${sqlString(attachment)},
+        ${sqlString(isVerified)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteAchievement(achievementId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_achievement(
+        ${sqlString(achievementId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetAchievementById(achievementId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_achievement_by_id(
+          ${sqlString(achievementId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetAchievementsByUser(userId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        `CALL procedure_get_achievements_by_user(
+          ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddNotification(
+    receiverId: number,
+    content: string,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_notification(
+        ${sqlString(receiverId)},
+        ${sqlString(content)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditNotificationAttr(
+    notificationId: number,
+    receiverId: number | null = null,
+    content: string | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_notification_attr(
+        ${sqlString(notificationId)},
+        ${sqlString(receiverId)},
+        ${sqlString(content)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteNotification(notificationId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_notification(
+        ${sqlString(notificationId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindNotifications(
+    notificationId: number | null = null,
+    receiverId: number | null = null,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_find_notifications(
+        ${sqlString(notificationId)},
+        ${sqlString(receiverId)},
+        ${sqlString(limitRangeStart)},
+        ${sqlString(limitRangeSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryAddDiscussionMessage(
+    senderId: number,
+    problemId: number,
+    parentId: number | null,
+    content: string,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_add_discussion_message(
+        ${sqlString(senderId)},
+        ${sqlString(problemId)},
+        ${sqlString(parentId)},
+        ${sqlString(content)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryEditDiscussionMessageAttr(
+    messageId: number,
+    senderId: number | null = null,
+    problemId: number | null = null,
+    parentId: number | null = null,
+    content: string | null = null,
+  ): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_edit_discussion_message_attr(
+        ${sqlString(messageId)},
+        ${sqlString(senderId)},
+        ${sqlString(problemId)},
+        ${sqlString(parentId)},
+        ${sqlString(content)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryDeleteDiscussionMessage(messageId: number): Promise<boolean> {
+    try {
+      let res = await this.connPool.promise().execute<ResultSetHeader>(
+        ` CALL procedure_delete_discussion_message(
+        ${sqlString(messageId)})`,
+      );
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindDiscussionMessages(
+    messageId: number | null = null,
+    senderId: number | null = null,
+    problemId: number | null = null,
+    parentId: number | null = null,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_find_discussion_messages(
+        ${sqlString(messageId)},
+        ${sqlString(senderId)},
+        ${sqlString(problemId)},
+        ${sqlString(parentId)},
+        ${sqlString(limitRangeStart)},
+        ${sqlString(limitRangeSize)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryFindRootDiscussionMessages(
+    messageId: number | null = null,
+    senderId: number | null = null,
+    problemId: number | null = null,
+    limitRangeStart: number = 0,
+    limitRangeSize: number = 100,
+  ): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_find_root_discussion_messages(
+        ${sqlString(messageId)},
+        ${sqlString(senderId)},
+        ${sqlString(problemId)},
+        ${sqlString(limitRangeStart)},
+        ${sqlString(limitRangeSize)})`,
       );
       return JSON.stringify(res[0][0]);
     } catch (err) {

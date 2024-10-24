@@ -31,18 +31,16 @@ app.listen(PORT, () => {
   console.log("Server is running on port", PORT);
 });
 
-// db.queryAddSubmission(
-//   4, 1, 1, "C++", 9299, "AC", "warning: none"
-// );
+// db.queryAddDiscussionMessage(3, 3, null, "idk");
 
-// db.queryDeleteSubmission(7);
+db.queryDeleteDiscussionMessage(7);
 
 // db.queryProblemById(1);
 
-// db.queryEditSubmission(7, null, null, null, null, null, "AC");
+// db.queryEditDiscussionMessageAttr(7, null, null, null, "sech");
 
 const f = async () => {
-  let t: string = await db.queryFindOfficialSubmissionsInContests(1, 4);
+  let t: string = await db.queryFindRootDiscussionMessages();
   console.log(JSON.parse(t));
 };
 

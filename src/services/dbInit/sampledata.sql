@@ -782,7 +782,7 @@ INSERT INTO
         is_verified
     )
 VALUES (
-        "Giải Nhì HSG Quốc gia môn Khủng",
+        "Giải Nhì HSG Quốc gia môn Đẹp trai",
         4,
         NULL,
         TRUE

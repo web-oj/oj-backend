@@ -165,7 +165,7 @@ CREATE TABLE Achievements (
     achievement_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
-    attachment MEDIUMBLOB,
+    attachment MEDIUMTEXT,
     is_verified BOOL NOT NULL,
     PRIMARY KEY (achievement_id),
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE
@@ -300,7 +300,7 @@ CREATE PROCEDURE procedure_edit_problem_attr(
     IN __memory_limit INT,
     IN __input_format VARCHAR(15),
     IN __output_format VARCHAR(15),
-    IN __solution_text mediumtext,
+    IN __solution_text MEDIUMTEXT,
     IN __creator_id INT,
     IN __is_published BOOLEAN
 ) BEGIN
@@ -932,7 +932,7 @@ CREATE PROCEDURE procedure_get_solved_problems_in_contest_by_user (
     ) AS current_contest_number_of_official_submissions USING (problem_id);
 END$$
 
-CREATE PROCEDURE procedure_add_submission_results_by_submission(
+CREATE PROCEDURE procedure_add_submission_result_by_submission(
     IN __submission_id INT,
     IN __test_case_id INT,
     IN __time_elapsed INT,
@@ -960,8 +960,8 @@ CREATE PROCEDURE procedure_add_submission_results_by_submission(
         memory_used,
         output,
         judge_message,
-        status,
-        judged_at
+        judged_at,
+        status
     ) VALUES (
         __submission_id,
         __test_case_id,
@@ -970,7 +970,7 @@ CREATE PROCEDURE procedure_add_submission_results_by_submission(
         __output,
         __judge_message,
         __judged_at,
-        NOW()
+        __status
     );
     COMMIT;
 END$$
@@ -1050,7 +1050,7 @@ CREATE PROCEDURE procedure_delete_user(
 ) BEGIN
     START TRANSACTION;
     DELETE FROM users
-    WHERE user_id = __user;
+    WHERE user_id = __user_id;
     COMMIT;
 END$$
 
@@ -1065,7 +1065,7 @@ CREATE PROCEDURE procedure_find_users(
     IN __user_id INT,
     IN __user_name VARCHAR(15),
     IN __email VARCHAR(255),
-    IN __role SET("AD", "PS", "CU"),
+    IN __role ENUM("AD", "PS", "CU"),
     IN __rating_low INT,
     IN __rating_high INT,
     IN __limit_range_start INT,
@@ -1075,7 +1075,7 @@ CREATE PROCEDURE procedure_find_users(
     WHERE user_id = COALESCE(__user_id, user_id)
     AND user_name = COALESCE(__user_name, user_name)
     AND email = COALESCE(__email, email)
-    AND role = COALESCE(__role, role)
+    AND FIND_IN_SET(COALESCE(__role, "CU"), role) != 0
     AND rating BETWEEN COALESCE(__rating_low, 0)
     AND COALESCE(__rating_high, 1000000)
     ORDER BY rating DESC
@@ -1103,7 +1103,7 @@ END$$
 CREATE PROCEDURE procedure_edit_achievement_attr(
     IN __achievement_id INT,
     IN __title VARCHAR(255),
-    IN __attachment MEDIUMBLOB,
+    IN __attachment MEDIUMTEXT,
     IN __is_verified BOOLEAN
 ) BEGIN
     START TRANSACTION;
@@ -1177,7 +1177,7 @@ CREATE PROCEDURE procedure_delete_notification(
     COMMIT;
 END$$
 
-CREATE PROCEDURE procedure_find_notification(
+CREATE PROCEDURE procedure_find_notifications(
     IN __notification_id INT,
     IN __receiver_id INT,
     IN __limit_range_start INT,
@@ -1207,19 +1207,17 @@ CREATE PROCEDURE procedure_add_discussion_message(
         __problem_id,
         __parent_id,
         __content,
-        __send_at
+        NOW()
     );
     COMMIT;
 END$$
 
-CREATE PROCEDURE procedure_edit_disscussion_message_content (
+CREATE PROCEDURE procedure_edit_discussion_message_attr (
     IN __message_id INT,
     IN __sender_id INT,
     IN __problem_id INT,
     IN __parent_id INT,
-    IN __content MEDIUMTEXT,
-    IN __limit_range_start INT,
-    IN __limit_range_size INT
+    IN __content MEDIUMTEXT
 ) BEGIN
     START TRANSACTION;
     UPDATE discussionmessages
@@ -1231,7 +1229,7 @@ CREATE PROCEDURE procedure_edit_disscussion_message_content (
     COMMIT;
 END$$
 
-CREATE PROCEDURE procedure_delete_disscussion_message (
+CREATE PROCEDURE procedure_delete_discussion_message (
     IN __message_id INT
 ) BEGIN
     DELETE FROM discussionmessages
@@ -1250,8 +1248,7 @@ CREATE PROCEDURE procedure_find_discussion_messages (
     WHERE message_id = COALESCE(__message_id, message_id)
     AND sender_id = COALESCE(__sender_id, sender_id)
     AND problem_id = COALESCE(__problem_id, problem_id)
-    AND parent_id = COALESCE(__parent_id, parent_id)
-    AND content = COALESCE(__content, content)
+    AND IF(parent_id IS NOT NULL, parent_id = __parent_id, TRUE)
     LIMIT __limit_range_start, __limit_range_size;
 END$$
 
@@ -1266,8 +1263,7 @@ CREATE PROCEDURE procedure_find_root_discussion_messages (
     WHERE message_id = COALESCE(__message_id, message_id)
     AND sender_id = COALESCE(__sender_id, sender_id)
     AND problem_id = COALESCE(__problem_id, problem_id)
-    AND parent_id = NULL
-    AND content = COALESCE(__content, content)
+    AND parent_id IS NULL
     LIMIT __limit_range_start, __limit_range_size;
 END$$
 
