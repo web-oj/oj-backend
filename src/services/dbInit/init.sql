@@ -926,6 +926,67 @@ CREATE PROCEDURE procedure_get_solved_problems_in_contest_by_user (
     ) AS current_contest_number_of_official_submissions USING (problem_id);
 END$$
 
+CREATE PROCEDURE procedure_add_submission_results_by_submission(
+    IN __submission_id INT,
+    IN __test_case_id INT,
+    IN __time_elapsed INT,
+    IN __memory_used INT,
+    IN __output MEDIUMTEXT,
+    IN __judge_message MEDIUMTEXT,
+    IN __status ENUM(
+        'AC',
+        'P',
+        'J',
+        'WA',
+        'TLE',
+        'MLE',
+        'RTE',
+        'CE',
+        'D'
+    )
+) BEGIN
+    START TRANSACTION;
+    INSERT INTO submissionresults (
+        submission_id,
+        test_case_id,
+        time_elapsed,
+        memory_used,
+        output,
+        judge_message,
+        status
+    ) VALUES (
+        __submission_id,
+        __test_case_id,
+        __time_elapsed,
+        __memory_used,
+        __output,
+        __judge_message,
+        __status
+    );
+    COMMIT;
+END
+
+CREATE PROCEDURE procedure_delete_all_submission_results_of_problem_by_submission (
+    IN __submission_id INT,
+    IN __problem_id INT
+) BEGIN
+    START TRANSACTION;
+    DELETE FROM submissionresults
+    WHERE submission_id = __submission_id
+    AND test_case_id IN (
+        SELECT test_case_id FROM testcases
+        WHERE problem_id = __problem_id
+    );
+    COMMIT;
+END;
+
+CREATE PROCEDURE procedure_get_submission_results_by_submission (
+    IN __submission_id INT
+) BEGIN
+    SELECT * FROM submissionresults
+    WHERE submission_id = __submission_id;
+END;
+
 CREATE PROCEDURE procedure_add_user (
     IN __user_name VARCHAR(15),
     IN __email VARCHAR(255),
