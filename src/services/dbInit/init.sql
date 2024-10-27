@@ -1267,6 +1267,34 @@ CREATE PROCEDURE procedure_find_root_discussion_messages (
     LIMIT __limit_range_start, __limit_range_size;
 END$$
 
+CREATE PROCEDURE procedure_get_solved_problems_by_user(
+    IN __user_id INT
+) BEGIN
+    SELECT * FROM problemssolved
+    WHERE user_id = __user_id;
+END$$
+
+CREATE PROCEDURE procedure_get_solved_users_by_problem(
+    IN __problem_id INT
+) BEGIN
+    SELECT * FROM problemssolved
+    WHERE problem_id = __problem_id;
+END$$
+
+CREATE PROCEDURE procedure_get_participated_contests_by_user(
+    IN __user_id INT
+) BEGIN
+    SELECT * FROM contestsparticipated
+    WHERE user_id = __user_id;
+END$$
+
+CREATE PROCEDURE procedure_get_contest_participants(
+    IN __contest_id INT
+) BEGIN
+    SELECT * FROM contestsparticipated
+    WHERE contest_id = __contest_id;
+END$$
+
 CREATE TRIGGER trigger_after_insert_submissions
 AFTER INSERT ON submissions
 FOR EACH ROW BEGIN 

@@ -1100,6 +1100,53 @@ class Database {
       throw err;
     }
   }
+
+  async queryGetSolvedProblemsByUser(userId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_get_solved_problems_by_user(
+        ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetSolvedUsersByProblem(problemId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_get_solved_users_by_problem(
+        ${sqlString(problemId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async queryGetParticipatedContestsByUser(userId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_get_participated_contests_by_user(
+        ${sqlString(userId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
+  async queryGetContestParticipants(contestId: number): Promise<string> {
+    try {
+      let res = await this.connPool.promise().execute<RowDataPacket[]>(
+        ` CALL procedure_get_contest_participants(
+        ${sqlString(contestId)})`,
+      );
+      return JSON.stringify(res[0][0]);
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export default new Database(

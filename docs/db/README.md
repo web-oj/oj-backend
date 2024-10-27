@@ -16,7 +16,9 @@ Hiện chưa có
 
 ### Cài đặt Schema (local)
 
-Chạy `mysql` để vào MySQL, sau đó truy vấn
+Cần phải tải MySQL server trước (bản nào cũng được).
+
+Chạy `mysql` và đăng nhập để vào MySQL, sau đó truy vấn
 
 ```sql
 SOURCE ./src/services/init.sql
@@ -359,6 +361,7 @@ Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON ch�
 #### Nhận xét
 
 Một số ví dụ sử dụng:
+
 - Liệt kê tất cả các tag: `queryFindTags()`
 - Liệt kê tất cả các nguồn bài: `quertFindTags(null, null, "SOURCE")`
 - Liệt kê tất cả các tag đang được chọn cho việc lọc bài tập: `quertFindTags(null, null, null, true)`
@@ -375,6 +378,7 @@ async queryAddTaggedProblem(
 Thêm một tag cho một bài tập.
 
 #### Tham số
+
 - `problemId`: ID của bài tập, có thể lấy được qua [`queryFindProblems`](#hàm-queryfindproblems)
 - `tagId`: ID của tag, có thể lấy được qua [`queryFindTags`](#hàm-queryfindtags)
 
@@ -396,6 +400,7 @@ async queryDeleteTaggedProblem(
 Xoá một tag có trong cho một bài tập.
 
 #### Tham số
+
 - `problemId`: ID của bài tập, có thể lấy được qua [`queryFindProblems`](#hàm-queryfindproblems)
 - `tagId`: ID của tag, có thể lấy được qua [`queryFindTags`](#hàm-queryfindtags)
 
@@ -416,6 +421,7 @@ async queryFindTagsByProblem(problemId: number): Promise<string>
 Liệt kê các tag có trong một bài tập.
 
 #### Tham số
+
 - `problemId`: ID của bài tập, có thể lấy được qua [`queryFindProblems`](#hàm-queryfindproblems)
 
 #### Giá trị trả về
@@ -491,16 +497,19 @@ async queryEditTestCase(
 ```
 
 ### Hàm `queryDeleteTestCase`
+
 ```ts
 async queryDeleteTestCase(testCaseId: number): Promise<boolean>
 ```
 
 ### Hàm `queryGetTestCaseById`
+
 ```ts
 async queryGetTestCaseById(testCaseId: number): Promise<string>
 ```
 
 ### Hàm `queryFindTestCases`
+
 ```ts
 async queryFindTestCases(
     testCaseId: number | null = null,
@@ -513,6 +522,7 @@ async queryFindTestCases(
 ```
 
 ### Hàm `queryAddContest`
+
 ```ts
 async queryAddContest(
     title: string,
@@ -527,6 +537,7 @@ async queryAddContest(
 ```
 
 ### Hàm `queryEditContest`
+
 ```ts
 async queryEditContest(
     contestId: number,
@@ -542,16 +553,19 @@ async queryEditContest(
 ```
 
 ### Hàm `queryDeleteContest`
+
 ```ts
 async queryDeleteContest(contestId: number): Promise<boolean>
 ```
 
 ### Hàm `queryGetContestById`
+
 ```ts
 async queryGetContestById(contestId: number): Promise<string>
 ```
 
 ### Hàm `queryFindContests`
+
 ```ts
 async queryFindContests(
     contestId: number | null = null,
@@ -562,6 +576,7 @@ async queryFindContests(
 ```
 
 ### Hàm `queryAddProblemToContest`
+
 ```ts
 async queryAddProblemToContest(
     contestId: number,
@@ -571,6 +586,7 @@ async queryAddProblemToContest(
 ```
 
 ### Hàm `queryEditProblemPointInContest`
+
 ```ts
 async queryEditProblemPointInContest(
     contestId: number,
@@ -580,6 +596,7 @@ async queryEditProblemPointInContest(
 ```
 
 ### Hàm `queryDeleteProblemFromContest`
+
 ```ts
 async queryDeleteProblemFromContest(
     contestId: number,
@@ -588,10 +605,13 @@ async queryDeleteProblemFromContest(
 ```
 
 ### Hàm `queryGetProblemsInContest`
+
 ```ts
 async queryGetProblemsInContest(contestId: number): Promise<string>
 ```
+
 ### Hàm `queryAddSubmission`
+
 ```ts
 async queryAddSubmission(
     userId: number,
@@ -605,6 +625,7 @@ async queryAddSubmission(
 ```
 
 ### Hàm `queryEditSubmission`
+
 ```ts
 async queryEditSubmission(
     submissionId: number,
@@ -619,16 +640,19 @@ async queryEditSubmission(
 ```
 
 ### Hàm `queryDeleteSubmission`
+
 ```ts
 async queryDeleteSubmission(submissionId: number): Promise<boolean>
 ```
 
 ### Hàm `queryGetSubmissionById`
+
 ```ts
 async queryGetSubmissionById(submissionId: number): Promise<string>
 ```
 
 ### Hàm `queryFindSubmissions`
+
 ```ts
 async queryFindSubmissions(
     submissionId: number | null = null,
@@ -642,6 +666,7 @@ async queryFindSubmissions(
 ```
 
 ### Hàm `queryFindOfficialSubmissionsInContests`
+
 ```ts
 async queryFindOfficialSubmissionsInContests(
     contestId: number,
@@ -650,6 +675,7 @@ async queryFindOfficialSubmissionsInContests(
 ```
 
 ### Hàm `queryGetContestRanking`
+
 ```ts
 async queryGetContestRanking(
     contestId: number,
@@ -659,6 +685,7 @@ async queryGetContestRanking(
 ```
 
 ### Hàm `queryGetSolvedProblemsInContestByUser`
+
 ```ts
 async queryGetSolvedProblemsInContestByUser(
     contestId: number,
@@ -667,6 +694,7 @@ async queryGetSolvedProblemsInContestByUser(
 ```
 
 ### Hàm `queryAddSubmissionResultBySubmission`
+
 ```ts
 async queryAddSubmissionResultBySubmission(
     submissionId: number,
@@ -681,6 +709,7 @@ async queryAddSubmissionResultBySubmission(
 ```
 
 ### Hàm `queryDeleteAllSubmissionResultsBySubmission`
+
 ```ts
 async queryDeleteAllSubmissionResultsBySubmission(
     submissionId: number,
@@ -688,6 +717,7 @@ async queryDeleteAllSubmissionResultsBySubmission(
 ```
 
 ### Hàm `queryGetSubmissionResultBySubmission`
+
 ```ts
 async queryGetSubmissionResultBySubmission(
     submissionId: number,
@@ -695,6 +725,7 @@ async queryGetSubmissionResultBySubmission(
 ```
 
 ### Hàm `queryAddUser`
+
 ```ts
 async queryAddUser(
     userName: string,
@@ -705,6 +736,7 @@ async queryAddUser(
 ```
 
 ### Hàm `queryEditUserAttr`
+
 ```ts
 async queryEditUserAttr(
     userId: number,
@@ -717,16 +749,19 @@ async queryEditUserAttr(
 ```
 
 ### Hàm `queryDeleteUser`
+
 ```ts
  async queryDeleteUser(userId: number): Promise<boolean>
 ```
 
 ### Hàm `queryGetUserById`
+
 ```ts
 async queryGetUserById(userId: number): Promise<string>
 ```
 
 ### Hàm `queryFindUsers`
+
 ```ts
 async queryFindUsers(
     userId: number | null = null,
@@ -741,11 +776,13 @@ async queryFindUsers(
 ```
 
 ### Hàm `queryAddAchievement`
+
 ```ts
 async queryAddAchievement(userId: number, title: string): Promise<boolean>
 ```
 
 ### Hàm `queryEditAchievementAttr`
+
 ```ts
 async queryEditAchievementAttr(
     achievementId: number,
@@ -756,21 +793,25 @@ async queryEditAchievementAttr(
 ```
 
 ### Hàm `queryDeleteAchievement`
+
 ```ts
 async queryDeleteAchievement(achievementId: number): Promise<boolean>
 ```
 
 ### Hàm `queryGetAchievementById`
+
 ```ts
 async queryGetAchievementById(achievementId: number): Promise<string>
 ```
 
 ### Hàm `queryGetAchievementsByUser`
+
 ```ts
 async queryGetAchievementsByUser(userId: number): Promise<string>
 ```
 
 ### Hàm `queryAddNotification`
+
 ```ts
 async queryAddNotification(
     receiverId: number,
@@ -779,6 +820,7 @@ async queryAddNotification(
 ```
 
 ### Hàm `queryEditNotificationAttr`
+
 ```ts
 async queryEditNotificationAttr(
     notificationId: number,
@@ -788,11 +830,13 @@ async queryEditNotificationAttr(
 ```
 
 ### Hàm `queryDeleteNotification`
+
 ```ts
  async queryDeleteNotification(notificationId: number): Promise<boolean>
 ```
 
 ### Hàm `queryFindNotifications`
+
 ```ts
 async queryFindNotifications(
     notificationId: number | null = null,
@@ -803,6 +847,7 @@ async queryFindNotifications(
 ```
 
 ### Hàm `queryAddDiscussionMessage`
+
 ```ts
 async queryAddDiscussionMessage(
     senderId: number,
@@ -813,6 +858,7 @@ async queryAddDiscussionMessage(
 ```
 
 ### Hàm `queryEditDiscussionMessageAttr`
+
 ```ts
 async queryEditDiscussionMessageAttr(
     messageId: number,
@@ -824,6 +870,7 @@ async queryEditDiscussionMessageAttr(
 ```
 
 ### Hàm `queryFindDiscussionMessages`
+
 ```ts
 async queryFindDiscussionMessages(
     messageId: number | null = null,
@@ -836,6 +883,7 @@ async queryFindDiscussionMessages(
 ```
 
 ### Hàm `queryFindRootDiscussionMessages`
+
 ```ts
 async queryFindRootDiscussionMessages(
     messageId: number | null = null,
@@ -846,3 +894,26 @@ async queryFindRootDiscussionMessages(
   ): Promise<string>
 ```
 
+### Hàm `queryGetSolvedProblemsByUser`
+
+```ts
+async queryGetSolvedProblemsByUser(userId: number): Promise<string>
+```
+
+### Hàm `queryGetSolvedUsersByProblem`
+
+```ts
+async queryGetSolvedUsersByProblem(problemId: number): Promise<string>
+```
+
+### Hàm `queryGetParticipatedContestsByUser`
+
+```ts
+async queryGetParticipatedContestsByUser(userId: number): Promise<string>
+```
+
+### Hàm `queryGetContestParticipants`
+
+```ts
+async queryGetContestParticipants(contestId: number): Promise<string>
+```
