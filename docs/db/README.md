@@ -138,7 +138,7 @@ Khởi tạo đối tượng thuộc lớp `Database`, trong đó mở kết n�
 - `__password`: Mật khẩu cho user
 - `__database`: Tên database
 
-#### Nhận xét
+#### Chú ý
 
 Khi import và gọi đối tượng `db`, nó đã được khởi tạo sẵn bằng hàm này với các tham số là các giá trị lưu trong `.env`.
 
@@ -171,14 +171,14 @@ Thêm một bài toán vào CSDL.
 - `inputFormat`: Một xâu miêu tả cách mà code của người dùng nhận dữ liệu, từ màn hình console (stdin) hay từ một file input. Để là `null` để sử dụng input từ màn hình console, hoặc để là tên file nếu muốn input từ file đó.
 - `outputFormat`: Một xâu miêu tả cách mà code của người dùng xuất dữ liệu ra, ra màn hình console (stdout) hay ra một file input. Để là `null` để sử dụng input từ màn hình console, hoặc để là tên file nếu muốn input từ file đó.
 - `solutionText`: Một xâu miêu tả lời giải cho bài toán. Lời giải này có thể được viết dưới dạng Markdown. Có thể để `null` nếu không có lời giải
-- `creatorId`: `userId` của người tạo bài tập này
+- `creatorId`: `userId` của người tạo bài tập này. Người tạo phải có role là Admin hoặc Problem Setter, nếu không sẽ gây lỗi
 - `isPublished`: Giá trị boolean cho biết bài toán này đã được hoàn thiện để đăng lên chưa (dùng cho tính năng Save Draft). Để là `null` hoặc bỏ qua tham số này sẽ ngầm định `isPublished = 0`.
 
 #### Giá trị trả về
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Sử dụng hàm này để thêm một bài tập vào CSDL, chẳng hạn:
 
@@ -258,7 +258,7 @@ Sửa một bài tập đang có trong CSDL, biết trước `problemId` của b
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Xem [`queryAddProblem`](#hàm-queryaddproblem)
 
@@ -278,7 +278,7 @@ Xoá một bài tập với ID cho trước đã có trong CSDL.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`). Nếu xoá thành công, các bộ giá trị mang khoá ngoài tham chiếu đến giá trị này sẽ bị xoá (`ON DELETE CASCADE`).
 
@@ -298,7 +298,7 @@ Trả về tất cả thông tin có trong CSDL cho một bài tập với ID c�
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa tất cả các entry có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 ### Hàm `queryFindProblems`
 
@@ -335,7 +335,7 @@ Lấy một số thông tin của các bài tập trong CSDL, dựa vào một s
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa `problem_id`, `title`, `difficulty`, `created_at`, `creator_id`, `is_published` có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Hàm này chỉ trả về một lượng giới hạn các thuộc tính của các bài tập theo các điều kiện cho trước. Để lấy tất cả các thuộc tính, sử dụng hàm [`queryGetProblemById`](#hàm-querygetproblembyid).
 
@@ -358,7 +358,7 @@ Thêm một tag (nhãn bài tập) vào CSDL. Tags có thể là loại bài (`C
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Một bài tập sẽ được gắn nhãn để dễ dàng tìm kiếm. Trong đó, loại bài thường là những phương pháp áp dụng trong bài đó, như `dp`, `divide and conquer`, ... còn nguồn bài thì đơn giản là bài đó có ở đâu.
 
@@ -388,7 +388,7 @@ Sửa các thuộc tính đã có của một tag trong CSDL. Các thuộc tính
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Về ý nghĩa của các giá trị, xem hàm [`queryAddTag`](#hàm-queryaddtag).
 
@@ -410,7 +410,7 @@ Xoá một tag khỏi CSDL.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`). Nếu xoá thành công, các bộ giá trị mang khoá ngoài tham chiếu đến giá trị này sẽ bị xoá (`ON DELETE CASCADE`).
 
@@ -435,7 +435,7 @@ Xem [queryEditTagAttr](#hàm-queryedittagattr) để hiểu ý nghĩa. Tất c�
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa tất cả các thuộc tính của các giá trị thoả mãn có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Một số ví dụ sử dụng:
 
@@ -463,7 +463,7 @@ Thêm một tag cho một bài tập.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 ### Hàm `queryDeleteTaggedProblem`
 
@@ -485,7 +485,7 @@ Xoá một tag có trong cho một bài tập.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`).
 
@@ -505,7 +505,7 @@ Liệt kê các tag có trong một bài tập.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 ### Hàm `queryFindProblemsWithTags`
 
@@ -542,7 +542,7 @@ Lấy một số thông tin của một bài tập có nhãn là các nhãn đan
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa `problem_id`, `title`, `difficulty`, `created_at`, `creator_id`, `is_published` có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Hàm này thực chất thực hiện chọn các tag có `is_selected = TRUE`. Do đó, trước hết cần phải chọn một số tag bằng cách sử dụng `queryEditTagAttr(tag_id, null, null, true)`.
 
@@ -574,7 +574,7 @@ Thêm một test case cho một bài tập vào CSDL.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
@@ -602,7 +602,7 @@ Sửa các thuộc tính đã có của một test case trong CSDL.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
@@ -622,7 +622,7 @@ Xoá một test case trong CSDL.
 
 Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`).
 
@@ -642,7 +642,7 @@ Trả về tất cả thông tin có trong CSDL cho một test case từ ID củ
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa tất cả các entry có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
@@ -670,7 +670,7 @@ Lấy một số thông tin các test case tập trong CSDL thoả mãn một s�
 
 Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa `test_case_id`, `title`, `problem_id`, `is_hidden` có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
 
-#### Nhận xét
+#### Chú ý
 
 Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
@@ -692,6 +692,27 @@ async queryAddContest(
   ): Promise<boolean>
 ```
 
+Thêm một kỳ thi vào CSDL.
+
+#### Tham số
+
+- `title`: Tên của kỳ thi
+- `description`: Mô tả kỳ thi. Có thể để null
+- `startTime`: Thời gian bắt đầu kỳ thi dưới dạng `DATETIME` MySQL `yyyy-mm-dd hh:mm:ss`
+- `endTime`: Thời gian kết thúc kỳ thi dưới dạng `DATETIME` MySQL `yyyy-mm-dd hh:mm:ss`
+- `scoringRule`: Quy tắc chấm điểm của kỳ thi. Nhận một trong hai giá trị `ICPC` hoặc `IOI`
+- `organizerID`: ID của người tạo contest. Người tạo contest phải có role là Admin, nếu không sẽ gây lỗi
+- `isPublished`: Thuộc tính boolean cho biết bài toán này đã được hoàn thiện để đăng lên chưa (dùng cho tính năng Save Draft). Để là `null` hoặc bỏ qua tham số này sẽ ngầm định `isPublished = 0`.
+- `isPlagiarismCheckEnabled`: Thuộc tính boolean, nếu để `true` thì contest cho phép check chép code
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
+
 ### Hàm `queryEditContest`
 
 ```ts
@@ -708,17 +729,60 @@ async queryEditContest(
   ): Promise<boolean>
 ```
 
+Sửa các thuộc tính đã có của một kỳ thi trong CSDL. 
+
+#### Tham số
+
+- `contestId`: ID của kỳ thi, có thể lấy từ [`queryFindContests`](#hàm-queryfindcontests)
+- Các tham số khác: Xem [`queryAddContest`](#hàm-queryaddcontest). Đặt là `null` hoặc bỏ qua để giữ nguyên giá trị trong bảng.
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
+
 ### Hàm `queryDeleteContest`
 
 ```ts
 async queryDeleteContest(contestId: number): Promise<boolean>
 ```
 
+Xoá một test case trong CSDL.
+
+#### Tham số
+
+- `contestId`: ID của kỳ thi, có thể lấy từ [`queryFindContests`](#hàm-queryfindcontests)
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`). Nếu xoá thành công, các bộ giá trị mang khoá ngoài tham chiếu đến giá trị này sẽ bị xoá (`ON DELETE CASCADE`).
+
 ### Hàm `queryGetContestById`
 
 ```ts
 async queryGetContestById(contestId: number): Promise<string>
 ```
+
+Trả về tất cả thông tin có trong CSDL cho một kỳ thi từ ID của kỳ thi đó.
+
+#### Tham số
+
+- `contestId`: ID của kỳ thi, có thể lấy từ [`queryFindContests`](#hàm-queryfindcontests)
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa tất cả các entry có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
 ### Hàm `queryFindContests`
 
@@ -731,6 +795,22 @@ async queryFindContests(
   ): Promise<string>
 ```
 
+Lấy một số thông tin các kỳ thi trong CSDL thoả mãn một số điều kiện cho trước. 
+
+#### Tham số
+
+Xem [`queryAddContest`](#hàm-queryaddcontest)
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa `contest_id`, `title`, `start_time`, `end_time`, `scoring_rule`, `organizer`, `is_published` có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
+
+Hàm này chỉ trả về một lượng giới hạn các thuộc tính của các kỳ thi theo các điều kiện cho trước. Để lấy tất cả các thuộc tính, sử dụng hàm [`queryGetContestById`](#hàm-querygetcontestbyid).
+
 ### Hàm `queryAddProblemToContest`
 
 ```ts
@@ -740,6 +820,22 @@ async queryAddProblemToContest(
     point: number,
   ): Promise<boolean>
 ```
+
+Thêm một bài tập vào một kỳ thi đã có trong CSDL.
+
+#### Tham số
+
+- `contestId`: ID kỳ thi, có thể lấy được từ [`queryFindContests`](#hàm-queryfindcontests)
+- `problemId`: ID của bài tập được thêm vào, có thể lấy được từ [`queryFindProblems`](#hàm-queryfindproblems)
+- `point`: Điểm số của bài tập này trong kỳ thi
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
 ### Hàm `queryEditProblemPointInContest`
 
@@ -751,6 +847,22 @@ async queryEditProblemPointInContest(
   ): Promise<boolean>
 ```
 
+Sửa điểm số của bài tập trong một kỳ thi đã có trong CSDL.
+
+#### Tham số
+
+- `contestId`: ID kỳ thi, có thể lấy được từ [`queryFindContests`](#hàm-queryfindcontests)
+- `problemId`: ID của bài tập, có thể lấy được từ [`queryFindProblems`](#hàm-queryfindproblems)
+- `point`: Số điểm cần sửa. Đặt là `null` nếu muốn giữ nguyên
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
+
 ### Hàm `queryDeleteProblemFromContest`
 
 ```ts
@@ -760,11 +872,42 @@ async queryDeleteProblemFromContest(
   ): Promise<boolean>
 ```
 
+Xoá bài tập khỏi một kỳ thi đã có trong CSDL.
+
+#### Tham số
+
+- `contestId`: ID kỳ thi, có thể lấy được từ [`queryFindContests`](#hàm-queryfindcontests)
+- `problemId`: ID của bài tập, có thể lấy được từ [`queryFindProblems`](#hàm-queryfindproblems)
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về `true` nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
+
+Nếu giá trị này không xuất hiện trong CSDL, không có gì xảy ra cả và hàm vẫn trả về `true` (do sử dụng `DELETE ... FROM ...`)
+
 ### Hàm `queryGetProblemsInContest`
 
 ```ts
 async queryGetProblemsInContest(contestId: number): Promise<string>
 ```
+
+Liệt kê tất cả các bài tập cùng điểm số của chúng trong một kỳ thi
+
+#### Tham số
+
+- `contestId`: ID của kỳ thi, có thể lấy từ [`queryFindContests`](#hàm-queryfindcontests)
+
+#### Giá trị trả về
+
+Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON chứa tất cả các entry có trong CSDL nếu thành công. Nếu có lỗi, hàm này sẽ ném lại lỗi đó.
+
+#### Chú ý
+
+Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
 ### Hàm `queryAddSubmission`
 
