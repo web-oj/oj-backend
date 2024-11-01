@@ -89,7 +89,11 @@
 
 ### Online hosting MySQL server
 
-Hiện chưa có
+Host: `mysql-3f37b883-ojdb-test.f.aivencloud.com`
+Port: `11192`
+User: `testuser`
+Password:
+Database: `ojdb`
 
 ### Cài đặt Schema (local)
 
@@ -591,7 +595,7 @@ async queryEditTestCase(
   ): Promise<boolean>
 ```
 
-Sửa các thuộc tính đã có của một test case trong CSDL. 
+Sửa các thuộc tính đã có của một test case trong CSDL.
 
 #### Tham số
 
@@ -659,7 +663,7 @@ async queryFindTestCases(
   ): Promise<string>
 ```
 
-Lấy một số thông tin các test case tập trong CSDL thoả mãn một số điều kiện cho trước. 
+Lấy một số thông tin các test case tập trong CSDL thoả mãn một số điều kiện cho trước.
 
 #### Tham số
 
@@ -675,7 +679,6 @@ Một `Promise`, khi hoàn thành sẽ trả về một xâu có dạng JSON ch�
 Về ý nghĩa của các tham số, xem [Ý nghĩa các bảng](#ý-nghĩa-các-bảng).
 
 Hàm này chỉ trả về một lượng giới hạn các thuộc tính của các test case theo các điều kiện cho trước. Để lấy tất cả các thuộc tính, sử dụng hàm [`queryGetTestCaseById`](#hàm-querygettestcasebyid).
-
 
 ### Hàm `queryAddContest`
 
@@ -729,7 +732,7 @@ async queryEditContest(
   ): Promise<boolean>
 ```
 
-Sửa các thuộc tính đã có của một kỳ thi trong CSDL. 
+Sửa các thuộc tính đã có của một kỳ thi trong CSDL.
 
 #### Tham số
 
@@ -795,7 +798,7 @@ async queryFindContests(
   ): Promise<string>
 ```
 
-Lấy một số thông tin các kỳ thi trong CSDL thoả mãn một số điều kiện cho trước. 
+Lấy một số thông tin các kỳ thi trong CSDL thoả mãn một số điều kiện cho trước.
 
 #### Tham số
 

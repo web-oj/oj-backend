@@ -18,12 +18,14 @@ class Database {
 
   constructor(
     __host: string,
+    __port: number,
     __user: string,
     __password: string,
     __database: string,
   ) {
     this.connPool = mysql.createPool({
       host: __host,
+      port: __port,
       user: __user,
       password: __password,
       database: __database,
@@ -1151,6 +1153,7 @@ class Database {
 
 export default new Database(
   process.env.MYSQL_HOST as string,
+  +(process.env.MYSQL_PORT as string),
   process.env.MYSQL_USER as string,
   process.env.MYSQL_PASSWORD as string,
   process.env.MYSQL_DATABASE as string,

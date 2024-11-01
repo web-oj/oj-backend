@@ -1,3 +1,4 @@
+-- Active: 1730453180774@@mysql-3f37b883-ojdb-test.f.aivencloud.com@11192@ojdb
 -- Schema: https://drive.google.com/file/d/1LXLR8uFOKzCWZ5iASw4Rbs8xYwgfgVkW/view?usp=drive_link
 
 DROP DATABASE IF EXISTS ojdb;
@@ -6,7 +7,7 @@ CREATE DATABASE ojdb;
 
 USE ojdb;
 
-CREATE TABLE Users (
+CREATE TABLE users (
     user_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_name VARCHAR(15) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -37,7 +38,7 @@ VALUES (
         0
     );
 
-CREATE TABLE Contests (
+CREATE TABLE contests (
     contest_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     description MEDIUMTEXT,
@@ -50,33 +51,33 @@ CREATE TABLE Contests (
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
     is_plagiarism_check_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (contest_id),
-    FOREIGN KEY (organizer_id) REFERENCES Users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (organizer_id) REFERENCES users (user_id) ON DELETE CASCADE,
     INDEX index_start_time (start_time),
     FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE Problems (
+CREATE TABLE problems (
     problem_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     statement MEDIUMTEXT NOT NULL,
     difficulty INT NOT NULL,
     time_limit INT NOT NULL,
     memory_limit INT NOT NULL,
-    input_format VARCHAR(15) NOT NULL DEFAULT "stdin",
-    output_format VARCHAR(15) NOT NULL DEFAULT "stdout",
+    input_format VARCHAR(15) NOT NULL DEFAULT 'stdin',
+    output_format VARCHAR(15) NOT NULL DEFAULT 'stdout',
     solution_text MEDIUMTEXT,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     creator_id INT NOT NULL,
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (problem_id),
-    FOREIGN KEY (creator_id) REFERENCES Users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,
     INDEX index_difficulty (difficulty),
     INDEX index_created_at (created_at),
     FULLTEXT (title)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE Submissions (
+CREATE TABLE submissions (
     submission_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     problem_id INT NOT NULL,
@@ -97,38 +98,38 @@ CREATE TABLE Submissions (
     ) NOT NULL DEFAULT 'P',
     compiler_message MEDIUMTEXT,
     PRIMARY KEY (submission_id),
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
-    FOREIGN KEY (contest_id) REFERENCES Contests (contest_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE,
+    FOREIGN KEY (contest_id) REFERENCES contests (contest_id) ON DELETE CASCADE,
     INDEX index_status (status)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE ContestsParticipated (
+CREATE TABLE contestsparticipated (
     user_id INT NOT NULL,
     contest_id INT NOT NULL,
     PRIMARY KEY (user_id, contest_id),
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (contest_id) REFERENCES Contests (contest_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (contest_id) REFERENCES contests (contest_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE ProblemsSolved (
+CREATE TABLE problemssolved (
     user_id INT NOT NULL,
     problem_id INT NOT NULL,
     PRIMARY KEY (user_id, problem_id),
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE ContestProblems (
+CREATE TABLE contestproblems (
     problem_id INT NOT NULL,
     contest_id INT NOT NULL,
     point INT NOT NULL,
     PRIMARY KEY (contest_id, problem_id),
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
-    FOREIGN KEY (contest_id) REFERENCES Contests (contest_id) ON DELETE CASCADE
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE,
+    FOREIGN KEY (contest_id) REFERENCES contests (contest_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE TestCases (
+CREATE TABLE testcases (
     test_case_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     problem_id INT NOT NULL,
@@ -136,10 +137,10 @@ CREATE TABLE TestCases (
     expected_output MEDIUMTEXT NOT NULL,
     is_hidden BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (test_case_id),
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE SubmissionResults (
+CREATE TABLE submissionresults (
     submission_id INT NOT NULL,
     test_case_id INT NOT NULL,
     time_elapsed INT NOT NULL,
@@ -159,31 +160,31 @@ CREATE TABLE SubmissionResults (
     ) NOT NULL DEFAULT 'P',
     judged_at DATETIME NOT NULL,
     PRIMARY KEY (submission_id, test_case_id),
-    FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id) ON DELETE CASCADE,
-    FOREIGN KEY (test_case_id) REFERENCES TestCases (test_case_id) ON DELETE CASCADE,
+    FOREIGN KEY (submission_id) REFERENCES submissions (submission_id) ON DELETE CASCADE,
+    FOREIGN KEY (test_case_id) REFERENCES testcases (test_case_id) ON DELETE CASCADE,
     INDEX index_status (status)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE Achievements (
+CREATE TABLE achievements (
     achievement_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     user_id INT NOT NULL,
     attachment MEDIUMTEXT,
     is_verified BOOL NOT NULL,
     PRIMARY KEY (achievement_id),
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE Notifications (
+CREATE TABLE notifications (
     notification_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     receiver_id INT NOT NULL,
     content MEDIUMTEXT NOT NULL,
     send_at DATETIME NOT NULL,
     PRIMARY KEY (notification_id),
-    FOREIGN KEY (receiver_id) REFERENCES Users (user_id) ON DELETE CASCADE
+    FOREIGN KEY (receiver_id) REFERENCES users (user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE DiscussionMessages (
+CREATE TABLE discussionmessages (
     message_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     sender_id INT NOT NULL,
     problem_id INT NOT NULL,
@@ -191,12 +192,12 @@ CREATE TABLE DiscussionMessages (
     content MEDIUMTEXT NOT NULL,
     send_at DATETIME,
     PRIMARY KEY (message_id),
-    FOREIGN KEY (sender_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE,
     INDEX index_parent_id (parent_id)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE Tags (
+CREATE TABLE tags (
     tag_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     tag_name VARCHAR(31) UNIQUE NOT NULL,
     tag_type ENUM('CATEGORY', 'SOURCE') NOT NULL,
@@ -206,20 +207,20 @@ CREATE TABLE Tags (
     INDEX index_is_selected (is_selected)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE TaggedProblems (
+CREATE TABLE taggedproblems (
     problem_id INT NOT NULL,
     tag_id INT NOT NULL,
     PRIMARY KEY (problem_id, tag_id),
-    FOREIGN KEY (problem_id) REFERENCES Problems (problem_id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Tags (tag_id) ON DELETE CASCADE
+    FOREIGN KEY (problem_id) REFERENCES problems (problem_id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags (tag_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
-CREATE TABLE PlagiarismReports (
+CREATE TABLE plagiarismReports (
     report_id INT UNIQUE NOT NULL AUTO_INCREMENT,
     submission_id INT NOT NULL,
     moss_dump_file VARCHAR(255) NOT NULL,
     PRIMARY KEY (report_id),
-    FOREIGN KEY (submission_id) REFERENCES Submissions (submission_id) ON DELETE CASCADE
+    FOREIGN KEY (submission_id) REFERENCES submissions (submission_id) ON DELETE CASCADE
 ) ENGINE = InnoDB CHARSET = utf8;
 
 DELIMITER $$
@@ -285,8 +286,8 @@ CREATE PROCEDURE procedure_add_problem(
             __difficulty, 
             __time_limit, 
             __memory_limit,
-            COALESCE(__input_format, "stdin"),
-            COALESCE(__output_format, "stdout"),
+            COALESCE(__input_format, 'stdin'),
+            COALESCE(__output_format, 'stdout'),
             __solution_text, 
             NOW(), 
             NOW(),
@@ -585,7 +586,7 @@ CREATE PROCEDURE procedure_find_test_cases (
 ) BEGIN
     SELECT test_case_id, title, problem_id, is_hidden FROM testcases 
     WHERE test_case_id = COALESCE(__test_case_id, test_case_id)
-    AND title LIKE CONCAT(COALESCE(__title, title), "%")
+    AND title LIKE CONCAT(COALESCE(__title, title), '%')
     AND problem_id = COALESCE(__problem_id, problem_id)
     AND is_hidden = COALESCE(__is_hidden, is_hidden)
     ORDER BY test_case_id
@@ -694,7 +695,7 @@ CREATE PROCEDURE procedure_find_contests  (
     organizer, is_published FROM contests
     WHERE IF(
         __title IS NOT NULL,
-        title LIKE CONCAT(__title, "%") OR 
+        title LIKE CONCAT(__title, '%') OR 
         MATCH(title) AGAINST (__title IN BOOLEAN MODE),
         TRUE
     )
@@ -886,7 +887,7 @@ CREATE PROCEDURE procedure_get_contest_ranking (
     IN __limit_range_start INT,
     IN __limit_range_size INT
 ) BEGIN
-    DECLARE __scoring_rule ENUM("IOI", "ICPC");
+    DECLARE __scoring_rule ENUM('IOI', 'ICPC');
     DECLARE __contest_start_time DATETIME;
     DECLARE __contest_end_time DATETIME;
     DECLARE __contest_duration INT;
@@ -909,7 +910,7 @@ CREATE PROCEDURE procedure_get_contest_ranking (
     SELECT current_contest_official_accepted_submissions.user_id 
     AS user_id,
     IF(
-        __scoring_rule = "ICPC", 
+        __scoring_rule = 'ICPC', 
         COUNT(problem_id) * 10000 -
         SUM(TIMESTAMPDIFF(MINUTE, __contest_start_time, solved_at)) -
         (SUM(number_of_submissions) - COUNT(problem_id)) * 20, 
@@ -924,7 +925,7 @@ CREATE PROCEDURE procedure_get_contest_ranking (
         MAX(submitted_at) AS solved_at FROM submissions
         WHERE contest_id = __contest_id
         AND is_submission_official(submission_id)
-        AND status = "AC"
+        AND status = 'AC'
         GROUP BY user_id, problem_id
     ) AS current_contest_official_accepted_submissions
     JOIN (
@@ -959,7 +960,7 @@ CREATE PROCEDURE procedure_get_solved_problems_in_contest_by_user (
         WHERE user_id = __user_id
         AND contest_id = __contest_id
         AND is_submission_official(submission_id)
-        AND status = "AC"
+        AND status = 'AC'
         GROUP BY problem_id
     ) AS current_contest_official_accepted_submissions
     JOIN (
@@ -1044,7 +1045,7 @@ CREATE PROCEDURE procedure_add_user (
     IN __user_name VARCHAR(15),
     IN __email VARCHAR(255),
     IN __password VARCHAR(31),
-    IN __role SET("AD", "PS", "CU")
+    IN __role SET('AD', 'PS', 'CU')
 ) BEGIN
     START TRANSACTION;
     INSERT INTO users (
@@ -1070,7 +1071,7 @@ CREATE PROCEDURE procedure_edit_user_attr (
     IN __user_name VARCHAR(15),
     IN __email VARCHAR(255),
     IN __password VARCHAR(31),
-    IN __role SET("AD", "PS", "CU"),
+    IN __role SET('AD', 'PS', 'CU'),
     IN __rating INT
 ) BEGIN
     START TRANSACTION;
@@ -1104,7 +1105,7 @@ CREATE PROCEDURE procedure_find_users(
     IN __user_id INT,
     IN __user_name VARCHAR(15),
     IN __email VARCHAR(255),
-    IN __role ENUM("AD", "PS", "CU"),
+    IN __role ENUM('AD', 'PS', 'CU'),
     IN __rating_low INT,
     IN __rating_high INT,
     IN __limit_range_start INT,
@@ -1114,7 +1115,7 @@ CREATE PROCEDURE procedure_find_users(
     WHERE user_id = COALESCE(__user_id, user_id)
     AND user_name = COALESCE(__user_name, user_name)
     AND email = COALESCE(__email, email)
-    AND FIND_IN_SET(COALESCE(__role, "CU"), role) != 0
+    AND FIND_IN_SET(COALESCE(__role, 'CU'), role) != 0
     AND rating BETWEEN COALESCE(__rating_low, 0)
     AND COALESCE(__rating_high, 1000000)
     ORDER BY rating DESC
@@ -1390,7 +1391,7 @@ END$$
 CREATE TRIGGER trigger_after_insert_submission_results
 AFTER INSERT ON submissionresults
 FOR EACH ROW BEGIN
-    IF (NEW.status != "AC") THEN
+    IF (NEW.status != 'AC') THEN
         UPDATE submissions 
         SET status = NEW.STATUS
         WHERE submission_id = NEW.submission_id;
@@ -1399,7 +1400,7 @@ FOR EACH ROW BEGIN
             (
                 SELECT COUNT(*) FROM submissionresults
                 WHERE submission_id = NEW.submission_id
-                AND status = "AC"
+                AND status = 'AC'
             ) = (
                 SELECT COUNT(*) FROM testcases
                 WHERE testcases.problem_id = (
@@ -1409,11 +1410,11 @@ FOR EACH ROW BEGIN
             )
         ) THEN
             UPDATE submissions 
-            SET status = "AC"
+            SET status = 'AC'
             WHERE submission_id = NEW.submission_id;
         ELSE 
             UPDATE submissions 
-            SET status = "J"
+            SET status = 'J'
             WHERE submission_id = NEW.submission_id;
         END IF;
     END IF;
@@ -1430,14 +1431,14 @@ END$$
 CREATE TRIGGER trigger_before_insert_problem
 BEFORE INSERT ON problems
 FOR EACH ROW BEGIN
-    DECLARE __user_roles SET("AD", "PS", "CU");
+    DECLARE __user_roles SET('AD', 'PS', 'CU');
     
     SET __user_roles = (
         SELECT role FROM users
         WHERE user_id = NEW.creator_id
     );
-    IF (FIND_IN_SET("PS", __user_roles) = 0
-    AND FIND_IN_SET("AD", __user_roles) = 0) THEN
+    IF (FIND_IN_SET('PS', __user_roles) = 0
+    AND FIND_IN_SET('AD', __user_roles) = 0) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The creator of this problem does not have Problem Setter or Admin role.';
     END IF;
@@ -1446,14 +1447,14 @@ END$$
 CREATE TRIGGER trigger_before_update_problem
 BEFORE UPDATE ON problems
 FOR EACH ROW BEGIN
-    DECLARE __user_roles SET("AD", "PS", "CU");
+    DECLARE __user_roles SET('AD', 'PS', 'CU');
     
     SET __user_roles = (
         SELECT role FROM users
         WHERE user_id = NEW.creator_id
     );
-    IF (FIND_IN_SET("PS", __user_roles) = 0
-    AND FIND_IN_SET("AD", __user_roles) = 0) THEN
+    IF (FIND_IN_SET('PS', __user_roles) = 0
+    AND FIND_IN_SET('AD', __user_roles) = 0) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The creator of this problem does not have Problem Setter or Admin role.';
     END IF;
@@ -1462,13 +1463,13 @@ END$$
 CREATE TRIGGER trigger_before_insert_contest
 BEFORE INSERT ON contests
 FOR EACH ROW BEGIN
-    DECLARE __user_roles SET("AD", "PS", "CU");
+    DECLARE __user_roles SET('AD', 'PS', 'CU');
     
     SET __user_roles = (
         SELECT role FROM users
         WHERE user_id = NEW.organizer_id
     );
-    IF (FIND_IN_SET("AD", __user_roles) = 0) THEN
+    IF (FIND_IN_SET('AD', __user_roles) = 0) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The creator of this contest does not have Admin role.';
     END IF;
@@ -1477,13 +1478,13 @@ END$$
 CREATE TRIGGER trigger_before_update_contest
 BEFORE UPDATE ON contests
 FOR EACH ROW BEGIN
-    DECLARE __user_roles SET("AD", "PS", "CU");
+    DECLARE __user_roles SET('AD', 'PS', 'CU');
     
     SET __user_roles = (
         SELECT role FROM users
         WHERE user_id = NEW.organizer_id
     );
-    IF (FIND_IN_SET("AD", __user_roles) = 0) THEN
+    IF (FIND_IN_SET('AD', __user_roles) = 0) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'The creator of this contest does not have Admin role.';
     END IF;

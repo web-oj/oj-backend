@@ -33,14 +33,14 @@ app.listen(PORT, () => {
 
 // db.queryAddDiscussionMessage(3, 3, null, "idk");
 
-db.queryDeleteDiscussionMessage(7);
+// db.queryDeleteDiscussionMessage(7);
 
-// db.queryProblemById(1);
+// db.queryGetProblemById(1);
 
 // db.queryEditDiscussionMessageAttr(7, null, null, null, "sech");
 
 const f = async () => {
-  let t: string = await db.queryFindRootDiscussionMessages();
+  let t: string = await db.queryGetProblemById(1);
   console.log(JSON.parse(t));
 };
 
