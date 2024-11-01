@@ -97,7 +97,7 @@ INSERT INTO
         end_time,
         scoring_rule,
         created_at,
-        last_modified_at,
+        updated_at,
         organizer_id
     )
 VALUES (
@@ -117,7 +117,7 @@ INSERT INTO
         end_time,
         scoring_rule,
         created_at,
-        last_modified_at,
+        updated_at,
         organizer_id
     )
 VALUES (
@@ -137,7 +137,7 @@ INSERT INTO
         end_time,
         scoring_rule,
         created_at,
-        last_modified_at,
+        updated_at,
         organizer_id
     )
 VALUES (
@@ -161,7 +161,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
-        last_modified_at,
+        updated_at,
         creator_id
     )
 VALUES (
@@ -220,7 +220,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
-        last_modified_at,
+        updated_at,
         creator_id
     )
 VALUES (
@@ -268,7 +268,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
-        last_modified_at,
+        updated_at,
         creator_id
     )
 VALUES (
@@ -296,7 +296,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
-        last_modified_at,
+        updated_at,
         creator_id
     )
 VALUES (
@@ -324,7 +324,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
-        last_modified_at,
+        updated_at,
         creator_id
     )
 VALUES (

@@ -45,7 +45,7 @@ CREATE TABLE Contests (
     end_time DATETIME NOT NULL,
     scoring_rule ENUM('IOI', 'ICPC') NOT NULL,
     created_at DATETIME NOT NULL,
-    last_modified_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     organizer_id INT NOT NULL,
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
     is_plagiarism_check_enabled BOOLEAN NOT NULL DEFAULT FALSE,
@@ -66,7 +66,7 @@ CREATE TABLE Problems (
     output_format VARCHAR(15) NOT NULL DEFAULT "stdout",
     solution_text MEDIUMTEXT,
     created_at DATETIME NOT NULL,
-    last_modified_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     creator_id INT NOT NULL,
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (problem_id),
@@ -275,7 +275,7 @@ CREATE PROCEDURE procedure_add_problem(
             output_format, 
             solution_text, 
             created_at, 
-            last_modified_at,
+            updated_at,
             creator_id,
             is_published
         )
@@ -322,7 +322,7 @@ CREATE PROCEDURE procedure_edit_problem_attr(
         solution_text = COALESCE(__solution_text, solution_text),
         creator_id = COALESCE(__creator_id, creator_id),
         is_published = COALESCE(__is_published, is_published),
-        last_modified_at = IF(
+        updated_at = IF(
             COALESCE(
                 __title,
                 __statement, 
@@ -336,7 +336,7 @@ CREATE PROCEDURE procedure_edit_problem_attr(
                 __is_published)
             IS NOT NULL,
             NOW(),
-            last_modified_at
+            updated_at
         )
     WHERE problem_id = __problem_id;
     COMMIT;
@@ -610,7 +610,7 @@ CREATE PROCEDURE procedure_add_contest (
         end_time,
         scoring_rule,
         created_at,
-        last_modified_at,
+        updated_at,
         organizer_id,
         is_published,
         is_plagiarism_check_enabled
@@ -650,7 +650,7 @@ CREATE PROCEDURE procedure_edit_contest  (
     organizer_id = COALESCE(__organizer_id, organizer_id),
     is_published = COALESCE(__is_published, is_published),
     is_plagiarism_check_enabled = COALESCE(__is_plagiarism_check_enabled, is_plagiarism_check_enabled),
-    last_modified_at = IF(
+    updated_at = IF(
         COALESCE(
             __title,
             __description, 
@@ -662,7 +662,7 @@ CREATE PROCEDURE procedure_edit_contest  (
             is_plagiarism_check_enabled
         ) IS NOT NULL,
         NOW(),
-        last_modified_at
+        updated_at
     )
     WHERE contest_id = __contest_id;
     COMMIT;
@@ -1493,7 +1493,7 @@ CREATE TRIGGER trigger_after_insert_test_cases
 AFTER INSERT ON testcases
 FOR EACH ROW BEGIN
     UPDATE problems
-    SET last_modified_at = NOW()
+    SET updated_at = NOW()
     WHERE problem_id = NEW.problem_id;
 END$$
 
@@ -1501,7 +1501,7 @@ CREATE TRIGGER trigger_after_update_test_cases
 AFTER UPDATE ON testcases
 FOR EACH ROW BEGIN
     UPDATE problems
-    SET last_modified_at = NOW()
+    SET updated_at = NOW()
     WHERE problem_id = NEW.problem_id;
 END$$
 
@@ -1509,7 +1509,7 @@ CREATE TRIGGER trigger_before_insert_contest_problems
 AFTER INSERT ON contestproblems
 FOR EACH ROW BEGIN
     UPDATE contests
-    SET last_modified_at = NOW()
+    SET updated_at = NOW()
     WHERE contest_id = NEW.contest_id;
 END$$
 
@@ -1517,7 +1517,7 @@ CREATE TRIGGER trigger_before_update_contest_problems
 AFTER UPDATE ON contestproblems
 FOR EACH ROW BEGIN
     UPDATE contests
-    SET last_modified_at = NOW()
+    SET updated_at = NOW()
     WHERE contest_id = NEW.contest_id;
 END$$
 
