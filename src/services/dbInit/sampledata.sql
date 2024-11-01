@@ -96,6 +96,8 @@ INSERT INTO
         start_time,
         end_time,
         scoring_rule,
+        created_at,
+        last_modified_at,
         organizer_id
     )
 VALUES (
@@ -103,6 +105,8 @@ VALUES (
         "2024-10-10 00:00:00",
         "2024-11-11 03:00:00",
         "IOI",
+        NOW(),
+        NOW(),
         6
     );
 
@@ -112,6 +116,8 @@ INSERT INTO
         start_time,
         end_time,
         scoring_rule,
+        created_at,
+        last_modified_at,
         organizer_id
     )
 VALUES (
@@ -119,6 +125,8 @@ VALUES (
         "2024-12-10 00:00:00",
         "2024-12-10 05:00:00",
         "ICPC",
+        NOW(),
+        NOW(),
         1
     );
 
@@ -128,6 +136,8 @@ INSERT INTO
         start_time,
         end_time,
         scoring_rule,
+        created_at,
+        last_modified_at,
         organizer_id
     )
 VALUES (
@@ -135,6 +145,8 @@ VALUES (
         "2025-12-10 00:00:00",
         "2025-12-10 03:00:00",
         "IOI",
+        NOW(),
+        NOW(),
         6
     );
 
@@ -149,6 +161,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
+        last_modified_at,
         creator_id
     )
 VALUES (
@@ -192,6 +205,7 @@ int main() {
 }
 ```',
         NOW(),
+        NOW(),
         1
     );
 
@@ -206,6 +220,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
+        last_modified_at,
         creator_id
     )
 VALUES (
@@ -238,6 +253,7 @@ Ghi ra tổng $A + B$.
         "stdout",
         NULL,
         NOW(),
+        NOW(),
         1
     );
 
@@ -252,6 +268,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
+        last_modified_at,
         creator_id
     )
 VALUES (
@@ -263,6 +280,7 @@ VALUES (
         "stdin",
         "stdout",
         NULL,
+        NOW(),
         NOW(),
         2
     );
@@ -278,6 +296,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
+        last_modified_at,
         creator_id
     )
 VALUES (
@@ -289,6 +308,7 @@ VALUES (
         "cbdbd.inp",
         "cbdbd.out",
         "cbd dop dop dop yes yes yes",
+        NOW(),
         NOW(),
         1
     );
@@ -304,6 +324,7 @@ INSERT INTO
         output_format,
         solution_text,
         created_at,
+        last_modified_at,
         creator_id
     )
 VALUES (
@@ -315,6 +336,7 @@ VALUES (
         "sample.inp",
         "sample.out",
         "sample text",
+        NOW(),
         NOW(),
         2
     );
