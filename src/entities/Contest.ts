@@ -6,6 +6,7 @@ import {
   ManyToOne,
   ManyToMany,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
@@ -44,10 +45,16 @@ export class Contest extends BaseEntityWithTimestamps {
   @Column({ nullable: false, default: false })
   isPublished: boolean;
 
-  @ManyToOne(() => User, (user) => user.organizedContests)
+  @ManyToOne(() => User, (user) => user.organizedContests, {
+    onDelete: "SET NULL",
+    orphanedRowAction: "nullify",
+  })
+  @JoinColumn()
   organizer: User;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (participant) => participant.participatedContests, {
+    cascade: true,
+  })
   @JoinTable()
   participants: User[];
 }

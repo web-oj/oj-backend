@@ -58,6 +58,12 @@
 							"$ref": "#/components/schemas/Contest"
 						},
 						"type": "array"
+					},
+					"participatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/Contest"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -74,7 +80,8 @@
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
 					"country",
-					"organizedContests"
+					"organizedContests",
+					"participatedContests"
 				],
 				"type": "object",
 				"additionalProperties": false
