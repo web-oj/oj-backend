@@ -46,8 +46,8 @@ export class Contest extends BaseEntityWithTimestamps {
   isPublished: boolean;
 
   @ManyToOne(() => User, (user) => user.organizedContests, {
+    cascade: true,
     onDelete: "SET NULL",
-    orphanedRowAction: "nullify",
   })
   @JoinColumn()
   organizer: User;

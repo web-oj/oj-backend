@@ -14,16 +14,27 @@ export type CreateContestInput = {
 };
 
 export interface IContestService {
+  addParticipant(participant: User): Promise<boolean>;
+
   createContest(ContestInput: CreateContestInput): Contest;
+
+  getContestById(): Promise<Contest>;
+
+  getContestsByTitle(title: string): Promise<Contest[]>;
+
+  getContestsByTimeRange(
+    startTimeLow: number,
+    startTimeHigh: number,
+    endTimeLow: number,
+    endTimeHigh: number,
+  ): Promise<Contest[]>;
+
+  removeParticipant(participant: User): Promise<boolean>;
+
+  softDeleteContest(id: number): Promise<boolean>;
 
   updateContest(
     id: number,
     updatedData: Partial<Contest>,
   ): Promise<Contest | null>;
-
-  softDeleteContest(id: number): Promise<boolean>;
-
-  addParticipant(participant: User): Promise<boolean>;
-
-  removeParticipant(participant: User): Promise<boolean>;
 }
