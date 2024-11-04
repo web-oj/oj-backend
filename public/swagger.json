@@ -52,6 +52,12 @@
 					},
 					"country": {
 						"type": "string"
+					},
+					"organizedContests": {
+						"items": {
+							"$ref": "#/components/schemas/Contest"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -67,7 +73,69 @@
 					"isBan",
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
-					"country"
+					"country",
+					"organizedContests"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Contest": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"ruleText": {
+						"type": "string"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"scoringRule": {
+						"type": "string"
+					},
+					"isPlagiarismCheckEnabled": {
+						"type": "boolean"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"organizer": {
+						"$ref": "#/components/schemas/User"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"title",
+					"description",
+					"ruleText",
+					"startTime",
+					"endTime",
+					"scoringRule",
+					"isPlagiarismCheckEnabled",
+					"isPublished",
+					"organizer"
 				],
 				"type": "object",
 				"additionalProperties": false
