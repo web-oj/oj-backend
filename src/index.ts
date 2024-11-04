@@ -1,47 +1,45 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
-import db from "./services/Database";
+import { env } from "./config/config";
+import { mysqlDataSource } from "./database/MysqlDataSource";
+import { UserService } from "./services/impl/UserService";
+import { UserRepository } from "./repositories/UserRepo";
+import UserRouter from "./routes/userRouter";
 
-const PORT = process.env.PORT || 8000;
+const PORT = env.port;
 
-const app: Application = express();
+async function main() {
+  await mysqlDataSource.initialize();
+  await mysqlDataSource.synchronize();
 
-app.use(express.json());
-app.use(morgan("tiny"));
-app.use(express.static("public"));
+  const app: Application = express();
 
-app.get("/ping", async (_req, res) => {
-  res.send({
-    message: "hello",
+  app.use(express.json());
+  app.use(morgan("tiny"));
+  app.use(express.static("public"));
+  
+  app.get("/ping", async (_req, res) => {
+    res.send({
+      message: "hello",
+    });
   });
-});
+  
+  app.use(
+    "/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(undefined, {
+      swaggerOptions: {
+        url: "/swagger.json",
+      },
+    }),
+  );
 
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(undefined, {
-    swaggerOptions: {
-      url: "/swagger.json",
-    },
-  }),
-);
+  app.use("/user", UserRouter);
 
-app.listen(PORT, () => {
-  console.log("Server is running on port", PORT);
-});
+  app.listen(PORT, () => {
+    console.log("Server is running on port", PORT);
+  });  
+}
 
-// db.queryAddDiscussionMessage(3, 3, null, "idk");
-
-// db.queryDeleteDiscussionMessage(7);
-
-// db.queryGetProblemById(1);
-
-// db.queryEditDiscussionMessageAttr(7, null, null, null, "sech");
-
-const f = async () => {
-  let t: string = await db.queryGetProblemById(1);
-  console.log(JSON.parse(t));
-};
-
-f();
+main();

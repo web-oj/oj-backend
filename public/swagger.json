@@ -7,14 +7,67 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"PingResponse": {
+			"User": {
 				"properties": {
-					"message": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"handle": {
+						"type": "string"
+					},
+					"avatar_image": {
+						"type": "string"
+					},
+					"bio": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"role": {
+						"type": "string"
+					},
+					"isBan": {
+						"type": "boolean"
+					},
+					"lastTimeChangeHandle": {
+						"type": "number",
+						"format": "double"
+					},
+					"lastTimeChangeImage": {
+						"type": "number",
+						"format": "double"
+					},
+					"country": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"message"
+					"id",
+					"createdAt",
+					"updatedAt",
+					"handle",
+					"avatar_image",
+					"bio",
+					"email",
+					"password",
+					"role",
+					"isBan",
+					"lastTimeChangeHandle",
+					"lastTimeChangeImage",
+					"country"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -31,23 +84,124 @@
 		"contact": {}
 	},
 	"paths": {
-		"/ping": {
-			"get": {
-				"operationId": "GetMessage",
+		"/user/createUser": {
+			"post": {
+				"operationId": "CreateUser",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PingResponse"
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
 								}
 							}
 						}
 					}
 				},
 				"security": [],
-				"parameters": []
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"password": {
+										"type": "string"
+									},
+									"handle": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email",
+									"password",
+									"handle"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/{id}": {
+			"get": {
+				"operationId": "GetUserById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/{handle}": {
+			"get": {
+				"operationId": "GetUserByHandle",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "handle",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

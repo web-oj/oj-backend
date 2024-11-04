@@ -36,11 +36,13 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "keccak256": "^1.0.6",
     "morgan": "^1.10.0",
     "mysql2": "^3.11.3",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.5.0"
+    "tsoa": "^6.5.0",
+    "typeorm": "^0.3.20"
   }
 }
