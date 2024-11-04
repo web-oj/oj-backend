@@ -16,9 +16,9 @@ export type CreateContestInput = {
 export interface IContestService {
   createContest(ContestInput: CreateContestInput): Contest;
 
-  getContestById(): Promise<Contest>;
+  getContestById(id: number): Promise<Contest>;
 
-  getContestsByTitle(title: string): Promise<Contest[]>;
+  getContestParticipants(id: number): Promise<User[]>
 
   getContestsByTimeRange(
     startTimeLow: number,
@@ -26,6 +26,8 @@ export interface IContestService {
     endTimeLow: number,
     endTimeHigh: number,
   ): Promise<Contest[]>;
+
+  getContestsByTitle(title: string): Promise<Contest[]>;
 
   softDeleteContest(id: number): Promise<boolean>;
 

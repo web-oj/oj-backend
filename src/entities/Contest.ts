@@ -2,12 +2,11 @@ import "reflect-metadata";
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToOne,
-  ManyToMany,
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  Index,
 } from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
@@ -23,6 +22,7 @@ export class Contest extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ nullable: false, unique: true })
   title: string;
 
