@@ -1,7 +1,14 @@
 import "reflect-metadata";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToOne,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
-import {User} from "./User"
+import { User } from "./User";
 
 export enum ScoringRules {
   IOI = "IOI",
@@ -37,6 +44,10 @@ export class Contest extends BaseEntityWithTimestamps {
   @Column({ nullable: false, default: false })
   isPublished: boolean;
 
-  @ManyToOne(() => User, (organizer) => organizer.organizedContests)
+  @ManyToOne(() => User, (user) => user.organizedContests)
   organizer: User;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  participants: User[];
 }

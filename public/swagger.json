@@ -121,6 +121,12 @@
 					},
 					"organizer": {
 						"$ref": "#/components/schemas/User"
+					},
+					"participants": {
+						"items": {
+							"$ref": "#/components/schemas/User"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -135,7 +141,8 @@
 					"scoringRule",
 					"isPlagiarismCheckEnabled",
 					"isPublished",
-					"organizer"
+					"organizer",
+					"participants"
 				],
 				"type": "object",
 				"additionalProperties": false
