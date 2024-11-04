@@ -7,9 +7,11 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
+import { ContestParticipation } from "./ContestParticipation";
 
 export enum ScoringRules {
   IOI = "IOI",
@@ -46,15 +48,11 @@ export class Contest extends BaseEntityWithTimestamps {
   isPublished: boolean;
 
   @ManyToOne(() => User, (user) => user.organizedContests, {
-    cascade: true,
     onDelete: "SET NULL",
   })
   @JoinColumn()
   organizer: User;
 
-  @ManyToMany(() => User, (participant) => participant.participatedContests, {
-    cascade: true,
-  })
-  @JoinTable()
-  participants: User[];
+  @OneToMany(() => ContestParticipation, (participation) => participation.contest)
+  participations: ContestParticipation[];
 }

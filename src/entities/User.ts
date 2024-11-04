@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { Column, Entity, OneToMany, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
 import { Contest } from './Contest';
+import { ContestParticipation } from './ContestParticipation';
 
 @Entity('user')
 export class User extends BaseEntityWithTimestamps {
@@ -41,6 +42,6 @@ export class User extends BaseEntityWithTimestamps {
   @OneToMany(() => Contest, (contest) => contest.organizer)
   organizedContests: Contest[];
 
-  @ManyToMany(() => Contest, (contest) => contest.participants)
-  participatedContests: Contest[];
+  @OneToMany(() => ContestParticipation, (participation) => participation.user)
+  contestParticipations: ContestParticipation[];
 }

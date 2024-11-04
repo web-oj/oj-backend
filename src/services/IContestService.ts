@@ -14,8 +14,6 @@ export type CreateContestInput = {
 };
 
 export interface IContestService {
-  addParticipant(participant: User): Promise<boolean>;
-
   createContest(ContestInput: CreateContestInput): Contest;
 
   getContestById(): Promise<Contest>;
@@ -28,8 +26,6 @@ export interface IContestService {
     endTimeLow: number,
     endTimeHigh: number,
   ): Promise<Contest[]>;
-
-  removeParticipant(participant: User): Promise<boolean>;
 
   softDeleteContest(id: number): Promise<boolean>;
 

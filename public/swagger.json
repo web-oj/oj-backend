@@ -59,9 +59,9 @@
 						},
 						"type": "array"
 					},
-					"participatedContests": {
+					"contestParticipations": {
 						"items": {
-							"$ref": "#/components/schemas/Contest"
+							"$ref": "#/components/schemas/ContestParticipation"
 						},
 						"type": "array"
 					}
@@ -81,7 +81,7 @@
 					"lastTimeChangeImage",
 					"country",
 					"organizedContests",
-					"participatedContests"
+					"contestParticipations"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -129,9 +129,9 @@
 					"organizer": {
 						"$ref": "#/components/schemas/User"
 					},
-					"participants": {
+					"participations": {
 						"items": {
-							"$ref": "#/components/schemas/User"
+							"$ref": "#/components/schemas/ContestParticipation"
 						},
 						"type": "array"
 					}
@@ -149,7 +149,48 @@
 					"isPlagiarismCheckEnabled",
 					"isPublished",
 					"organizer",
-					"participants"
+					"participations"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ContestParticipation": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contestId": {
+						"type": "number",
+						"format": "double"
+					},
+					"user": {
+						"$ref": "#/components/schemas/User"
+					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
+					"score": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"userId",
+					"contestId",
+					"user",
+					"contest",
+					"score"
 				],
 				"type": "object",
 				"additionalProperties": false
