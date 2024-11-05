@@ -17,7 +17,7 @@ export class Contest extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index({ fulltext: true })
+  @Index("title-fulltext-index", { fulltext: true })
   @Column({ nullable: false, unique: true })
   title: string;
 
@@ -45,6 +45,7 @@ export class Contest extends BaseEntityWithTimestamps {
   @ManyToOne(() => User, (user) => user.organizedContests, {
     onDelete: "SET NULL",
   })
+
   @JoinColumn()
   organizer: User;
 
