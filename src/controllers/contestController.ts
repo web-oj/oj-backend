@@ -16,7 +16,7 @@
 
 import "dotenv/config";
 import { IContestService } from "@/services/IContestService";
-import { Body, Get, Path, Post, Route } from "tsoa";
+import { Body, Get, Path, Post, Query, Route } from "tsoa";
 import { Contest } from "../entities/Contest";
 
 export type GetAllContestsResponseEntry = {
@@ -34,10 +34,16 @@ export class ContestController {
     this.contestService = contestService;
   }
 
-  @Get()
-  public async getAllContests(): Promise<GetAllContestsResponseEntry[] | null> {
+  @Get("")
+  public async getAllContests(
+    @Query() limit?: number,
+    @Query() offset?: number,
+  ): Promise<GetAllContestsResponseEntry[] | null> {
     try {
-      const allContests = await this.contestService.getAllContests();
+      const allContests = await this.contestService.getAllContests(
+        limit,
+        offset,
+      );
       let response: GetAllContestsResponseEntry[] = [];
       if (allContests !== null) {
         for (let contest of allContests) {
@@ -50,6 +56,16 @@ export class ContestController {
         }
       }
       return response;
+    } catch (err) {
+      throw new Error(`Error getting contest: ${err}`);
+    }
+  }
+
+  @Get("{id}")
+  public async getContestById(@Path() id: number): Promise<Contest | null> {
+    try {
+      const contest = await this.contestService.getContestById(id);
+      return contest;
     } catch (err) {
       throw new Error(`Error getting contest: ${err}`);
     }
@@ -97,16 +113,6 @@ export class ContestController {
       return { message: "Contest created successfully" };
     } catch (err) {
       throw new Error(`Error creating contest: ${err}`);
-    }
-  }
-
-  @Get("{id}")
-  public async getContestById(@Path() id: number): Promise<Contest | null> {
-    try {
-      const contest = await this.contestService.getContestById(id);
-      return contest;
-    } catch (err) {
-      throw new Error(`Error getting contest: ${err}`);
     }
   }
 

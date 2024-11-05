@@ -3,9 +3,9 @@
  * @summary Contest routes
  * @description Handles following routes:
  *      - GET '/'
+ *      - GET '/search'
  *      - GET '/:id'
  *      - GET '/:id/ranking'
- *      - GET '/search'
  *      - DELETE '/:id'
  *      - PATCH '/:id'
  *      - PATCH '/:id/editScore'
@@ -26,10 +26,45 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   try {
-    const response = await contestController.getAllContests();
+    const response = await contestController.getAllContests(
+      typeof req.query.limit !== "undefined"
+        ? parseInt(req.query.limit as string)
+        : undefined,
+      typeof req.query.offset !== "undefined"
+        ? parseInt(req.query.offset as string)
+        : undefined,
+    );
     res.status(200).send(response);
   } catch (err) {
     res.status(500).send(`Error creating contest: ${err}`);
+  }
+});
+
+router.get("/:id", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.getContestById(id);
+    if (!response) {
+      res.status(404).send(`Contest with id ${id} not found`);
+    } else {
+      res.status(200).send(response);
+    }
+  } catch (err) {
+    res.status(500).send(`Error getting contest: ${err}`);
+  }
+});
+
+router.get("/search", async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.getContestById(id);
+    if (!response) {
+      res.status(404).send(`Contest with id ${id} not found`);
+    } else {
+      res.status(200).send(response);
+    }
+  } catch (err) {
+    res.status(500).send(`Error getting contest: ${err}`);
   }
 });
 
@@ -44,7 +79,7 @@ router.post("/create", async (req, res) => {
     isPlagiarismCheckEnabled,
     isPublished,
     organizerId,
-  }= req.body;
+  } = req.body;
   try {
     await contestController.createContest({
       title,
@@ -68,24 +103,5 @@ router.post("/create", async (req, res) => {
 //   handle: string;
 //   email: string;
 // };
-
-// router.get("/:id", async (req: Request, res: Response) => {
-//   const id = parseInt(req.params.id);
-//   try {
-//     const contest = await contestController.getContestById(id);
-//     if (!contest) {
-//       res.status(404).send(`Contest with id ${id} not found`);
-//     } else {
-//       const response: GetContestResponse = {
-//         id: contest.id,
-//         handle: contest.handle,
-//         email: contest.email,
-//       };
-//       res.status(200).send(response);
-//     }
-//   } catch (err) {
-//     res.status(500).send(`Error getting contest: ${err}`);
-//   }
-// });
 
 export default router;

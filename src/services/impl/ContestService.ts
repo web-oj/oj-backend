@@ -96,12 +96,12 @@ export class ContestService implements IContestService {
   }
 
   async getAllContests(
-    getQty?: number,
-    getStartFrom?: number,
+    limit?: number,
+    offset?: number,
   ): Promise<Contest[] | null> {
     return this.contestRepo.find({
-      skip: getStartFrom,
-      take: getQty,
+      skip: offset,
+      take: limit,
     });
   }
 
@@ -114,16 +114,16 @@ export class ContestService implements IContestService {
     startTimeHigh: number,
     endTimeLow: number,
     endTimeHigh: number,
-    getQty?: number,
-    getStartFrom?: number,
+    limit?: number,
+    offset?: number,
   ): Promise<Contest[] | null> {
     return this.contestRepo.find({
       where: {
         startTime: Between(startTimeLow, startTimeHigh),
         endTime: Between(endTimeLow, endTimeHigh),
       },
-      skip: getStartFrom,
-      take: getQty,
+      skip: offset,
+      take: limit,
     });
   }
 
@@ -140,8 +140,8 @@ export class ContestService implements IContestService {
 
   async getContestRanking(
     id: number,
-    getQty?: number,
-    getStartFrom?: number,
+    limit?: number,
+    offset?: number,
   ): Promise<ContestParticipation[] | null> {
     return this.contestParticipationRepo.find({
       where: {
@@ -150,8 +150,8 @@ export class ContestService implements IContestService {
       order: {
         score: "DESC",
       },
-      skip: getStartFrom,
-      take: getQty,
+      skip: offset,
+      take: limit,
     });
   }
 

@@ -33,7 +33,11 @@ export interface IContestService {
     newScore: number,
   ): Promise<ContestParticipation | null>;
 
-  searchContests(searchKeyword: string): Promise<Contest[] | null>;
+  searchContests(
+    searchKeyword: string,
+    getQty?: number,
+    getStartFrom?: number,
+  ): Promise<Contest[] | null>;
 
   getAllContests(
     getQty?: number,
