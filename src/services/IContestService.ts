@@ -11,16 +11,27 @@ export type CreateContestInput = {
   scoringRule: ScoringRules;
   isPlagiarismCheckEnabled?: boolean;
   isPublished?: boolean;
-  organizer: User;
+  organizerId: number;
 };
 
 export interface IContestService {
-  createContest(ContestInput: CreateContestInput): Contest;
+  addContestParticipation(
+    contestId: number,
+    userId: number,
+  ): Promise<ContestParticipation>;
+
+  createContest(ContestInput: CreateContestInput): Promise<Contest>;
 
   editContest(
     id: number,
     updatedData: Partial<Contest>,
   ): Promise<Contest | null>;
+
+  editUserScoreInContest(
+    contestId: number,
+    userId: number,
+    newScore: number,
+  ): Promise<ContestParticipation | null>;
 
   findContestsWhoseTitleContain(phrase: string): Promise<Contest[] | null>;
 
@@ -42,8 +53,13 @@ export interface IContestService {
 
   getContestByTitle(title: string): Promise<Contest | null>;
 
+  getContestParticipationByContestIdAndUserId(
+    contestId: number,
+    userId: number,
+  ): Promise<ContestParticipation | null>;
+
   getContestRanking(
-    id: number,
+    contestId: number,
     getQty?: number,
     getStartFrom?: number,
   ): Promise<ContestParticipation[] | null>;

@@ -24,7 +24,17 @@ export class ContestService implements IContestService {
     this.contestParticipationRepo = ContestParticipationRepository;
   }
 
-  createContest(userInput: CreateContestInput): Contest {
+  async addContestParticipation(
+    contestId: number,
+    userId: number,
+  ): Promise<ContestParticipation> {
+    return this.contestParticipationRepo.save({
+      contestId: contestId,
+      userId: userId,
+    });
+  }
+
+  async createContest(userInput: CreateContestInput): Promise<Contest> {
     const contest = new Contest();
 
     contest.title = userInput.title;
@@ -43,7 +53,9 @@ export class ContestService implements IContestService {
     if (typeof userInput.isPublished !== "undefined") {
       contest.isPublished = userInput.isPublished;
     }
-    contest.organizer = userInput.organizer;
+    contest.organizer = await UserRepository.findOneByOrFail({
+      id: userInput.organizerId,
+    });
     this.contestRepo.save(contest);
     return contest;
   }
@@ -54,6 +66,20 @@ export class ContestService implements IContestService {
   ): Promise<Contest | null> {
     await this.contestRepo.update(id, updatedData);
     return this.contestRepo.findOneBy({ id });
+  }
+
+  async editUserScoreInContest(
+    contestId: number,
+    userId: number,
+    newScore: number,
+  ): Promise<ContestParticipation | null> {
+    const updatedData: Partial<ContestParticipation> = {
+      contestId: contestId,
+      userId: userId,
+      score: newScore,
+    };
+    await this.contestRepo.update([contestId, userId], updatedData);
+    return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 
   async findContestsWhoseTitleContain(
@@ -100,6 +126,13 @@ export class ContestService implements IContestService {
 
   async getContestByTitle(title: string): Promise<Contest | null> {
     return this.contestRepo.findOneBy({ title });
+  }
+
+  async getContestParticipationByContestIdAndUserId(
+    contestId: number,
+    userId: number,
+  ): Promise<ContestParticipation | null> {
+    return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 
   async getContestRanking(
