@@ -4,12 +4,13 @@
  * @description Handles following routes:
  *      - GET '/'
  *      - GET '/:id'
+ *      - GET '/:id/ranking'
+ *      - GET '/search'
  *      - DELETE '/:id'
- *      - PATCH ':/id'
- *      - PATCH '/role/:id'
- *      - POST '/'
- *      - POST '/login'
- *      - POST '/logout'
+ *      - PATCH '/:id'
+ *      - PATCH '/:id/editScore'
+ *      - POST '/create'
+ *      - POST '/:id/register'
  */
 
 import { Request, Response, Router } from "express";
