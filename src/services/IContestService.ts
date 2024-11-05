@@ -34,28 +34,18 @@ export interface IContestService {
   ): Promise<ContestParticipation | null>;
 
   searchContests(
-    searchKeyword: string,
-    getQty?: number,
-    getStartFrom?: number,
+    searchKeyword?: string,
+    startTimeLow?: number,
+    startTimeHigh?: number,
+    endTimeLow?: number,
+    endTimeHigh?: number,
+    limit?: number,
+    offset?: number,
   ): Promise<Contest[] | null>;
 
-  getAllContests(
-    getQty?: number,
-    getStartFrom?: number,
-  ): Promise<Contest[] | null>;
+  getAllContests(limit?: number, offset?: number): Promise<Contest[] | null>;
 
   getContestById(id: number): Promise<Contest | null>;
-
-  getContestsByTimeRange(
-    startTimeLow: number,
-    startTimeHigh: number,
-    endTimeLow: number,
-    endTimeHigh: number,
-    getQty?: number,
-    getStartFrom?: number,
-  ): Promise<Contest[] | null>;
-
-  getContestByTitle(title: string): Promise<Contest | null>;
 
   getContestParticipationByContestIdAndUserId(
     contestId: number,
@@ -64,8 +54,8 @@ export interface IContestService {
 
   getContestRanking(
     contestId: number,
-    getQty?: number,
-    getStartFrom?: number,
+    limit?: number,
+    offset?: number,
   ): Promise<ContestParticipation[] | null>;
 
   softDeleteContest(id: number): Promise<void>;

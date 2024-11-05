@@ -71,6 +71,56 @@ export class ContestController {
     }
   }
 
+  @Get("/search")
+  public async searchContests(
+    @Query() searchKeywords?: string,
+    @Query() startTimeLow?: number,
+    @Query() startTimeHigh?: number,
+    @Query() endTimeLow?: number,
+    @Query() endTimeHigh?: number,
+    @Query() limit?: number,
+    @Query() offset?: number,
+  ): Promise<GetAllContestsResponseEntry[] | null> {
+    try {
+      if (startTimeLow = undefined) {
+        startTimeLow = 0;
+      }
+      if (startTimeHigh = undefined) {
+        startTimeHigh = new Date().getTime();
+      }
+      if (endTimeLow = undefined) {
+        endTimeLow = 0;
+      }
+      if (endTimeHigh = undefined) {
+        endTimeHigh = new Date().getTime();
+      }
+      
+      const contests = await this.contestService.searchContests(
+        searchKeywords,
+        startTimeLow,
+        startTimeHigh,
+        endTimeLow,
+        endTimeHigh,
+        limit,
+        offset,
+      );
+      let response: GetAllContestsResponseEntry[] = [];
+      if (contests !== null) {
+        for (let contest of contests) {
+          response.push({
+            id: contest.id,
+            title: contest.title,
+            startTime: contest.startTime,
+            endTime: contest.endTime,
+          });
+        }
+      }
+      return response;
+    } catch (err) {
+      throw new Error(`Error getting contest: ${err}`);
+    }
+  }
+
   @Post("create")
   public async createContest(
     @Body()

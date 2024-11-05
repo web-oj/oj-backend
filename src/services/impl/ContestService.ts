@@ -87,12 +87,38 @@ export class ContestService implements IContestService {
     return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 
-  async searchContests(searchKeyword: string): Promise<Contest[] | null> {
-    return this.contestRepo
+  async searchContests(
+    searchKeyword?: string,
+    startTimeLow?: number,
+    startTimeHigh?: number,
+    endTimeLow?: number,
+    endTimeHigh?: number,
+    limit?: number,
+    offset?: number,
+  ): Promise<Contest[] | null> {
+    if (searchKeyword === undefined) {
+      return this.contestRepo
       .createQueryBuilder()
       .select()
       .where(`MATCH(title) AGAINST ('${searchKeyword}' IN BOOLEAN MODE)`)
+      .andWhere(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
+      .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
+      .orderBy("startTime", "DESC")
+      .skip(offset)
+      .take(limit)
       .getMany();
+    } else {
+      return this.contestRepo
+      .createQueryBuilder()
+      .select()
+      .where(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
+      .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
+      .orderBy("startTime", "DESC")
+      .skip(offset)
+      .take(limit)
+      .getMany();
+    }
+    
   }
 
   async getAllContests(
@@ -107,24 +133,6 @@ export class ContestService implements IContestService {
 
   async getContestById(id: number): Promise<Contest | null> {
     return this.contestRepo.findOneBy({ id });
-  }
-
-  async getContestsByTimeRange(
-    startTimeLow: number,
-    startTimeHigh: number,
-    endTimeLow: number,
-    endTimeHigh: number,
-    limit?: number,
-    offset?: number,
-  ): Promise<Contest[] | null> {
-    return this.contestRepo.find({
-      where: {
-        startTime: Between(startTimeLow, startTimeHigh),
-        endTime: Between(endTimeLow, endTimeHigh),
-      },
-      skip: offset,
-      take: limit,
-    });
   }
 
   async getContestByTitle(title: string): Promise<Contest | null> {
