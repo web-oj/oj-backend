@@ -1,5 +1,6 @@
 import { User } from "@/entities/User";
 import { Contest, ScoringRules } from "../entities/Contest";
+import { ContestParticipation } from "@/entities/ContestParticipation";
 
 export type CreateContestInput = {
   title: string;
@@ -16,23 +17,36 @@ export type CreateContestInput = {
 export interface IContestService {
   createContest(ContestInput: CreateContestInput): Contest;
 
-  getContestById(id: number): Promise<Contest>;
+  editContest(
+    id: number,
+    updatedData: Partial<Contest>,
+  ): Promise<Contest | null>;
 
-  getContestParticipants(id: number): Promise<User[]>
+  findContestsWhoseTitleContain(phrase: string): Promise<Contest[] | null>;
+
+  getAllContests(
+    getQty?: number,
+    getStartFrom?: number,
+  ): Promise<Contest[] | null>;
+
+  getContestById(id: number): Promise<Contest | null>;
 
   getContestsByTimeRange(
     startTimeLow: number,
     startTimeHigh: number,
     endTimeLow: number,
     endTimeHigh: number,
-  ): Promise<Contest[]>;
+    getQty?: number,
+    getStartFrom?: number,
+  ): Promise<Contest[] | null>;
 
-  getContestsByTitle(title: string): Promise<Contest[]>;
+  getContestByTitle(title: string): Promise<Contest | null>;
 
-  softDeleteContest(id: number): Promise<boolean>;
-
-  updateContest(
+  getContestRanking(
     id: number,
-    updatedData: Partial<Contest>,
-  ): Promise<Contest | null>;
+    getQty?: number,
+    getStartFrom?: number,
+  ): Promise<ContestParticipation[] | null>;
+
+  softDeleteContest(id: number): Promise<void>;
 }

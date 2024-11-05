@@ -22,7 +22,7 @@ export class Contest extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
+  @Index({ fulltext: true })
   @Column({ nullable: false, unique: true })
   title: string;
 
@@ -53,6 +53,9 @@ export class Contest extends BaseEntityWithTimestamps {
   @JoinColumn()
   organizer: User;
 
-  @OneToMany(() => ContestParticipation, (participation) => participation.contest)
+  @OneToMany(
+    () => ContestParticipation,
+    (participation) => participation.contest,
+  )
   participations: ContestParticipation[];
 }
