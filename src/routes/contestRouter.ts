@@ -23,39 +23,68 @@ const contestController = new ContestController(contestService);
 
 const router = Router();
 
-router.post("/createContest", (req, res) => {
-  const { handle, password, email } = req.body;
+router.get("/", async (req, res) => {
   try {
-    contestController.createContest({ handle, password, email });
+    const response = await contestController.getAllContests();
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(500).send(`Error creating contest: ${err}`);
+  }
+});
+
+router.post("/create", async (req, res) => {
+  const {
+    title,
+    description,
+    ruleText,
+    startTime,
+    endTime,
+    scoringRule,
+    isPlagiarismCheckEnabled,
+    isPublished,
+    organizerId,
+  }= req.body;
+  try {
+    await contestController.createContest({
+      title,
+      description,
+      ruleText,
+      startTime,
+      endTime,
+      scoringRule,
+      isPlagiarismCheckEnabled,
+      isPublished,
+      organizerId,
+    });
     res.status(200).send("Contest created successfully");
   } catch (err) {
     res.status(500).send(`Error creating contest: ${err}`);
   }
 });
 
-export type GetContestResponse = {
-  id: number;
-  handle: string;
-  email: string;
-};
+// export type GetContestResponse = {
+//   id: number;
+//   handle: string;
+//   email: string;
+// };
 
-router.get("/:id", async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  try {
-    const contest = await contestController.getContestById(id);
-    if (!contest) {
-      res.status(404).send(`Contest with id ${id} not found`);
-    } else {
-      const response: GetContestResponse = {
-        id: contest.id,
-        handle: contest.handle,
-        email: contest.email,
-      };
-      res.status(200).send(response);  
-    }
-  } catch (err) {
-    res.status(500).send(`Error getting contest: ${err}`);
-  }
-});
+// router.get("/:id", async (req: Request, res: Response) => {
+//   const id = parseInt(req.params.id);
+//   try {
+//     const contest = await contestController.getContestById(id);
+//     if (!contest) {
+//       res.status(404).send(`Contest with id ${id} not found`);
+//     } else {
+//       const response: GetContestResponse = {
+//         id: contest.id,
+//         handle: contest.handle,
+//         email: contest.email,
+//       };
+//       res.status(200).send(response);
+//     }
+//   } catch (err) {
+//     res.status(500).send(`Error getting contest: ${err}`);
+//   }
+// });
 
 export default router;

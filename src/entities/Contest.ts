@@ -12,11 +12,6 @@ import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
 import { ContestParticipation } from "./ContestParticipation";
 
-export enum ScoringRules {
-  IOI = "IOI",
-  ICPC = "ICPC",
-}
-
 @Entity("contest")
 export class Contest extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
@@ -38,7 +33,7 @@ export class Contest extends BaseEntityWithTimestamps {
   @Column({ nullable: false, type: "bigint" })
   endTime: number;
 
-  @Column({ nullable: false, type: "enum", enum: ScoringRules, default: "IOI" })
+  @Column({ nullable: false })
   scoringRule: string;
 
   @Column({ nullable: false, default: false })

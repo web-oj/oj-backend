@@ -6,6 +6,7 @@ import { mysqlDataSource } from "./database/MysqlDataSource";
 import { UserService } from "./services/impl/UserService";
 import { UserRepository } from "./repositories/UserRepo";
 import UserRouter from "./routes/userRouter";
+import ContestRouter from "./routes/contestRouter"
 
 const PORT = env.port;
 
@@ -36,6 +37,7 @@ async function main() {
   );
 
   app.use("/user", UserRouter);
+  app.use("/contest", ContestRouter);
 
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);

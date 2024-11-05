@@ -1,5 +1,5 @@
 import { Contest } from "../../entities/Contest";
-import { User } from "@/entities/User";
+import { User } from "../..//entities/User";
 import { CreateContestInput, IContestService } from "../IContestService";
 import {
   IContestRepository,
@@ -8,10 +8,10 @@ import {
 import {
   ContestParticipationRepository,
   IContestParticipationRepository,
-} from "@/repositories/ContestParticipationRepo";
-import { IUserRepository, UserRepository } from "@/repositories/UserRepo";
+} from "../../repositories/ContestParticipationRepo";
+import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
 import { Between } from "typeorm";
-import { ContestParticipation } from "@/entities/ContestParticipation";
+import { ContestParticipation } from "../../entities/ContestParticipation";
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;
@@ -35,29 +35,34 @@ export class ContestService implements IContestService {
   }
 
   async createContest(userInput: CreateContestInput): Promise<Contest> {
-    const contest = new Contest();
+    try {
+      const contest = new Contest();
 
-    contest.title = userInput.title;
-    if (typeof userInput.description !== "undefined") {
-      contest.description = userInput.description;
+      contest.title = userInput.title;
+      if (typeof userInput.description !== "undefined") {
+        contest.description = userInput.description;
+      }
+      if (typeof userInput.ruleText !== "undefined") {
+        contest.ruleText = userInput.ruleText;
+      }
+      contest.startTime = userInput.startTime;
+      contest.endTime = userInput.endTime;
+      contest.scoringRule = userInput.scoringRule;
+      if (typeof userInput.isPlagiarismCheckEnabled !== "undefined") {
+        contest.isPlagiarismCheckEnabled = userInput.isPlagiarismCheckEnabled;
+      }
+      if (typeof userInput.isPublished !== "undefined") {
+        contest.isPublished = userInput.isPublished;
+      }
+      contest.organizer = await UserRepository.findOneByOrFail({
+        id: userInput.organizerId,
+      });
+
+      await this.contestRepo.save(contest);
+      return contest;
+    } catch (err) {
+      throw new Error(`${err}`);
     }
-    if (typeof userInput.ruleText !== "undefined") {
-      contest.ruleText = userInput.ruleText;
-    }
-    contest.startTime = userInput.startTime;
-    contest.endTime = userInput.endTime;
-    contest.scoringRule = userInput.scoringRule;
-    if (typeof userInput.isPlagiarismCheckEnabled !== "undefined") {
-      contest.isPlagiarismCheckEnabled = userInput.isPlagiarismCheckEnabled;
-    }
-    if (typeof userInput.isPublished !== "undefined") {
-      contest.isPublished = userInput.isPublished;
-    }
-    contest.organizer = await UserRepository.findOneByOrFail({
-      id: userInput.organizerId,
-    });
-    this.contestRepo.save(contest);
-    return contest;
   }
 
   async editContest(
@@ -82,13 +87,11 @@ export class ContestService implements IContestService {
     return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 
-  async findContestsWhoseTitleContain(
-    phrase: string,
-  ): Promise<Contest[] | null> {
+  async searchContests(searchKeyword: string): Promise<Contest[] | null> {
     return this.contestRepo
       .createQueryBuilder()
       .select()
-      .where(`MATCH(title) AGAINST ('${phrase}' IN BOOLEAN MODE)`)
+      .where(`MATCH(title) AGAINST ('${searchKeyword}' IN BOOLEAN MODE)`)
       .getMany();
   }
 

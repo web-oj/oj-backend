@@ -4,11 +4,6 @@ import { BaseEntityWithoutId, BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
 import { Contest } from "./Contest";
 
-export enum ScoringRules {
-  IOI = "IOI",
-  ICPC = "ICPC",
-}
-
 @Entity("contest_participation")
 export class ContestParticipation extends BaseEntityWithoutId {
   @PrimaryColumn()

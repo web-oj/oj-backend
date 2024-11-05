@@ -194,6 +194,32 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"GetAllContestsResponseEntry": {
+				"properties": {
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"endTime",
+					"startTime",
+					"title",
+					"id"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -322,6 +348,139 @@
 						"required": true,
 						"schema": {
 							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/contest": {
+			"get": {
+				"operationId": "GetAllContests",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/GetAllContestsResponseEntry"
+									},
+									"type": "array",
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/contest/create": {
+			"post": {
+				"operationId": "CreateContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"organizerId": {
+										"type": "number",
+										"format": "double"
+									},
+									"isPublished": {
+										"type": "boolean"
+									},
+									"isPlagiarismCheckEnabled": {
+										"type": "boolean"
+									},
+									"scoringRule": {
+										"type": "string"
+									},
+									"endTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"startTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"ruleText": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"title": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"organizerId",
+									"scoringRule",
+									"endTime",
+									"startTime",
+									"title"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/{id}": {
+			"get": {
+				"operationId": "GetContestById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/Contest"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
 						}
 					}
 				]

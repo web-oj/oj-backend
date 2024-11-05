@@ -1,5 +1,5 @@
 import { User } from "@/entities/User";
-import { Contest, ScoringRules } from "../entities/Contest";
+import { Contest } from "../entities/Contest";
 import { ContestParticipation } from "@/entities/ContestParticipation";
 
 export type CreateContestInput = {
@@ -8,7 +8,7 @@ export type CreateContestInput = {
   ruleText?: string;
   startTime: number;
   endTime: number;
-  scoringRule: ScoringRules;
+  scoringRule: string;
   isPlagiarismCheckEnabled?: boolean;
   isPublished?: boolean;
   organizerId: number;
@@ -33,7 +33,7 @@ export interface IContestService {
     newScore: number,
   ): Promise<ContestParticipation | null>;
 
-  findContestsWhoseTitleContain(phrase: string): Promise<Contest[] | null>;
+  searchContests(searchKeyword: string): Promise<Contest[] | null>;
 
   getAllContests(
     getQty?: number,

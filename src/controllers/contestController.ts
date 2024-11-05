@@ -17,7 +17,14 @@
 import "dotenv/config";
 import { IContestService } from "@/services/IContestService";
 import { Body, Get, Path, Post, Route } from "tsoa";
-import { Contest, ScoringRules } from "../entities/Contest";
+import { Contest } from "../entities/Contest";
+
+export type GetAllContestsResponseEntry = {
+  id: number;
+  title: string;
+  startTime: number;
+  endTime: number;
+};
 
 @Route("contest")
 export class ContestController {
@@ -27,42 +34,71 @@ export class ContestController {
     this.contestService = contestService;
   }
 
-  // @Post("create")
-  // public async createContest(
-  //   @Body()
-  //   body: {
-  //     title: string;
-  //     description?: string;
-  //     ruleText?: string;
-  //     startTime: number;
-  //     endTime: number;
-  //     scoringRule: string;
-  //     isPlagiarismCheckEnabled?: boolean;
-  //     isPublished?: boolean;
-  //   },
-  // ) {
-  //   const {
-  //     title,
-  //     description,
-  //     ruleText,
-  //     startTime,
-  //     endTime,
-  //     scoringRule,
-  //     isPlagiarismCheckEnabled,
-  //     isPublished,
-  //   } = body;
+  @Get()
+  public async getAllContests(): Promise<GetAllContestsResponseEntry[] | null> {
+    try {
+      const allContests = await this.contestService.getAllContests();
+      let response: GetAllContestsResponseEntry[] = [];
+      if (allContests !== null) {
+        for (let contest of allContests) {
+          response.push({
+            id: contest.id,
+            title: contest.title,
+            startTime: contest.startTime,
+            endTime: contest.endTime,
+          });
+        }
+      }
+      return response;
+    } catch (err) {
+      throw new Error(`Error getting contest: ${err}`);
+    }
+  }
 
-  //   try {
-  //     this.contestService.createContest({
-  //       handle,
-  //       password: hashedPassword,
-  //       email,
-  //     });
-  //     return { message: "Contest created successfully" };
-  //   } catch (err) {
-  //     throw new Error(`Error creating contest: ${err}`);
-  //   }
-  // }
+  @Post("create")
+  public async createContest(
+    @Body()
+    body: {
+      title: string;
+      description?: string;
+      ruleText?: string;
+      startTime: number;
+      endTime: number;
+      scoringRule: string;
+      isPlagiarismCheckEnabled?: boolean;
+      isPublished?: boolean;
+      organizerId: number;
+    },
+  ) {
+    const {
+      title,
+      description,
+      ruleText,
+      startTime,
+      endTime,
+      scoringRule,
+      isPlagiarismCheckEnabled,
+      isPublished,
+      organizerId,
+    } = body;
+
+    try {
+      await this.contestService.createContest({
+        title,
+        description,
+        ruleText,
+        startTime,
+        endTime,
+        scoringRule,
+        isPlagiarismCheckEnabled,
+        isPublished,
+        organizerId,
+      });
+      return { message: "Contest created successfully" };
+    } catch (err) {
+      throw new Error(`Error creating contest: ${err}`);
+    }
+  }
 
   @Get("{id}")
   public async getContestById(@Path() id: number): Promise<Contest | null> {
@@ -74,15 +110,15 @@ export class ContestController {
     }
   }
 
-  @Get("{handle}")
-  public async getContestByHandle(
-    @Path() handle: string,
-  ): Promise<Contest | null> {
-    try {
-      const contest = await this.contestService.getContestByHandle(handle);
-      return contest;
-    } catch (err) {
-      throw new Error(`Error getting contest: ${err}`);
-    }
-  }
+  // @Get("{handle}")
+  // public async getContestByHandle(
+  //   @Path() handle: string,
+  // ): Promise<Contest | null> {
+  //   try {
+  //     const contest = await this.contestService.getContestByHandle(handle);
+  //     return contest;
+  //   } catch (err) {
+  //     throw new Error(`Error getting contest: ${err}`);
+  //   }
+  // }
 }
