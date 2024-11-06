@@ -6,6 +6,7 @@
  *      - GET '/search'
  *      - GET '/:id'
  *      - GET '/:id/ranking'
+ *      - GET '/:id/personalScore
  *      - DELETE '/:id'
  *      - PATCH '/:id'
  *      - PATCH '/:id/editScore'
@@ -37,7 +38,7 @@ router.get("/", async (req, res) => {
         ? parseInt(req.query.offset as string)
         : undefined,
     );
-    res.status(200).send(response);
+    res.status(response.status).send(response);
   } catch (err) {
     res.status(500).send(`${err}`);
   }
@@ -80,7 +81,7 @@ router.get("/search", async (req: Request, res: Response) => {
       limit,
       offset,
     );
-    res.status(200).send(response);
+    res.status(response.status).send(response);
   } catch (err) {
     res.status(500).send(`${err}`);
   }
@@ -90,11 +91,7 @@ router.get("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const response = await contestController.getContestById(id);
-    if (!response) {
-      res.status(404).send(`Contest with id ${id} not found`);
-    } else {
-      res.status(200).send(response);
-    }
+    res.status(response.status).send(response);
   } catch (err) {
     res.status(500).send(`${err}`);
   }
@@ -103,7 +100,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post("/create", async (req, res) => {
   try {
     const response = await contestController.createContest(req.body);
-    res.status(200).send(response);
+    res.status(response.status).send(response);
   } catch (err) {
     res.status(500).send(`${err}`);
   }

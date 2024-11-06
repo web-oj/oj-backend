@@ -18,14 +18,25 @@ import "dotenv/config";
 import { IContestService } from "@/services/IContestService";
 import { Body, Get, Path, Post, Query, Route } from "tsoa";
 import { Contest } from "../entities/Contest";
-import { any } from "joi";
 import { IUserService } from "@/services/IUserService";
+import { ContestParticipation } from "../entities/ContestParticipation";
 
 export type GetAllContestsResponseEntry = {
   id: number;
   title: string;
   startTime: number;
   endTime: number;
+};
+
+export type ContestResponse = {
+  message: string;
+  status: number;
+  data?:
+    | Contest
+    | Contest[]
+    | GetAllContestsResponseEntry[]
+    | ContestParticipation
+    | ContestParticipation[];
 };
 
 @Route("contest")
@@ -42,7 +53,7 @@ export class ContestController {
   public async getAllContests(
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<GetAllContestsResponseEntry[] | null> {
+  ): Promise<ContestResponse> {
     try {
       const allContests = await this.contestService.getAllContests(
         limit,
@@ -59,17 +70,31 @@ export class ContestController {
           });
         }
       }
-      return response;
+      return {
+        message: "OK",
+        status: 200,
+        data: response,
+      };
     } catch (err) {
       throw new Error(`Error getting contest: ${err}`);
     }
   }
 
   @Get("{id}")
-  public async getContestById(@Path() id: number): Promise<Contest | null> {
+  public async getContestById(@Path() id: number): Promise<ContestResponse> {
     try {
-      const contest = await this.contestService.getContestById(id);
-      return contest;
+      let res = await this.contestService.getContestById(id);
+      if (!res) {
+        return {
+          message: "Contest not found",
+          status: 404,
+        };
+      }
+      return {
+        message: "OK",
+        status: 200,
+        data: res,
+      };
     } catch (err) {
       throw new Error(`Error getting contest: ${err}`);
     }
@@ -84,7 +109,7 @@ export class ContestController {
     @Query() endTimeHigh?: number,
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<GetAllContestsResponseEntry[] | null> {
+  ): Promise<ContestResponse> {
     try {
       if (startTimeLow === undefined) {
         startTimeLow = 0;
@@ -119,7 +144,11 @@ export class ContestController {
           });
         }
       }
-      return response;
+      return {
+        message: "OK",
+        status: 200,
+        data: response,
+      };
     } catch (err) {
       throw new Error(`Error searching contest: ${err}`);
     }
@@ -139,7 +168,7 @@ export class ContestController {
       isPublished?: boolean;
       organizerId: number;
     },
-  ) {
+  ): Promise<ContestResponse> {
     const {
       title,
       description,
@@ -153,7 +182,17 @@ export class ContestController {
     } = body;
 
     try {
-      const response = await this.contestService.createContest({
+      let res: any;
+
+      res = await this.userService.getUserById(organizerId);
+      if (!res) {
+        return {
+          message: "The creator of the contest cannot be found",
+          status: 404,
+        };
+      }
+
+      res = await this.contestService.createContest({
         title,
         description,
         ruleText,
@@ -166,7 +205,8 @@ export class ContestController {
       });
       return {
         message: "Contest created successfully",
-        responseData: response,
+        status: 201,
+        data: res,
       };
     } catch (err) {
       throw new Error(`Error creating contest: ${err}`);
@@ -177,7 +217,7 @@ export class ContestController {
   public async registerToContest(
     @Path() id: number,
     @Body() body: { userId: number },
-  ) {
+  ): Promise<ContestResponse> {
     const { userId } = body;
 
     try {
@@ -188,7 +228,6 @@ export class ContestController {
         return {
           message: "Contest not found",
           status: 404,
-          data: res,
         };
       }
 
@@ -197,7 +236,6 @@ export class ContestController {
         return {
           message: "User not found",
           status: 404,
-          data: res,
         };
       }
 
@@ -208,7 +246,7 @@ export class ContestController {
         );
       if (res) {
         return {
-          message: "Already registered",
+          message: "User already registered",
           status: 403,
           data: res,
         };

@@ -220,6 +220,50 @@
 					"id"
 				],
 				"type": "object"
+			},
+			"ContestResponse": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Contest"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Contest"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/GetAllContestsResponseEntry"
+								},
+								"type": "array"
+							},
+							{
+								"$ref": "#/components/schemas/ContestParticipation"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/ContestParticipation"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
 			}
 		},
 		"securitySchemes": {}
@@ -362,11 +406,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/GetAllContestsResponseEntry"
-									},
-									"type": "array",
-									"nullable": true
+									"$ref": "#/components/schemas/ContestResponse"
 								}
 							}
 						}
@@ -404,12 +444,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/Contest"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/ContestResponse"
 								}
 							}
 						}
@@ -438,11 +473,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/GetAllContestsResponseEntry"
-									},
-									"type": "array",
-									"nullable": true
+									"$ref": "#/components/schemas/ContestResponse"
 								}
 							}
 						}
@@ -524,17 +555,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"responseData": {},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"responseData",
-										"message"
-									],
-									"type": "object"
+									"$ref": "#/components/schemas/ContestResponse"
 								}
 							}
 						}
@@ -602,22 +623,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"data": {},
-										"status": {
-											"type": "number",
-											"format": "double"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"data",
-										"status",
-										"message"
-									],
-									"type": "object"
+									"$ref": "#/components/schemas/ContestResponse"
 								}
 							}
 						}

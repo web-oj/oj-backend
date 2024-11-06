@@ -1,5 +1,5 @@
 import { Contest } from "../../entities/Contest";
-import { User } from "../..//entities/User";
+import { User } from "../../entities/User";
 import { CreateContestInput, IContestService } from "../IContestService";
 import {
   IContestRepository,
