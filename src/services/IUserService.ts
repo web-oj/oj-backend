@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { User } from "@/entities/User";
 
 export type CreateUserInput = {
   handle: string;
@@ -18,10 +18,4 @@ export interface IUserService {
   getUserByEmail(email: string): Promise<User | null>;
 
   getUserByHandle(handle: string): Promise<User | null>;
-
-  // getUserAchievements(id: number): Promise<string[]>;
-
-  // getUserContestHistory(id: number): Promise<any[]>; 
-
-  // getUserStats(id: number): Promise<{ rating: number; problemsSolved: number; contestsParticipated: number } | null>;
 }
