@@ -82,19 +82,29 @@ export class ContestController {
     @Query() offset?: number,
   ): Promise<GetAllContestsResponseEntry[] | null> {
     try {
-      if (startTimeLow = undefined) {
+      if (startTimeLow === undefined) {
         startTimeLow = 0;
       }
-      if (startTimeHigh = undefined) {
-        startTimeHigh = new Date().getTime();
+      if (startTimeHigh === undefined) {
+        startTimeHigh = 2 ** 63 - 1;
       }
-      if (endTimeLow = undefined) {
+      if (endTimeLow === undefined) {
         endTimeLow = 0;
       }
-      if (endTimeHigh = undefined) {
-        endTimeHigh = new Date().getTime();
+      if (endTimeHigh === undefined) {
+        endTimeHigh = 2 ** 63 - 1;
       }
-      
+
+      console.log(
+        searchKeywords,
+        startTimeLow,
+        startTimeHigh,
+        endTimeLow,
+        endTimeHigh,
+        limit,
+        offset,
+      );
+
       const contests = await this.contestService.searchContests(
         searchKeywords,
         startTimeLow,

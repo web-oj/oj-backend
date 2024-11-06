@@ -40,21 +40,50 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+router.get("/search", async (req: Request, res: Response) => {
   try {
-    const response = await contestController.getContestById(id);
-    if (!response) {
-      res.status(404).send(`Contest with id ${id} not found`);
-    } else {
-      res.status(200).send(response);
-    }
+    const searchKeywords = req.query.searchKeywords as string | undefined;
+    const startTimeLow =
+      req.query.startTimeLow !== undefined
+        ? parseInt(req.query.startTimeLow as string)
+        : undefined;
+    const startTimeHigh =
+      req.query.startTimeHigh !== undefined
+        ? parseInt(req.query.startTimeHigh as string)
+        : undefined;
+    const endTimeLow =
+      req.query.endTimeLow !== undefined
+        ? parseInt(req.query.endTimeLow as string)
+        : undefined;
+    const endTimeHigh =
+      req.query.endTimeHigh !== undefined
+        ? parseInt(req.query.endTimeHigh as string)
+        : undefined;
+    const limit =
+      req.query.limit !== undefined
+        ? parseInt(req.query.limit as string)
+        : undefined;
+    const offset =
+      req.query.offset !== undefined
+        ? parseInt(req.query.offset as string)
+        : undefined;
+
+    const response = await contestController.searchContests(
+      searchKeywords,
+      startTimeLow,
+      startTimeHigh,
+      endTimeLow,
+      endTimeHigh,
+      limit,
+      offset,
+    );
+    res.status(200).send(response);
   } catch (err) {
-    res.status(500).send(`Error getting contest: ${err}`);
+    res.status(500).send(`Error searching contests: ${err}`);
   }
 });
 
-router.get("/search", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const response = await contestController.getContestById(id);

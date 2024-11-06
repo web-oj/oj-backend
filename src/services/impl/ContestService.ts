@@ -87,40 +87,6 @@ export class ContestService implements IContestService {
     return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 
-  async searchContests(
-    searchKeyword?: string,
-    startTimeLow?: number,
-    startTimeHigh?: number,
-    endTimeLow?: number,
-    endTimeHigh?: number,
-    limit?: number,
-    offset?: number,
-  ): Promise<Contest[] | null> {
-    if (searchKeyword === undefined) {
-      return this.contestRepo
-      .createQueryBuilder()
-      .select()
-      .where(`MATCH(title) AGAINST ('${searchKeyword}' IN BOOLEAN MODE)`)
-      .andWhere(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
-      .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
-      .orderBy("startTime", "DESC")
-      .skip(offset)
-      .take(limit)
-      .getMany();
-    } else {
-      return this.contestRepo
-      .createQueryBuilder()
-      .select()
-      .where(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
-      .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
-      .orderBy("startTime", "DESC")
-      .skip(offset)
-      .take(limit)
-      .getMany();
-    }
-    
-  }
-
   async getAllContests(
     limit?: number,
     offset?: number,
@@ -161,6 +127,41 @@ export class ContestService implements IContestService {
       skip: offset,
       take: limit,
     });
+  }
+
+  async searchContests(
+    searchKeyword?: string,
+    startTimeLow?: number,
+    startTimeHigh?: number,
+    endTimeLow?: number,
+    endTimeHigh?: number,
+    limit?: number,
+    offset?: number,
+  ): Promise<Contest[] | null> {
+    if (searchKeyword !== undefined) {
+      return this.contestRepo
+        .createQueryBuilder()
+        .select()
+        .where(
+          `MATCH(title) AGAINST ('${searchKeyword}' IN NATURAL LANGUAGE MODE)`,
+        )
+        .andWhere(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
+        .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
+        .orderBy("startTime", "DESC")
+        .skip(offset)
+        .take(limit)
+        .getMany();
+    } else {
+      return this.contestRepo
+        .createQueryBuilder()
+        .select()
+        .where(`startTime BETWEEN ${startTimeLow} AND ${startTimeHigh}`)
+        .andWhere(`endTime BETWEEN ${endTimeLow} AND ${endTimeHigh}`)
+        .orderBy("startTime", "DESC")
+        .skip(offset)
+        .take(limit)
+        .getMany();
+    }
   }
 
   async softDeleteContest(id: number): Promise<void> {
