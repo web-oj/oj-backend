@@ -18,9 +18,12 @@ import { ContestController } from "../controllers/contestController";
 import { auth } from "../middleware/auth";
 import { ContestService } from "../services/impl/ContestService";
 import { Get } from "tsoa";
+import { UserService } from "../services/impl/UserService";
 
-const contestService = new ContestService();
-const contestController = new ContestController(contestService);
+const contestController = new ContestController(
+  new ContestService(),
+  new UserService(),
+);
 
 const router = Router();
 
@@ -36,7 +39,7 @@ router.get("/", async (req, res) => {
     );
     res.status(200).send(response);
   } catch (err) {
-    res.status(500).send(`Error creating contest: ${err}`);
+    res.status(500).send(`${err}`);
   }
 });
 
@@ -79,7 +82,7 @@ router.get("/search", async (req: Request, res: Response) => {
     );
     res.status(200).send(response);
   } catch (err) {
-    res.status(500).send(`Error searching contests: ${err}`);
+    res.status(500).send(`${err}`);
   }
 });
 
@@ -93,37 +96,26 @@ router.get("/:id", async (req: Request, res: Response) => {
       res.status(200).send(response);
     }
   } catch (err) {
-    res.status(500).send(`Error getting contest: ${err}`);
+    res.status(500).send(`${err}`);
   }
 });
 
 router.post("/create", async (req, res) => {
-  const {
-    title,
-    description,
-    ruleText,
-    startTime,
-    endTime,
-    scoringRule,
-    isPlagiarismCheckEnabled,
-    isPublished,
-    organizerId,
-  } = req.body;
   try {
-    await contestController.createContest({
-      title,
-      description,
-      ruleText,
-      startTime,
-      endTime,
-      scoringRule,
-      isPlagiarismCheckEnabled,
-      isPublished,
-      organizerId,
-    });
-    res.status(200).send("Contest created successfully");
+    const response = await contestController.createContest(req.body);
+    res.status(200).send(response);
   } catch (err) {
-    res.status(500).send(`Error creating contest: ${err}`);
+    res.status(500).send(`${err}`);
+  }
+});
+
+router.post("/:id/register", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.registerToContest(id, req.body);
+    res.status(response.status).send(response);
+  } catch (err) {
+    res.status(500).send(`${err}`);
   }
 });
 

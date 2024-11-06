@@ -525,11 +525,13 @@
 							"application/json": {
 								"schema": {
 									"properties": {
+										"responseData": {},
 										"message": {
 											"type": "string"
 										}
 									},
 									"required": [
+										"responseData",
 										"message"
 									],
 									"type": "object"
@@ -583,6 +585,69 @@
 									"endTime",
 									"startTime",
 									"title"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/{id}/register": {
+			"post": {
+				"operationId": "RegisterToContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {},
+										"status": {
+											"type": "number",
+											"format": "double"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"data",
+										"status",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"userId"
 								],
 								"type": "object"
 							}
