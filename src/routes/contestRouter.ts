@@ -6,7 +6,7 @@
  *      - GET '/search'
  *      - GET '/:id'
  *      - GET '/:id/ranking'
- *      - GET '/:id/personalScore
+ *      - GET '/:id/userDetails
  *      - DELETE '/:id'
  *      - PATCH '/:id'
  *      - PATCH '/:id/editScore'
@@ -96,6 +96,58 @@ router.get("/:id", async (req: Request, res: Response) => {
     res.status(500).send(`${err}`);
   }
 });
+
+router.get("/:id/ranking", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const limit =
+    req.query.limit !== undefined
+      ? parseInt(req.query.limit as string)
+      : undefined;
+  const offset =
+    req.query.offset !== undefined
+      ? parseInt(req.query.offset as string)
+      : undefined;
+  try {
+    const response = await contestController.getContestRanking(
+      id,
+      limit,
+      offset,
+    );
+    res.status(response.status).send(response);
+  } catch (err) {
+    res.status(500).send(`${err}`);
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.deleteContest(id);
+    res.status(response.status).send(response);
+  } catch (err) {
+    res.status(500).send(`${err}`);
+  }
+})
+
+router.patch("/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.editContest(id, req.body);
+    res.status(response.status).send(response);
+  } catch (err) {
+    res.status(500).send(`${err}`);
+  }
+})
+
+router.patch("/:id/editScore", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const response = await contestController.editScore(id, req.body);
+    res.status(response.status).send(response);
+  } catch (err) {
+    res.status(500).send(`${err}`);
+  }
+})
 
 router.post("/create", async (req, res) => {
   try {

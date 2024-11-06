@@ -83,7 +83,10 @@ export class ContestService implements IContestService {
       userId: userId,
       score: newScore,
     };
-    await this.contestRepo.update([contestId, userId], updatedData);
+    await this.contestParticipationRepo.update(
+      { userId, contestId },
+      updatedData,
+    );
     return this.contestParticipationRepo.findOneBy({ contestId, userId });
   }
 

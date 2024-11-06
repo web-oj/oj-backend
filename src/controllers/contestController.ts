@@ -16,10 +16,11 @@
 
 import "dotenv/config";
 import { IContestService } from "@/services/IContestService";
-import { Body, Get, Path, Post, Query, Route } from "tsoa";
+import { Body, Delete, Get, Patch, Path, Post, Query, Route } from "tsoa";
 import { Contest } from "../entities/Contest";
 import { IUserService } from "@/services/IUserService";
 import { ContestParticipation } from "../entities/ContestParticipation";
+import { User } from "@/entities/User";
 
 export type GetAllContestsResponseEntry = {
   id: number;
@@ -36,7 +37,8 @@ export type ContestResponse = {
     | Contest[]
     | GetAllContestsResponseEntry[]
     | ContestParticipation
-    | ContestParticipation[];
+    | ContestParticipation[]
+    | null;
 };
 
 @Route("contest")
@@ -151,6 +153,142 @@ export class ContestController {
       };
     } catch (err) {
       throw new Error(`Error searching contest: ${err}`);
+    }
+  }
+
+  @Get("{id}/ranking")
+  public async getContestRanking(
+    @Path() id: number,
+    @Query() limit?: number,
+    @Query() offset?: number,
+  ): Promise<ContestResponse> {
+    try {
+      let res = await this.contestService.getContestRanking(id, limit, offset);
+      return {
+        message: "OK",
+        status: 200,
+        data: res,
+      };
+    } catch (err) {
+      throw new Error(`Error getting contest ranking: ${err}`);
+    }
+  }
+
+  @Delete("{id}")
+  public async deleteContest(@Path() id: number): Promise<ContestResponse> {
+    try {
+      let res = await this.contestService.softDeleteContest(id);
+      return {
+        message: "OK",
+        status: 200,
+      };
+    } catch (err) {
+      throw new Error(`Error deleting contest: ${err}`);
+    }
+  }
+
+  @Patch("{id}")
+  public async editContest(
+    @Path() id: number,
+    @Body()
+    body: {
+      title?: string;
+      description?: string;
+      ruleText?: string;
+      startTime?: number;
+      endTime?: number;
+      scoringRule?: string;
+      isPlagiarismCheckEnabled?: boolean;
+      isPublished?: boolean;
+      organizerId?: number;
+    },
+  ): Promise<ContestResponse> {
+    try {
+      let organizer: User | undefined = undefined;
+      if (body.organizerId !== undefined) {
+        let res = await this.userService.getUserById(body.organizerId);
+        if (!res) {
+          return {
+            message: "The new creator of the contest cannot be found",
+            status: 404,
+          };
+        }
+        organizer = res;
+      }
+
+      let res = await this.contestService.editContest(id, {
+        title: body.title,
+        description: body.description,
+        ruleText: body.ruleText,
+        startTime: body.startTime,
+        endTime: body.endTime,
+        scoringRule: body.scoringRule,
+        isPlagiarismCheckEnabled: body.isPlagiarismCheckEnabled,
+        isPublished: body.isPublished,
+      });
+      return {
+        message: "OK",
+        status: 200,
+        data: res,
+      };
+    } catch (err) {
+      throw new Error(`Error editing contest: ${err}`);
+    }
+  }
+
+  @Patch("{id}/editScore")
+  public async editScore(
+    @Path() id: number,
+    @Body()
+    body: {
+      userId: number;
+      score: number;
+    },
+  ): Promise<ContestResponse> {
+    try {
+      let res: any;
+      res = await this.contestService.getContestById(id);
+      if (!res) {
+        return {
+          message: "Contest not found",
+          status: 404,
+        };
+      }
+
+      res = await this.userService.getUserById(body.userId);
+      if (!res) {
+        return {
+          message: "User not found",
+          status: 404,
+        };
+      }
+
+      res =
+        await this.contestService.getContestParticipationByContestIdAndUserId(
+          id,
+          body.userId,
+        );
+      if (!res) {
+        return {
+          message: "User have not registered",
+          status: 404,
+          data: res,
+        };
+      }
+
+      res = await this.contestService.editUserScoreInContest(
+        id,
+        body.userId,
+        body.score,
+      );
+
+      return {
+        message: "OK",
+        status: 200,
+        data: res,
+      };
+    } catch (err) {
+      throw new Error(`Error editing user score: ${err}`);
     }
   }
 

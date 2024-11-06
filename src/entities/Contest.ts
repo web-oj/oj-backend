@@ -45,7 +45,6 @@ export class Contest extends BaseEntityWithTimestamps {
   @ManyToOne(() => User, (user) => user.organizedContests, {
     onDelete: "SET NULL",
   })
-
   @JoinColumn()
   organizer: User;
 

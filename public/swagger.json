@@ -21,6 +21,10 @@
 						"type": "string",
 						"format": "date-time"
 					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
 					"handle": {
 						"type": "string"
 					},
@@ -70,6 +74,7 @@
 					"id",
 					"createdAt",
 					"updatedAt",
+					"deletedAt",
 					"handle",
 					"avatar_image",
 					"bio",
@@ -97,6 +102,10 @@
 						"format": "date-time"
 					},
 					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
 						"type": "string",
 						"format": "date-time"
 					},
@@ -140,6 +149,7 @@
 					"id",
 					"createdAt",
 					"updatedAt",
+					"deletedAt",
 					"title",
 					"description",
 					"ruleText",
@@ -161,6 +171,10 @@
 						"format": "date-time"
 					},
 					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
 						"type": "string",
 						"format": "date-time"
 					},
@@ -186,6 +200,7 @@
 				"required": [
 					"createdAt",
 					"updatedAt",
+					"deletedAt",
 					"userId",
 					"contestId",
 					"user",
@@ -249,7 +264,8 @@
 								},
 								"type": "array"
 							}
-						]
+						],
+						"nullable": true
 					},
 					"status": {
 						"type": "number",
@@ -462,6 +478,102 @@
 						}
 					}
 				]
+			},
+			"delete": {
+				"operationId": "DeleteContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "EditContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"organizerId": {
+										"type": "number",
+										"format": "double"
+									},
+									"isPublished": {
+										"type": "boolean"
+									},
+									"isPlagiarismCheckEnabled": {
+										"type": "boolean"
+									},
+									"scoringRule": {
+										"type": "string"
+									},
+									"endTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"startTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"ruleText": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"title": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/contest/search": {
@@ -544,6 +656,106 @@
 						}
 					}
 				]
+			}
+		},
+		"/contest/{id}/ranking": {
+			"get": {
+				"operationId": "GetContestRanking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}/editScore": {
+			"patch": {
+				"operationId": "EditScore",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"score",
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/contest/create": {
