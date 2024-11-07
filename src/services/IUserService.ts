@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { User } from "@/entities/User";
 
 export type CreateUserInput = {
   handle: string;
@@ -7,7 +7,7 @@ export type CreateUserInput = {
 };  
 
 export interface IUserService {
-  createUser(userInput: CreateUserInput): User;
+  createUser(userInput: CreateUserInput): Promise<User>;
 
   updateUser(id: number, updatedData: Partial<User>): Promise<User | null>;
 
@@ -18,10 +18,4 @@ export interface IUserService {
   getUserByEmail(email: string): Promise<User | null>;
 
   getUserByHandle(handle: string): Promise<User | null>;
-
-  // getUserAchievements(id: number): Promise<string[]>;
-
-  // getUserContestHistory(id: number): Promise<any[]>; 
-
-  // getUserStats(id: number): Promise<{ rating: number; problemsSolved: number; contestsParticipated: number } | null>;
 }

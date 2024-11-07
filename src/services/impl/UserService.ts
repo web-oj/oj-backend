@@ -1,20 +1,46 @@
-import { User } from "../../entities/User";
+import { User } from "@/entities/User";
 import { CreateUserInput, IUserService } from "../IUserService";
-import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
+import { IUserRepository, UserRepository } from "@/repositories/UserRepo";
+import keccak256 from "keccak256";
 
 export class UserService implements IUserService {
   private readonly userRepo: IUserRepository;
   constructor() {
     this.userRepo = UserRepository;
   }
-  createUser(userInput: CreateUserInput): User {
+  async createUser(userInput: CreateUserInput): Promise<User> {
+    if (!userInput.handle || !userInput.email || !userInput.password) {
+      throw new Error('Missing required fields');
+    }
+    if (userInput.password.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+    if (!userInput.email.includes('@')) {
+      throw new Error('Invalid email');
+    } 
+    if (userInput.handle.length < 3) {
+      throw new Error('Handle must be at least 3 characters long');
+    }
+    if (userInput.handle.length > 20) {
+      throw new Error('Handle must be at most 20 characters long');
+    }
+    if (userInput.password.length > 100) {
+      throw new Error('Password must be at most 100 characters long');
+    }
+    if (userInput.email.length > 100) {
+      throw new Error('Email must be at most 100 characters long');
+    }
     const user = new User();
     user.handle = userInput.handle;
     user.email = userInput.email;
-    user.password = userInput.password;
+    user.password = keccak256(userInput.password).toString("hex");
     user.role = 'user';
     user.isBan = false;
-    this.userRepo.save(user);
+    try {
+      await this.userRepo.insert(user);
+    } catch (err) {
+      throw new Error(`Error creating user: ${err}`);
+    }
     return user;
   }
 
