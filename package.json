@@ -8,7 +8,7 @@
     "prebuild": "npm run swagger",
     "build:start": "tsc && tsoa spec && npm run start",
     "build": "tsc",
-    "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec\"",
+    "dev": "concurrently \"nodemon -r tsconfig-paths/register\" \"nodemon -x tsoa spec\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
@@ -16,7 +16,7 @@
       "src"
     ],
     "ext": "ts",
-    "exec": "ts-node src/index.ts"
+    "exec": "ts-node -r tsconfig-paths/register ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +42,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.11.3",
     "swagger-ui-express": "^5.0.1",
+    "tsconfig-paths": "^4.2.0",
     "tsoa": "^6.5.0",
     "typeorm": "^0.3.20"
   }

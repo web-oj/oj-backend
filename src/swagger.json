@@ -137,7 +137,7 @@
 				}
 			}
 		},
-		"/user/{id}": {
+		"/user/id/{id}": {
 			"get": {
 				"operationId": "GetUserById",
 				"responses": {
@@ -169,7 +169,42 @@
 						}
 					}
 				]
-			},
+			}
+		},
+		"/user/handle/{handle}": {
+			"get": {
+				"operationId": "GetUserByHandle",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "handle",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user/{id}": {
 			"delete": {
 				"operationId": "DeleteUser",
 				"responses": {
@@ -241,39 +276,6 @@
 				}
 			}
 		},
-		"/user/{handle}": {
-			"get": {
-				"operationId": "GetUserByHandle",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/User"
-										}
-									],
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "handle",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
 		"/user/admin/{id}": {
 			"patch": {
 				"operationId": "AddAdmin",
@@ -324,16 +326,16 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"email": {
+									"password": {
 										"type": "string"
 									},
-									"password": {
+									"email": {
 										"type": "string"
 									}
 								},
 								"required": [
-									"email",
-									"password"
+									"password",
+									"email"
 								],
 								"type": "object"
 							}

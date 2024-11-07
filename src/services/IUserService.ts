@@ -7,7 +7,7 @@ export type CreateUserInput = {
 };  
 
 export interface IUserService {
-  createUser(userInput: CreateUserInput): User;
+  createUser(userInput: CreateUserInput): Promise<User>;
 
   updateUser(id: number, updatedData: Partial<User>): Promise<User | null>;
 

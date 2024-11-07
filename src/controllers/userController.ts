@@ -17,7 +17,7 @@ import keccak256 from "keccak256";
 import "dotenv/config";
 import { IUserService } from "@/services/IUserService";
 import { Body, Delete, Get, Patch, Path, Post, Route } from "tsoa";
-import { User } from "@/entities/User";
+import { User } from "../entities/User";
 import { sign } from "jsonwebtoken";
 import { env } from "@/config/config";
 
@@ -34,17 +34,16 @@ export class UserController {
     @Body() body: { handle: string; password: string; email: string },
   ) {
     const { handle, password, email } = body;
-    const hashedPassword = keccak256(password).toString();
 
     try {
-      this.userService.createUser({ handle, password: hashedPassword, email });
+      await this.userService.createUser({ handle, password: password, email });
       return { message: "User created successfully" };
     } catch (err) {
       throw new Error(`Error creating user: ${err}`);
     }
   }
 
-  @Get("{id}")
+  @Get('id/{id}')
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
       return await this.userService.getUserById(id);
@@ -53,7 +52,7 @@ export class UserController {
     }
   }
 
-  @Get("{handle}")
+  @Get('handle/{handle}')
   public async getUserByHandle(@Path() handle: string): Promise<User | null> {
     try {
       return await this.userService.getUserByHandle(handle);
@@ -93,15 +92,15 @@ export class UserController {
   }
 
   @Post("login")
-  public async login(@Body() body: { password: string; email: string }) {
+  public async login(@Body() body: { email: string; password: string; }) {
     try {
       const { password, email } = body;
       const user = await this.userService.getUserByEmail(email);
-
       if (user) {
+
         if (keccak256(password).toString("hex") === user.password) {
-          return sign(user, env.jwt_secret, {
-            expiresIn: "maxAge",
+          return sign(JSON.parse(JSON.stringify(user)), env.jwt_secret, {
+            expiresIn: "2days",
           });
         }
       }

@@ -21,13 +21,13 @@ const userController = new UserController(userService);
 
 const router = Router();
 
-router.post("/createUser", (req, res) => {
+router.post("/createUser", async (req: Request, res: Response) => {
   const { handle, password, email } = req.body;
   try {
-    userController.createUser({ handle, password, email });
+    await userController.createUser({ handle, password, email });
     res.status(200).send("User created successfully");
   } catch (err) {
-    res.status(500).send(`Error creating user: ${err}`);
+    res.status(500).send(`${err}`);
   }
 });
 
