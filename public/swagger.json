@@ -378,6 +378,76 @@
 						}
 					}
 				]
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"password": {
+										"type": "string"
+									},
+									"handle": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email",
+									"password",
+									"handle"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/user/{handle}": {
@@ -413,6 +483,7 @@
 				]
 			}
 		},
+<<<<<<< HEAD
 		"/contest": {
 			"get": {
 				"operationId": "GetAllContests",
@@ -508,14 +579,23 @@
 			},
 			"patch": {
 				"operationId": "EditContest",
+=======
+		"/user/admin/{id}": {
+			"patch": {
+				"operationId": "AddAdmin",
+>>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
+<<<<<<< HEAD
 								"schema": {
 									"$ref": "#/components/schemas/ContestResponse"
 								}
+=======
+								"schema": {}
+>>>>>>> main
 							}
 						}
 					}
@@ -531,6 +611,7 @@
 							"type": "number"
 						}
 					}
+<<<<<<< HEAD
 				],
 				"requestBody": {
 					"required": true,
@@ -761,13 +842,25 @@
 		"/contest/create": {
 			"post": {
 				"operationId": "CreateContest",
+=======
+				]
+			}
+		},
+		"/user/login": {
+			"post": {
+				"operationId": "Login",
+>>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
+<<<<<<< HEAD
 									"$ref": "#/components/schemas/ContestResponse"
+=======
+									"type": "string"
+>>>>>>> main
 								}
 							}
 						}
@@ -781,6 +874,7 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+<<<<<<< HEAD
 									"organizerId": {
 										"type": "number",
 										"format": "double"
@@ -809,10 +903,17 @@
 										"type": "string"
 									},
 									"title": {
+=======
+									"email": {
+										"type": "string"
+									},
+									"password": {
+>>>>>>> main
 										"type": "string"
 									}
 								},
 								"required": [
+<<<<<<< HEAD
 									"organizerId",
 									"scoringRule",
 									"endTime",
@@ -866,6 +967,10 @@
 								},
 								"required": [
 									"userId"
+=======
+									"email",
+									"password"
+>>>>>>> main
 								],
 								"type": "object"
 							}

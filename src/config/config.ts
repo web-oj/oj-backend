@@ -45,4 +45,9 @@ export const env = {
   },
   nodeEnv: envVars.NODE_ENV,
   port: envVars.APP_PORT,
+<<<<<<< HEAD
 };
+=======
+  jwt_secret: envVars.JWT_SECRET,
+};
+>>>>>>> main
