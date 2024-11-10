@@ -8,7 +8,7 @@
     "prebuild": "npm run swagger",
     "build:start": "tsc && tsoa spec && npm run start",
     "build": "tsc",
-    "dev": "concurrently \"nodemon -r tsconfig-paths/register\" \"nodemon -x tsoa spec\"",
+    "dev": "concurrently \"nodemon -r tsconfig-paths/register\" \"nodemon -x tsoa spec-and-routes\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
@@ -16,6 +16,10 @@
       "src"
     ],
     "ext": "ts",
+    "ignore": [
+      "src/public",
+      "src/routes"
+    ],
     "exec": "ts-node -r tsconfig-paths/register ./src/index.ts"
   },
   "keywords": [],

@@ -84,7 +84,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/user/createUser": {
+		"/user/sign_up": {
 			"post": {
 				"operationId": "CreateUser",
 				"responses": {
