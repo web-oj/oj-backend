@@ -1,10 +1,9 @@
+import 'module-alias/register';
 import express, { Application } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
 import { env } from "./config/config";
 import { mysqlDataSource } from "./database/MysqlDataSource";
-import { UserService } from "./services/impl/UserService";
-import { UserRepository } from "./repositories/UserRepo";
 import { RegisterRoutes } from "./routes/routes";
 // import UserRouter from "./routes/userRouter";
 

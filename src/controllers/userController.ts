@@ -16,7 +16,7 @@
 import keccak256 from "keccak256";
 import "dotenv/config";
 import { IUserService } from "@/services/IUserService";
-import { Body, Controller, Delete, Get, Head, Header, Middlewares, Patch, Path, Post, Route, Security } from "tsoa";
+import { Body, Controller, Delete, Get, Header, Patch, Path, Post, Route, Security } from "tsoa";
 import { User } from "../entities/User";
 import { sign } from "jsonwebtoken";
 import { env } from "@/config/config";
