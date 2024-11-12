@@ -1,15 +1,29 @@
-import { env } from "../config/config";
-import { UserService } from "../services/impl/UserService";
-import { Request, Response, NextFunction } from "express";
+import { env } from "@/config/config";
+import { Request } from "express";
 import jwt from "jsonwebtoken";
-import { decode } from "punycode";
 
-const userService = new UserService();
+export type TokenInfo = {
+  id: number;
+  role: string;
+}
+
+export async function decodeJWT(token: string) {
+  const decoded: TokenInfo = await new Promise((resolve, reject) => {
+    jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
+      console.log(decoded);
+      if (err) {
+        return reject(err);
+      }
+      resolve(decoded);
+    });
+  });
+  return decoded;
+}
 
 export async function expressAuthentication(
   request: Request,
   securityName: string,
-  scopes?: string[],
+  scopes?: string[]
 ) {
   if (securityName === "api_key") {
     let token;
@@ -33,28 +47,22 @@ export async function expressAuthentication(
       request.query.token ||
       request.headers["x-access-token"];
 
-    return new Promise((resolve, reject) => {
-      if (!token) {
-        return reject(new Error("No token provided"));
+    if (!token) {
+      throw new Error("No token provided");
+    }
+
+    const decoded: TokenInfo = await decodeJWT(token);
+
+    if (scopes && scopes.length > 0) {
+      for (let scope of scopes) {
+        if (!decoded.role.includes(scope)) {
+          throw new Error("Invalid scope");
+        }
       }
+    }
 
-      jwt.verify(token, env.jwt_secret, function (err: any, decoded: any) {
-        if (err) {
-          return reject(err);
-        }
-
-        if (scopes && scopes.length > 0) {
-          for (let scope of scopes) {
-            if (!decoded.role.includes(scope)) {
-              return reject(new Error("JWT does not contain required scope."));
-            }
-          }
-        }
-
-        resolve(decoded);
-      });
-    });
+    return decoded;
   }
 
-  return Promise.reject(new Error("Invalid security name"));
+  throw new Error("No token provided");
 }
