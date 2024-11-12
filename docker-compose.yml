@@ -24,6 +24,11 @@ services:
     command: ["npm", "run", "build:start"]
     environment:
       - NODE_ENV=production
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
     depends_on:
       - db
 volumes:

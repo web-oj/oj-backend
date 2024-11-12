@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
 
 @Entity('user')
