@@ -84,7 +84,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/user/createUser": {
+		"/user/sign_up": {
 			"post": {
 				"operationId": "CreateUser",
 				"responses": {
@@ -137,7 +137,7 @@
 				}
 			}
 		},
-		"/user/{id}": {
+		"/user/id/{id}": {
 			"get": {
 				"operationId": "GetUserById",
 				"responses": {
@@ -157,91 +157,27 @@
 						}
 					}
 				},
-				"security": [],
-				"parameters": [
+				"security": [
 					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			},
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			},
-			"patch": {
-				"operationId": "UpdateUser",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
+						"jwt": [
+							"user"
+						]
 					}
 				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"email": {
-										"type": "string"
-									},
-									"password": {
-										"type": "string"
-									},
-									"handle": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"email",
-									"password",
-									"handle"
-								],
-								"type": "object"
-							}
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
 						}
 					}
-				}
+				]
 			}
 		},
-		"/user/{handle}": {
+		"/user/handle/{handle}": {
 			"get": {
 				"operationId": "GetUserByHandle",
 				"responses": {
@@ -274,6 +210,89 @@
 				]
 			}
 		},
+		"/user/{id}": {
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user": {
+			"patch": {
+				"operationId": "UpdateUserById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"password": {
+										"type": "string"
+									},
+									"handle": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email",
+									"password",
+									"handle"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/user/admin/{id}": {
 			"patch": {
 				"operationId": "AddAdmin",
@@ -287,7 +306,13 @@
 						}
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -324,16 +349,16 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"email": {
+									"password": {
 										"type": "string"
 									},
-									"password": {
+									"email": {
 										"type": "string"
 									}
 								},
 								"required": [
-									"email",
-									"password"
+									"password",
+									"email"
 								],
 								"type": "object"
 							}
