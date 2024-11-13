@@ -16,11 +16,22 @@
 import keccak256 from "keccak256";
 import "dotenv/config";
 import { IUserService } from "@/services/IUserService";
-import { Body, Controller, Delete, Get, Header, Patch, Path, Post, Route, Security } from "tsoa";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Header,
+  Patch,
+  Path,
+  Post,
+  Route,
+  Security,
+} from "tsoa";
 import { User } from "../entities/User";
 import { sign } from "jsonwebtoken";
-import { env } from "@/config/config";
-import { UserService } from "@/services/impl/UserService";
+import { env } from "../config/config";
+import { UserService } from "../services/impl/UserService";
 import jwt from "jsonwebtoken";
 
 @Route("user")
@@ -46,7 +57,7 @@ export class UserController extends Controller {
     }
   }
 
-  @Get('id/{id}')
+  @Get("id/{id}")
   @Security("jwt", ["user"])
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
@@ -56,7 +67,7 @@ export class UserController extends Controller {
     }
   }
 
-  @Get('handle/{handle}')
+  @Get("handle/{handle}")
   public async getUserByHandle(@Path() handle: string): Promise<User | null> {
     try {
       return await this.userService.getUserByHandle(handle);
@@ -108,7 +119,7 @@ export class UserController extends Controller {
   }
 
   @Post("login")
-  public async login(@Body() body: { email: string; password: string; }) {
+  public async login(@Body() body: { email: string; password: string }) {
     try {
       const { email, password } = body;
       const user = await this.userService.getUserByEmail(email);

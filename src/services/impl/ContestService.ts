@@ -10,7 +10,6 @@ import {
   IContestParticipationRepository,
 } from "../../repositories/ContestParticipationRepo";
 import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
-import { Between } from "typeorm";
 import { ContestParticipation } from "../../entities/ContestParticipation";
 
 export class ContestService implements IContestService {

@@ -1,13 +1,11 @@
-import 'module-alias/register';
+import "module-alias/register";
 import express, { Application } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
 import { env } from "./config/config";
 import { mysqlDataSource } from "./database/MysqlDataSource";
-import { UserService } from "./services/impl/UserService";
-import { UserRepository } from "./repositories/UserRepo";
-import UserRouter from "./routes/userRouter";
-import ContestRouter from "./routes/contestRouter"
+import { RegisterRoutes } from "./routes/routes";
+// import UserRouter from "./routes/userRouter";
 
 const PORT = env.port;
 
@@ -20,13 +18,13 @@ async function main() {
   app.use(express.json());
   app.use(morgan("tiny"));
   app.use(express.static("public"));
-  
+
   app.get("/ping", async (_req, res) => {
     res.send({
       message: "hello",
     });
   });
-  
+
   app.use(
     "/docs",
     swaggerUi.serve,
@@ -37,12 +35,11 @@ async function main() {
     }),
   );
 
-  app.use("/user", UserRouter);
-  app.use("/contest", ContestRouter);
+  RegisterRoutes(app);
 
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);
-  });  
+  });
 }
 
 main();

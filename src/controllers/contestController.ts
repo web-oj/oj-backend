@@ -15,12 +15,25 @@
  */
 
 import "dotenv/config";
-import { IContestService } from "@/services/IContestService";
-import { Body, Delete, Get, Patch, Path, Post, Query, Route } from "tsoa";
+import { IContestService } from "../services/IContestService";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Path,
+  Post,
+  Query,
+  Route,
+  Security,
+} from "tsoa";
 import { Contest } from "../entities/Contest";
-import { IUserService } from "@/services/IUserService";
+import { IUserService } from "../services/IUserService";
 import { ContestParticipation } from "../entities/ContestParticipation";
-import { User } from "@/entities/User";
+import { User } from "../entities/User";
+import { UserService } from "../services/impl/UserService";
+import { ContestService } from "../services/impl/ContestService";
 
 export type GetAllContestsResponseEntry = {
   id: number;
@@ -42,13 +55,14 @@ export type ContestResponse = {
 };
 
 @Route("contest")
-export class ContestController {
+export class ContestController extends Controller {
   private readonly contestService: IContestService;
   private readonly userService: IUserService;
 
-  constructor(contestService: IContestService, userService: IUserService) {
-    this.contestService = contestService;
-    this.userService = userService;
+  constructor() {
+    super();
+    this.userService = new UserService();
+    this.contestService = new ContestService();
   }
 
   @Get("")
@@ -72,6 +86,7 @@ export class ContestController {
           });
         }
       }
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -87,11 +102,13 @@ export class ContestController {
     try {
       let res = await this.contestService.getContestById(id);
       if (!res) {
+        this.setStatus(404)
         return {
           message: "Contest not found",
           status: 404,
         };
       }
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -146,6 +163,7 @@ export class ContestController {
           });
         }
       }
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -164,6 +182,7 @@ export class ContestController {
   ): Promise<ContestResponse> {
     try {
       let res = await this.contestService.getContestRanking(id, limit, offset);
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -175,9 +194,11 @@ export class ContestController {
   }
 
   @Delete("{id}")
+  @Security("jwt", ["admin"])
   public async deleteContest(@Path() id: number): Promise<ContestResponse> {
     try {
       let res = await this.contestService.softDeleteContest(id);
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -188,6 +209,7 @@ export class ContestController {
   }
 
   @Patch("{id}")
+  @Security("jwt", ["admin"])
   public async editContest(
     @Path() id: number,
     @Body()
@@ -207,6 +229,7 @@ export class ContestController {
       let organizer: User | undefined = undefined;
       if (body.organizerId !== undefined) {
         let res = await this.userService.getUserById(body.organizerId);
+        this.setStatus(404);
         if (!res) {
           return {
             message: "The new creator of the contest cannot be found",
@@ -226,6 +249,7 @@ export class ContestController {
         isPlagiarismCheckEnabled: body.isPlagiarismCheckEnabled,
         isPublished: body.isPublished,
       });
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -237,6 +261,7 @@ export class ContestController {
   }
 
   @Patch("{id}/editScore")
+  @Security("jwt", ["admin"])
   public async editScore(
     @Path() id: number,
     @Body()
@@ -248,6 +273,7 @@ export class ContestController {
     try {
       let res: any;
       res = await this.contestService.getContestById(id);
+      this.setStatus(404);
       if (!res) {
         return {
           message: "Contest not found",
@@ -257,6 +283,7 @@ export class ContestController {
 
       res = await this.userService.getUserById(body.userId);
       if (!res) {
+        this.setStatus(404);
         return {
           message: "User not found",
           status: 404,
@@ -269,6 +296,7 @@ export class ContestController {
           body.userId,
         );
       if (!res) {
+        this.setStatus(404);
         return {
           message: "User have not registered",
           status: 404,
@@ -282,6 +310,7 @@ export class ContestController {
         body.score,
       );
 
+      this.setStatus(200);
       return {
         message: "OK",
         status: 200,
@@ -293,6 +322,7 @@ export class ContestController {
   }
 
   @Post("create")
+  @Security("jwt", ["admin"])
   public async createContest(
     @Body()
     body: {
@@ -322,6 +352,7 @@ export class ContestController {
     try {
       let res: any;
 
+      this.setStatus(404);
       res = await this.userService.getUserById(organizerId);
       if (!res) {
         return {
@@ -341,6 +372,7 @@ export class ContestController {
         isPublished,
         organizerId,
       });
+      this.setStatus(201);
       return {
         message: "Contest created successfully",
         status: 201,
@@ -362,6 +394,7 @@ export class ContestController {
       let res: any;
 
       res = await this.contestService.getContestById(id);
+      this.setStatus(404);
       if (!res) {
         return {
           message: "Contest not found",
@@ -370,6 +403,7 @@ export class ContestController {
       }
 
       res = await this.userService.getUserById(userId);
+      this.setStatus(404);
       if (!res) {
         return {
           message: "User not found",
@@ -383,6 +417,7 @@ export class ContestController {
           userId,
         );
       if (res) {
+        this.setStatus(403);
         return {
           message: "User already registered",
           status: 403,
@@ -391,6 +426,7 @@ export class ContestController {
       }
 
       res = await this.contestService.addContestParticipation(id, userId);
+      this.setStatus(201);
       return {
         message: "Registered successfully",
         status: 201,

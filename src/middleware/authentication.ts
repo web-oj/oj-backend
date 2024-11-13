@@ -1,5 +1,5 @@
-import { env } from "@/config/config";
-import { UserService } from "@/services/impl/UserService";
+import { env } from "../config/config";
+import { UserService } from "../services/impl/UserService";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { decode } from "punycode";
@@ -9,7 +9,7 @@ const userService = new UserService();
 export async function expressAuthentication(
   request: Request,
   securityName: string,
-  scopes?: string[]
+  scopes?: string[],
 ) {
   if (securityName === "api_key") {
     let token;
@@ -45,7 +45,7 @@ export async function expressAuthentication(
 
         if (scopes && scopes.length > 0) {
           for (let scope of scopes) {
-            if (!decoded.roles.includes(scope)) {
+            if (!decoded.role.includes(scope)) {
               return reject(new Error("JWT does not contain required scope."));
             }
           }
