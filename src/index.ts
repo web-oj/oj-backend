@@ -1,4 +1,5 @@
 import "module-alias/register";
+import "./setupModuleAlias";
 import express, { Application } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
