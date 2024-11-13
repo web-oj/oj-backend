@@ -3,6 +3,7 @@ import path from 'path';
 import { DataSource } from 'typeorm';
 
 import { env, isLocal } from '../config/config';
+import { User } from '@/entities/User';
 
 export const mysqlDataSource = new DataSource({
   database: env.mysql.db,
