@@ -16,20 +16,23 @@
 import keccak256 from "keccak256";
 import "dotenv/config";
 import { IUserService } from "@/services/IUserService";
-import { Body, Delete, Get, Patch, Path, Post, Route } from "tsoa";
+import { Body, Controller, Delete, Get, Header, Patch, Path, Post, Route, Security } from "tsoa";
 import { User } from "../entities/User";
 import { sign } from "jsonwebtoken";
 import { env } from "@/config/config";
+import { UserService } from "@/services/impl/UserService";
+import jwt from "jsonwebtoken";
 
 @Route("user")
-export class UserController {
+export class UserController extends Controller {
   private readonly userService: IUserService;
 
-  constructor(userService: IUserService) {
-    this.userService = userService;
+  constructor() {
+    super();
+    this.userService = new UserService();
   }
 
-  @Post("createUser")
+  @Post("sign_up")
   public async createUser(
     @Body() body: { handle: string; password: string; email: string },
   ) {
@@ -44,6 +47,7 @@ export class UserController {
   }
 
   @Get('id/{id}')
+  @Security("jwt", ["user"])
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
       return await this.userService.getUserById(id);
@@ -70,19 +74,31 @@ export class UserController {
     }
   }
 
-  @Patch("{id}")
-  public async updateUser(
-    @Path() id: number,
+  @Patch()
+  public async updateUserById(
     @Body() body: { handle: string; password: string; email: string },
+    @Header("x-access-token") token: string,
   ) {
     try {
-      return await this.userService.updateUser(id, body);
+      const decoded: any = await new Promise((resolve, reject) => {
+        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
+          console.log(decoded);
+          if (err) {
+            return reject(err);
+          }
+          resolve(decoded);
+        });
+      });
+      await this.userService.updateUser(decoded.id, body);
+      this.setStatus(200);
+      return { message: "User updated successfully" };
     } catch (err) {
-      throw new Error(`Error updating user: ${err}`);
+      throw new Error(`Error verifying token: ${err}`);
     }
   }
 
   @Patch("admin/{id}")
+  @Security("jwt", ["admin"])
   public async addAdmin(@Path() id: number) {
     try {
       return await this.userService.updateUser(id, { role: "admin" });
@@ -94,12 +110,12 @@ export class UserController {
   @Post("login")
   public async login(@Body() body: { email: string; password: string; }) {
     try {
-      const { password, email } = body;
+      const { email, password } = body;
       const user = await this.userService.getUserByEmail(email);
       if (user) {
-
         if (keccak256(password).toString("hex") === user.password) {
-          return sign(JSON.parse(JSON.stringify(user)), env.jwt_secret, {
+          const payload = { id: user.id, role: user.role };
+          return sign(payload, env.jwt_secret, {
             expiresIn: "2days",
           });
         }

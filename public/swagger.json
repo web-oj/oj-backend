@@ -157,7 +157,13 @@
 						}
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -223,15 +229,27 @@
 						}
 					}
 				]
-			},
+			}
+		},
+		"/user": {
 			"patch": {
-				"operationId": "UpdateUser",
+				"operationId": "UpdateUserById",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
 							}
 						}
 					}
@@ -239,12 +257,11 @@
 				"security": [],
 				"parameters": [
 					{
-						"in": "path",
-						"name": "id",
+						"in": "header",
+						"name": "x-access-token",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				],
@@ -289,7 +306,13 @@
 						}
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"admin"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
