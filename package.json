@@ -22,9 +22,6 @@
     ],
     "exec": "ts-node -r tsconfig-paths/register ./src/index.ts"
   },
-  "_moduleAliases": {
-    "@": "./dist"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
