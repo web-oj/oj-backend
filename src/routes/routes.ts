@@ -5,6 +5,8 @@ import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserController } from './../controllers/userController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { SubmissionController } from './../controllers/submissionController';
 import { expressAuthentication } from './../middleware/authentication';
 // @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
@@ -31,6 +33,20 @@ const models: TsoaRoute.Models = {
             "lastTimeChangeHandle": {"dataType":"double","required":true},
             "lastTimeChangeImage": {"dataType":"double","required":true},
             "country": {"dataType":"string","required":true},
+            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Submission": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "owner": {"ref":"User","required":true},
+            "problem": {"dataType":"string","required":true},
+            "code": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -254,6 +270,68 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'login',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/submission/submit',
+            authenticateMiddleware([{"jwt":["user"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.submit)),
+
+            async function SubmissionController_submit(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"code":{"dataType":"string","required":true},"problem":{"dataType":"string","required":true},"userId":{"dataType":"double","required":true}}},
+                    token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SubmissionController();
+
+              await templateService.apiHandler({
+                methodName: 'submit',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/submission/get_all_submissions/:id',
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.getAllSubmissions)),
+
+            async function SubmissionController_getAllSubmissions(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SubmissionController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllSubmissions',
                 controller,
                 response,
                 next,

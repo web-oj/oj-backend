@@ -39,7 +39,7 @@ export class UserController extends Controller {
     const { handle, password, email } = body;
 
     try {
-      await this.userService.createUser({ handle, password: password, email });
+      await this.userService.createUser({ handle, password, email });
       return { message: "User created successfully" };
     } catch (err) {
       throw new Error(`Error creating user: ${err}`);

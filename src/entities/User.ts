@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
+import { Submission } from './Submission';
 
 @Entity('user')
 export class User extends BaseEntityWithTimestamps {
@@ -36,4 +37,7 @@ export class User extends BaseEntityWithTimestamps {
 
   @Column({ nullable: true })
   country: string;  // Optional country for regional ranking purposes
+
+  @OneToMany(() => Submission, (submission) => submission.owner)
+  submissions: Submission[];
 }

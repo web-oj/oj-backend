@@ -52,6 +52,12 @@
 					},
 					"country": {
 						"type": "string"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -67,7 +73,43 @@
 					"isBan",
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
-					"country"
+					"country",
+					"submissions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Submission": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/User"
+					},
+					"problem": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"owner",
+					"problem",
+					"code"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -365,6 +407,108 @@
 						}
 					}
 				}
+			}
+		},
+		"/submission/submit": {
+			"post": {
+				"operationId": "Submit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"code": {
+										"type": "string"
+									},
+									"problem": {
+										"type": "string"
+									},
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"code",
+									"problem",
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/submission/get_all_submissions/{id}": {
+			"get": {
+				"operationId": "GetAllSubmissions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Submission"
+									},
+									"type": "array",
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		}
 	},
