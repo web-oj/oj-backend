@@ -60,6 +60,8 @@ export async function expressAuthentication(
         }
       }
     }
+
+    return decoded;
   }
 
   throw new Error("No token provided");
