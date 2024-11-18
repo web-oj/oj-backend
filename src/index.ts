@@ -21,7 +21,7 @@ async function main() {
   app.use(express.json());
   app.use(morgan("tiny"));
   app.use(express.static("public"));
-  app.use(cors())
+  app.use(cors());
   
   app.get("/ping", async (_req, res) => {
     res.send({
