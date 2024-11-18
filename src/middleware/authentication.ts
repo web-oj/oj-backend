@@ -45,7 +45,7 @@ export async function expressAuthentication(
 
         if (scopes && scopes.length > 0) {
           for (let scope of scopes) {
-            if (!decoded.roles.includes(scope)) {
+            if (!decoded.role.includes(scope)) {
               return reject(new Error("JWT does not contain required scope."));
             }
           }
