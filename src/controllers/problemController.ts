@@ -30,6 +30,7 @@ import { IProblemService } from "@/services/IProblemService";
 import jwt from "jsonwebtoken";
 import { env } from "@/config/config";
 import { ProblemService } from "@/services/impl/ProblemService";
+import { decodeJWT, TokenInfo } from "@/middleware/authentication";
 
 export type GetAllProblemResponseEntity = {
   id: number;
@@ -76,15 +77,7 @@ export class ProblemController extends Controller {
     @Header("x-access-token") token: string,
   ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded: TokenInfo = await decodeJWT(token);
 
       await this.problemService.createProblem({
         ...body,
