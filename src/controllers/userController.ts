@@ -33,6 +33,7 @@ import { sign } from "jsonwebtoken";
 import { env } from "../config/config";
 import { UserService } from "../services/impl/UserService";
 import jwt from "jsonwebtoken";
+import { decodeJWT, TokenInfo } from "@/middleware/authentication";
 
 @Route("user")
 export class UserController extends Controller {
@@ -57,7 +58,29 @@ export class UserController extends Controller {
     }
   }
 
-  @Get("id/{id}")
+  @Get('get-user-id-from-token')
+  @Security("jwt", ["user"])
+  public async getUserIdFromToken(
+    @Header("x-access-token") token: string,
+  ) : Promise<number | null> {
+    try {
+      const decoded: any = await new Promise((resolve, reject) => {
+        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
+          console.log(decoded);
+          if (err) {
+            return reject(err);
+          }
+          resolve(decoded);
+        });
+      });
+      this.setStatus(200);
+      return decoded.id;
+    } catch (err) {
+      throw new Error(`Error verifying token: ${err}`);
+    }  
+  }
+
+  @Get('id/{id}')
   @Security("jwt", ["user"])
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
@@ -91,15 +114,8 @@ export class UserController extends Controller {
     @Header("x-access-token") token: string,
   ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded: TokenInfo = await decodeJWT(token);
+      
       await this.userService.updateUser(decoded.id, body);
       this.setStatus(200);
       return { message: "User updated successfully" };
@@ -130,6 +146,7 @@ export class UserController extends Controller {
             expiresIn: "2days",
           });
         }
+        throw new Error("Invalid password");
       }
       return null;
     } catch (err) {
