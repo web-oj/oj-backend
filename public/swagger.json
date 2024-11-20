@@ -91,7 +91,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-<<<<<<< HEAD
 			"Contest": {
 				"properties": {
 					"id": {
@@ -144,6 +143,12 @@
 							"$ref": "#/components/schemas/ContestParticipation"
 						},
 						"type": "array"
+					},
+					"associatedProblems": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -160,7 +165,8 @@
 					"isPlagiarismCheckEnabled",
 					"isPublished",
 					"organizer",
-					"participations"
+					"participations",
+					"associatedProblems"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -211,16 +217,131 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"GetAllContestsResponseEntry": {
+			"ProblemInContest": {
 				"properties": {
-					"endTime": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"problemId": {
 						"type": "number",
 						"format": "double"
 					},
-					"startTime": {
+					"contestId": {
 						"type": "number",
 						"format": "double"
-=======
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
+					"score": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"problemId",
+					"contestId",
+					"problem",
+					"contest",
+					"score"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Problem": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"statement": {
+						"type": "string"
+					},
+					"difficulty": {
+						"type": "number",
+						"format": "double"
+					},
+					"timeLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"memoryLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputFormat": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"solutionText": {
+						"type": "string"
+					},
+					"createdBy": {
+						"type": "number",
+						"format": "double"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"associatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"statement",
+					"difficulty",
+					"timeLimit",
+					"memoryLimit",
+					"inputFormat",
+					"outputFormat",
+					"solutionText",
+					"createdBy",
+					"isPublished",
+					"associatedContests"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ProblemRequestBody": {
 				"properties": {
 					"isPublished": {
@@ -286,7 +407,6 @@
 					},
 					"statement": {
 						"type": "string"
->>>>>>> main
 					},
 					"title": {
 						"type": "string"
@@ -297,26 +417,90 @@
 					}
 				},
 				"required": [
-<<<<<<< HEAD
-					"endTime",
-					"startTime",
-=======
 					"createdBy",
 					"createdAt",
 					"memoryLimit",
 					"timeLimit",
 					"difficulty",
 					"statement",
->>>>>>> main
 					"title",
 					"id"
 				],
 				"type": "object"
 			},
-<<<<<<< HEAD
-			"ContestResponse": {
+			"ProblemResponse": {
 				"properties": {
 					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetAllProblemResponseEntity"
+						},
+						"type": "array",
+						"nullable": true
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetAllContestsResponseEntry": {
+				"properties": {
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"endTime",
+					"startTime",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
+			"GetProblemsResponseEntry": {
+				"properties": {
+					"score": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"score",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
+			"ContestResponse": {
+				"properties": {
+					"payload": {
 						"anyOf": [
 							{
 								"$ref": "#/components/schemas/Contest"
@@ -341,17 +525,14 @@
 									"$ref": "#/components/schemas/ContestParticipation"
 								},
 								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/GetProblemsResponseEntry"
+								},
+								"type": "array"
 							}
 						],
-=======
-			"ProblemResponse": {
-				"properties": {
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/GetAllProblemResponseEntity"
-						},
-						"type": "array",
->>>>>>> main
 						"nullable": true
 					},
 					"status": {
@@ -699,24 +880,15 @@
 				}
 			}
 		},
-<<<<<<< HEAD
-		"/contest": {
-			"get": {
-				"operationId": "GetAllContests",
-=======
 		"/problem/create_problem": {
 			"post": {
 				"operationId": "CreateProblem",
->>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-<<<<<<< HEAD
-									"$ref": "#/components/schemas/ContestResponse"
-=======
 									"properties": {
 										"message": {
 											"type": "string"
@@ -726,40 +898,11 @@
 										"message"
 									],
 									"type": "object"
->>>>>>> main
 								}
 							}
 						}
 					}
 				},
-<<<<<<< HEAD
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "offset",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/contest/{id}": {
-			"get": {
-				"operationId": "GetContestById",
-=======
 				"security": [
 					{
 						"jwt": [
@@ -792,16 +935,12 @@
 		"/problem/id/{id}": {
 			"patch": {
 				"operationId": "UpdateProblem",
->>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-<<<<<<< HEAD
-									"$ref": "#/components/schemas/ContestResponse"
-=======
 									"properties": {
 										"message": {
 											"type": "string"
@@ -811,14 +950,11 @@
 										"message"
 									],
 									"type": "object"
->>>>>>> main
 								}
 							}
 						}
 					}
 				},
-<<<<<<< HEAD
-=======
 				"security": [
 					{
 						"jwt": [
@@ -868,7 +1004,6 @@
 						}
 					}
 				},
->>>>>>> main
 				"security": [],
 				"parameters": [
 					{
@@ -883,20 +1018,13 @@
 				]
 			},
 			"delete": {
-<<<<<<< HEAD
-				"operationId": "DeleteContest",
-=======
 				"operationId": "SoftDeleteProblem",
->>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-<<<<<<< HEAD
-									"$ref": "#/components/schemas/ContestResponse"
-=======
 									"properties": {
 										"message": {
 											"type": "string"
@@ -906,7 +1034,6 @@
 										"message"
 									],
 									"type": "object"
->>>>>>> main
 								}
 							}
 						}
@@ -928,13 +1055,6 @@
 							"format": "double",
 							"type": "number"
 						}
-<<<<<<< HEAD
-					}
-				]
-			},
-			"patch": {
-				"operationId": "EditContest",
-=======
 					},
 					{
 						"in": "header",
@@ -950,28 +1070,248 @@
 		"/problem/title/{title}": {
 			"get": {
 				"operationId": "GetProblemTitle",
->>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-<<<<<<< HEAD
-								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
-								}
-=======
 								"schema": {}
->>>>>>> main
 							}
 						}
 					}
 				},
-<<<<<<< HEAD
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "title",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/problem": {
+			"get": {
+				"operationId": "GetAllProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProblemResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/problem/search": {
+			"get": {
+				"operationId": "SearchProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProblemResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "searchKeyword",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "difficultyLow",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "difficultyHigh",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest": {
+			"get": {
+				"operationId": "GetAllContests",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}": {
+			"get": {
+				"operationId": "GetContestById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "EditContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
 						]
 					}
 				],
@@ -1033,35 +1373,13 @@
 		"/contest/search": {
 			"get": {
 				"operationId": "SearchContests",
-=======
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "title",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/problem": {
-			"get": {
-				"operationId": "GetAllProblems",
->>>>>>> main
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-<<<<<<< HEAD
 									"$ref": "#/components/schemas/ContestResponse"
-=======
-									"$ref": "#/components/schemas/ProblemResponse"
->>>>>>> main
 								}
 							}
 						}
@@ -1071,49 +1389,7 @@
 				"parameters": [
 					{
 						"in": "query",
-<<<<<<< HEAD
 						"name": "searchKeywords",
-=======
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "offset",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/problem/search": {
-			"get": {
-				"operationId": "SearchProblems",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ProblemResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "searchKeyword",
->>>>>>> main
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -1121,11 +1397,7 @@
 					},
 					{
 						"in": "query",
-<<<<<<< HEAD
 						"name": "startTimeLow",
-=======
-						"name": "difficultyLow",
->>>>>>> main
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -1134,7 +1406,6 @@
 					},
 					{
 						"in": "query",
-<<<<<<< HEAD
 						"name": "startTimeHigh",
 						"required": false,
 						"schema": {
@@ -1163,9 +1434,6 @@
 					{
 						"in": "query",
 						"name": "limit",
-=======
-						"name": "difficultyHigh",
->>>>>>> main
 						"required": false,
 						"schema": {
 							"format": "double",
@@ -1180,7 +1448,6 @@
 							"format": "double",
 							"type": "number"
 						}
-<<<<<<< HEAD
 					}
 				]
 			}
@@ -1210,8 +1477,6 @@
 							"format": "double",
 							"type": "number"
 						}
-=======
->>>>>>> main
 					},
 					{
 						"in": "query",
@@ -1221,7 +1486,6 @@
 							"format": "double",
 							"type": "number"
 						}
-<<<<<<< HEAD
 					},
 					{
 						"in": "query",
@@ -1233,6 +1497,199 @@
 						}
 					}
 				]
+			}
+		},
+		"/contest/{id}/problem": {
+			"get": {
+				"operationId": "GetContestProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"patch": {
+				"operationId": "EditProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"operationId": "AddProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/contest/{id}/editScore": {
@@ -1253,7 +1710,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1312,7 +1769,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1383,7 +1840,13 @@
 						}
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -1415,11 +1878,6 @@
 					}
 				}
 			}
-=======
-					}
-				]
-			}
->>>>>>> main
 		}
 	},
 	"servers": [

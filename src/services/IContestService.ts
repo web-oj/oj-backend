@@ -1,6 +1,6 @@
-import { User } from "@/entities/User";
 import { Contest } from "../entities/Contest";
 import { ContestParticipation } from "@/entities/ContestParticipation";
+import { ProblemInContest } from "@/entities/ProblemInContest";
 
 export type CreateContestInput = {
   title: string;
@@ -20,12 +20,24 @@ export interface IContestService {
     userId: number,
   ): Promise<ContestParticipation>;
 
+  addProblem(
+    contestId: number,
+    problemId: number,
+    score?: number,
+  ): Promise<ProblemInContest>;
+
   createContest(ContestInput: CreateContestInput): Promise<Contest>;
 
   editContest(
     id: number,
     updatedData: Partial<Contest>,
   ): Promise<Contest | null>;
+
+  editProblemScore(
+    contestId: number,
+    problemId: number,
+    score?: number,
+  ): Promise<ProblemInContest | null>;
 
   editUserScoreInContest(
     contestId: number,
@@ -58,5 +70,14 @@ export interface IContestService {
     offset?: number,
   ): Promise<ContestParticipation[] | null>;
 
+  getProblemIncontest(
+    contestId: number,
+    problemId: number,
+  ): Promise<ProblemInContest | null>;
+
+  getProblemList(contestId: number): Promise<ProblemInContest[]>;
+
   softDeleteContest(id: number): Promise<void>;
+
+  softDeleteProblem(contestId: number, problemId: number): Promise<void>;
 }

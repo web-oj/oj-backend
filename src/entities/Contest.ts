@@ -11,6 +11,7 @@ import {
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
 import { ContestParticipation } from "./ContestParticipation";
+import { ProblemInContest } from "./ProblemInContest";
 
 @Entity("contest")
 export class Contest extends BaseEntityWithTimestamps {
@@ -53,4 +54,10 @@ export class Contest extends BaseEntityWithTimestamps {
     (participation) => participation.contest,
   )
   participations: ContestParticipation[];
+
+  @OneToMany(
+    () => ProblemInContest,
+    (problemInContest) => problemInContest.contest,
+  )
+  associatedProblems: ProblemInContest[];
 }
