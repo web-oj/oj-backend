@@ -143,6 +143,12 @@
 							"$ref": "#/components/schemas/ContestParticipation"
 						},
 						"type": "array"
+					},
+					"associatedProblems": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -159,7 +165,8 @@
 					"isPlagiarismCheckEnabled",
 					"isPublished",
 					"organizer",
-					"participations"
+					"participations",
+					"associatedProblems"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -206,6 +213,131 @@
 					"user",
 					"contest",
 					"score"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ProblemInContest": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"problemId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contestId": {
+						"type": "number",
+						"format": "double"
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
+					"score": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"problemId",
+					"contestId",
+					"problem",
+					"contest",
+					"score"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Problem": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"statement": {
+						"type": "string"
+					},
+					"difficulty": {
+						"type": "number",
+						"format": "double"
+					},
+					"timeLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"memoryLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputFormat": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"solutionText": {
+						"type": "string"
+					},
+					"createdBy": {
+						"type": "number",
+						"format": "double"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"associatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"statement",
+					"difficulty",
+					"timeLimit",
+					"memoryLimit",
+					"inputFormat",
+					"outputFormat",
+					"solutionText",
+					"createdBy",
+					"isPublished",
+					"associatedContests"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -345,9 +477,30 @@
 				],
 				"type": "object"
 			},
+			"GetProblemsResponseEntry": {
+				"properties": {
+					"score": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"score",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
 			"ContestResponse": {
 				"properties": {
-					"data": {
+					"payload": {
 						"anyOf": [
 							{
 								"$ref": "#/components/schemas/Contest"
@@ -370,6 +523,12 @@
 							{
 								"items": {
 									"$ref": "#/components/schemas/ContestParticipation"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/GetProblemsResponseEntry"
 								},
 								"type": "array"
 							}
@@ -1119,7 +1278,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1152,7 +1311,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1340,6 +1499,199 @@
 				]
 			}
 		},
+		"/contest/{id}/problem": {
+			"get": {
+				"operationId": "GetContestProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"patch": {
+				"operationId": "EditProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"operationId": "AddProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/contest/{id}/editScore": {
 			"patch": {
 				"operationId": "EditScore",
@@ -1358,7 +1710,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1417,7 +1769,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1488,7 +1840,13 @@
 						}
 					}
 				},
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",

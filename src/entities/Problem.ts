@@ -1,12 +1,14 @@
 import "reflect-metadata";
-import { BaseEntityWithTimestamps } from "@/entities/Base";
+import { BaseEntityWithTimestamps } from "./Base";
 import {
   Column,
   DeleteDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { ProblemInContest } from "./ProblemInContest";
 
 @Entity("problem")
 export class Problem extends BaseEntityWithTimestamps {
@@ -46,4 +48,10 @@ export class Problem extends BaseEntityWithTimestamps {
 
   @Column({ nullable: false, default: false })
   isPublished: boolean;
+
+  @OneToMany(
+    () => ProblemInContest,
+    (problemInContest) => problemInContest.problem,
+  )
+  associatedContests: ProblemInContest[];
 }

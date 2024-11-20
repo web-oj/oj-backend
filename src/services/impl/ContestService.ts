@@ -1,5 +1,4 @@
 import { Contest } from "../../entities/Contest";
-import { User } from "../../entities/User";
 import { CreateContestInput, IContestService } from "../IContestService";
 import {
   IContestRepository,
@@ -11,16 +10,23 @@ import {
 } from "../../repositories/ContestParticipationRepo";
 import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
 import { ContestParticipation } from "../../entities/ContestParticipation";
+import {
+  IProblemInContestRepository,
+  ProblemInContestRepository,
+} from "../../repositories/ProblemInContestRepo";
+import { ProblemInContest } from "../../entities/ProblemInContest";
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;
   private readonly contestRepo: IContestRepository;
   private readonly contestParticipationRepo: IContestParticipationRepository;
+  private readonly problemInContestRepo: IProblemInContestRepository;
 
   constructor() {
     this.userRepo = UserRepository;
     this.contestRepo = ContestRepository;
     this.contestParticipationRepo = ContestParticipationRepository;
+    this.problemInContestRepo = ProblemInContestRepository;
   }
 
   async addContestParticipation(
@@ -30,6 +36,18 @@ export class ContestService implements IContestService {
     return this.contestParticipationRepo.save({
       contestId: contestId,
       userId: userId,
+    });
+  }
+
+  async addProblem(
+    contestId: number,
+    problemId: number,
+    score?: number,
+  ): Promise<ProblemInContest> {
+    return this.problemInContestRepo.save({
+      problemId: problemId,
+      contestId: contestId,
+      score: score ? score : 0,
     });
   }
 
@@ -70,6 +88,23 @@ export class ContestService implements IContestService {
   ): Promise<Contest | null> {
     await this.contestRepo.update(id, updatedData);
     return this.contestRepo.findOneBy({ id });
+  }
+
+  async editProblemScore(
+    contestId: number,
+    problemId: number,
+    score?: number,
+  ): Promise<ProblemInContest | null> {
+    const updatedData: Partial<ProblemInContest> = {
+      problemId: problemId,
+      contestId: contestId,
+      score: score,
+    };
+    await this.problemInContestRepo.update(
+      { problemId, contestId },
+      updatedData,
+    );
+    return this.problemInContestRepo.findOneBy({ problemId, contestId });
   }
 
   async editUserScoreInContest(
@@ -131,6 +166,24 @@ export class ContestService implements IContestService {
     });
   }
 
+  async getProblemIncontest(
+    contestId: number,
+    problemId: number,
+  ): Promise<ProblemInContest | null> {
+    return this.problemInContestRepo.findOneBy({ contestId, problemId });
+  }
+
+  async getProblemList(contestId: number): Promise<ProblemInContest[]> {
+    return this.problemInContestRepo.find({
+      where: {
+        contestId: contestId,
+      },
+      order: {
+        score: "ASC",
+      },
+    });
+  }
+
   async searchContests(
     searchKeyword?: string,
     startTimeLow?: number,
@@ -168,5 +221,9 @@ export class ContestService implements IContestService {
 
   async softDeleteContest(id: number): Promise<void> {
     await this.contestRepo.softDelete(id);
+  }
+
+  async softDeleteProblem(contestId: number, problemId: number): Promise<void> {
+    await this.problemInContestRepo.softDelete({ contestId, problemId });
   }
 }
