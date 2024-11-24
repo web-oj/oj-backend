@@ -14,32 +14,34 @@ import { Body, Controller, Get, Header, Path, Post, Route, Security } from "tsoa
 import { SubmissionService } from "@/services/impl/SubmissionService";
 import jwt from "jsonwebtoken";
 import { env } from "@/config/config";
+import { decodeJWT } from "@/middleware/authentication";
+import { ProblemService } from "@/services/impl/ProblemService";
+import { IProblemService } from "@/services/IProblemService";
 
 @Route("submission")
 export class SubmissionController extends Controller {
   private readonly submissionService: ISubmissionService;
+  private readonly problemService: IProblemService;
 
   constructor() {
     super();
     this.submissionService = new SubmissionService();
+    this.problemService = new ProblemService();
   }
 
   @Post("submit")
   @Security("jwt", ["user"])
   public async submit(
-    @Body() body: { userId: number; problem: string; code: string },
+    @Body() body: { userId: number; problemId: number; code: string },
     @Header("x-access-token") token: string
   ) {
-    const { problem, code } = body;
-    const decoded: any = await new Promise((resolve, reject) => {
-      jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-        console.log(decoded);
-        if (err) {
-          return reject(err);
-        }
-        resolve(decoded);
-      });
-    });
+    const { problemId, code } = body;
+    const decoded = await decodeJWT(token);
+    const problem = await this.problemService.getProblemById(problemId);
+
+    if (!problem) {
+      throw new Error("Problem not found");
+    }
 
     try {
       await this.submissionService.submit(decoded.id, problem, code);

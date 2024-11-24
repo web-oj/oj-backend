@@ -9,7 +9,7 @@ export const mysqlDataSource = new DataSource({
   database: env.mysql.db,
   entities: [path.join(__dirname, '../entities/*{.js,.ts}')],
   host: env.mysql.host,
-  migrations: [path.join(__dirname, '../migrations/*{.js,.ts}')],
+  migrations: [path.join(__dirname, './migrations/*{.js,.ts}')],
   password: env.mysql.password,
   port: env.mysql.port,
   synchronize: isLocal() ? true : false,

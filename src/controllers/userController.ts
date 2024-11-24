@@ -22,6 +22,7 @@ import { sign } from "jsonwebtoken";
 import { env } from "@/config/config";
 import { UserService } from "@/services/impl/UserService";
 import jwt from "jsonwebtoken";
+import { decodeJWT, TokenInfo } from "@/middleware/authentication";
 
 @Route("user")
 export class UserController extends Controller {
@@ -102,15 +103,8 @@ export class UserController extends Controller {
     @Header("x-access-token") token: string,
   ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded: TokenInfo = await decodeJWT(token);
+      
       await this.userService.updateUser(decoded.id, body);
       this.setStatus(200);
       return { message: "User updated successfully" };
@@ -141,6 +135,7 @@ export class UserController extends Controller {
             expiresIn: "2days",
           });
         }
+        throw new Error("Invalid password");
       }
       return null;
     } catch (err) {

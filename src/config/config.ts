@@ -13,6 +13,14 @@ const envVarsSchema = Joi.object()
     MYSQL_PORT: Joi.number().required(),
     MYSQL_USER: Joi.string().required(),
     MYSQL_ROOT_PASSWORD: Joi.string().required(),
+    MYSQL_DATABASE: Joi.string().required(),
+    JWT_SECRET: Joi.string().required(),
+    NODE_ENV: Joi.string()
+      .valid('local', 'development', 'production')
+      .required(),
+    APP_PORT: Joi.number().required(),
+    JUDGE0_HOST_NAME: Joi.string().required(),
+    JUDGE0_API_KEY: Joi.string().required(),
   })
   .unknown();
 
@@ -46,4 +54,8 @@ export const env = {
   nodeEnv: envVars.NODE_ENV,
   port: envVars.APP_PORT,
   jwt_secret: envVars.JWT_SECRET,
+  judge0: {
+    hostName: envVars.JUDGE0_HOST_NAME,
+    apiKey: envVars.JUDGE0_API_KEY,
+  },
 };
