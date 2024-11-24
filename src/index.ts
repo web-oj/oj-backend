@@ -28,7 +28,7 @@ async function main() {
       message: "hello",
     });
   });
-  
+
   app.use(
     "/docs",
     swaggerUi.serve,
@@ -43,7 +43,7 @@ async function main() {
 
   app.listen(PORT, () => {
     console.log("Server is running on port", PORT);
-  });  
+  });
 }
 
 main();

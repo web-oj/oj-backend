@@ -1,10 +1,10 @@
-import * as path from 'path';
+import * as path from "path";
 
-import * as dotenv from 'dotenv';
-import * as Joi from 'joi';
+import * as dotenv from "dotenv";
+import * as Joi from "joi";
 
 dotenv.config({
-  path: path.join(__dirname, '../../.env'),
+  path: path.join(__dirname, "../../.env"),
 });
 
 const envVarsSchema = Joi.object()
@@ -17,7 +17,7 @@ const envVarsSchema = Joi.object()
   .unknown();
 
 const { error, value: envVars } = envVarsSchema
-  .prefs({ errors: { label: 'key' } })
+  .prefs({ errors: { label: "key" } })
   .validate(process.env);
 
 if (error != null) {
@@ -25,14 +25,14 @@ if (error != null) {
 }
 
 export const isProduction = () => {
-  return envVars.NODE_ENV === 'production';
+  return envVars.NODE_ENV === "production";
 };
 
 export const isDevelopment = () => {
-  return envVars.NODE_ENV === 'development';
+  return envVars.NODE_ENV === "development";
 };
 export const isLocal = () => {
-  return envVars.NODE_ENV === 'local';
+  return envVars.NODE_ENV === "local";
 };
 
 export const env = {

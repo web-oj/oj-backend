@@ -21,6 +21,10 @@
 						"type": "string",
 						"format": "date-time"
 					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
 					"handle": {
 						"type": "string"
 					},
@@ -52,12 +56,25 @@
 					},
 					"country": {
 						"type": "string"
+					},
+					"organizedContests": {
+						"items": {
+							"$ref": "#/components/schemas/Contest"
+						},
+						"type": "array"
+					},
+					"contestParticipations": {
+						"items": {
+							"$ref": "#/components/schemas/ContestParticipation"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"id",
 					"createdAt",
 					"updatedAt",
+					"deletedAt",
 					"handle",
 					"avatar_image",
 					"bio",
@@ -67,7 +84,260 @@
 					"isBan",
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
-					"country"
+					"country",
+					"organizedContests",
+					"contestParticipations"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Contest": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"ruleText": {
+						"type": "string"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"scoringRule": {
+						"type": "string"
+					},
+					"isPlagiarismCheckEnabled": {
+						"type": "boolean"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"organizer": {
+						"$ref": "#/components/schemas/User"
+					},
+					"participations": {
+						"items": {
+							"$ref": "#/components/schemas/ContestParticipation"
+						},
+						"type": "array"
+					},
+					"associatedProblems": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"description",
+					"ruleText",
+					"startTime",
+					"endTime",
+					"scoringRule",
+					"isPlagiarismCheckEnabled",
+					"isPublished",
+					"organizer",
+					"participations",
+					"associatedProblems"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ContestParticipation": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contestId": {
+						"type": "number",
+						"format": "double"
+					},
+					"user": {
+						"$ref": "#/components/schemas/User"
+					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
+					"score": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"userId",
+					"contestId",
+					"user",
+					"contest",
+					"score"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ProblemInContest": {
+				"properties": {
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"problemId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contestId": {
+						"type": "number",
+						"format": "double"
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
+					"score": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"problemId",
+					"contestId",
+					"problem",
+					"contest",
+					"score"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Problem": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"statement": {
+						"type": "string"
+					},
+					"difficulty": {
+						"type": "number",
+						"format": "double"
+					},
+					"timeLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"memoryLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputFormat": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"solutionText": {
+						"type": "string"
+					},
+					"createdBy": {
+						"type": "number",
+						"format": "double"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"associatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"statement",
+					"difficulty",
+					"timeLimit",
+					"memoryLimit",
+					"inputFormat",
+					"outputFormat",
+					"solutionText",
+					"createdBy",
+					"isPublished",
+					"associatedContests"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -165,6 +435,104 @@
 							"$ref": "#/components/schemas/GetAllProblemResponseEntity"
 						},
 						"type": "array",
+						"nullable": true
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetAllContestsResponseEntry": {
+				"properties": {
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"endTime",
+					"startTime",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
+			"GetProblemsResponseEntry": {
+				"properties": {
+					"score": {
+						"type": "number",
+						"format": "double"
+					},
+					"title": {
+						"type": "string"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"score",
+					"title",
+					"id"
+				],
+				"type": "object"
+			},
+			"ContestResponse": {
+				"properties": {
+					"payload": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Contest"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/Contest"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/GetAllContestsResponseEntry"
+								},
+								"type": "array"
+							},
+							{
+								"$ref": "#/components/schemas/ContestParticipation"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/ContestParticipation"
+								},
+								"type": "array"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/GetProblemsResponseEntry"
+								},
+								"type": "array"
+							}
+						],
 						"nullable": true
 					},
 					"status": {
@@ -825,6 +1193,690 @@
 						}
 					}
 				]
+			}
+		},
+		"/contest": {
+			"get": {
+				"operationId": "GetAllContests",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}": {
+			"get": {
+				"operationId": "GetContestById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "EditContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"organizerId": {
+										"type": "number",
+										"format": "double"
+									},
+									"isPublished": {
+										"type": "boolean"
+									},
+									"isPlagiarismCheckEnabled": {
+										"type": "boolean"
+									},
+									"scoringRule": {
+										"type": "string"
+									},
+									"endTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"startTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"ruleText": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"title": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/search": {
+			"get": {
+				"operationId": "SearchContests",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "searchKeywords",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "startTimeLow",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "startTimeHigh",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "endTimeLow",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "endTimeHigh",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}/ranking": {
+			"get": {
+				"operationId": "GetContestRanking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}/problem": {
+			"get": {
+				"operationId": "GetContestProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"patch": {
+				"operationId": "EditProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"operationId": "AddProblem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"problemId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/{id}/editScore": {
+			"patch": {
+				"operationId": "EditScore",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"score": {
+										"type": "number",
+										"format": "double"
+									},
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"score",
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/create": {
+			"post": {
+				"operationId": "CreateContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"organizerId": {
+										"type": "number",
+										"format": "double"
+									},
+									"isPublished": {
+										"type": "boolean"
+									},
+									"isPlagiarismCheckEnabled": {
+										"type": "boolean"
+									},
+									"scoringRule": {
+										"type": "string"
+									},
+									"endTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"startTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"ruleText": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"title": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"organizerId",
+									"scoringRule",
+									"endTime",
+									"startTime",
+									"title"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/{id}/register": {
+			"post": {
+				"operationId": "RegisterToContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		}
 	},
