@@ -10,13 +10,11 @@ import { RegisterRoutes } from "./routes/routes";
 
 // import UserRouter from "./routes/userRouter";
 
-const PORT = env.port;
-
-async function main() {
+export default async function initApp() {
   await mysqlDataSource.initialize();
   await mysqlDataSource.synchronize();
 
-  const app: Application = express();
+  const app = express();
 
   app.use(express.json());
   app.use(morgan("tiny"));
@@ -41,9 +39,14 @@ async function main() {
 
   RegisterRoutes(app);
 
-  app.listen(PORT, () => {
-    console.log("Server is running on port", PORT);
-  });  
+  return app;
 }
 
-main();
+if (require.main === module) {
+  const PORT = env.port;
+  initApp().then((app) => {
+    app.listen(PORT, () => {
+      console.log("Server is running on port", PORT);
+    });
+  });
+}

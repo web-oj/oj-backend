@@ -41,6 +41,6 @@ export class ExecutorService implements IExecutorService {
     if (!submission) {
       throw new Error('Submission not found');
     }
-    
+    return await this.executeCode(submission.code, submission.language, "1");
   }
 } 
