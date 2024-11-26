@@ -57,6 +57,12 @@
 					"country": {
 						"type": "string"
 					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
+					},
 					"organizedContests": {
 						"items": {
 							"$ref": "#/components/schemas/Contest"
@@ -65,7 +71,7 @@
 					},
 					"contestParticipations": {
 						"items": {
-							"$ref": "#/components/schemas/ContestParticipation"
+							"$ref": "#/components/schemas/Contest"
 						},
 						"type": "array"
 					}
@@ -85,8 +91,182 @@
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
 					"country",
+					"submissions",
 					"organizedContests",
 					"contestParticipations"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Submission": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/User"
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					},
+					"code": {
+						"type": "string"
+					},
+					"language": {
+						"$ref": "#/components/schemas/LANGUAGE"
+					},
+					"executionResult": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"owner",
+					"problem",
+					"code",
+					"language",
+					"executionResult"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Problem": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"statement": {
+						"type": "string"
+					},
+					"difficulty": {
+						"type": "number",
+						"format": "double"
+					},
+					"timeLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"memoryLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputFormat": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"solutionText": {
+						"type": "string"
+					},
+					"createdBy": {
+						"type": "number",
+						"format": "double"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
+					},
+					"testcases": {
+						"items": {
+							"$ref": "#/components/schemas/Testcase"
+						},
+						"type": "array"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"associatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"statement",
+					"difficulty",
+					"timeLimit",
+					"memoryLimit",
+					"inputFormat",
+					"outputFormat",
+					"solutionText",
+					"createdBy",
+					"submissions",
+					"testcases",
+					"isPublished",
+					"associatedContests"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Testcase": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"problem"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -263,84 +443,14 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Problem": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"deletedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"title": {
-						"type": "string"
-					},
-					"statement": {
-						"type": "string"
-					},
-					"difficulty": {
-						"type": "number",
-						"format": "double"
-					},
-					"timeLimit": {
-						"type": "number",
-						"format": "double"
-					},
-					"memoryLimit": {
-						"type": "number",
-						"format": "double"
-					},
-					"inputFormat": {
-						"type": "string"
-					},
-					"outputFormat": {
-						"type": "string"
-					},
-					"solutionText": {
-						"type": "string"
-					},
-					"createdBy": {
-						"type": "number",
-						"format": "double"
-					},
-					"isPublished": {
-						"type": "boolean"
-					},
-					"associatedContests": {
-						"items": {
-							"$ref": "#/components/schemas/ProblemInContest"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"id",
-					"createdAt",
-					"updatedAt",
-					"deletedAt",
-					"title",
-					"statement",
-					"difficulty",
-					"timeLimit",
-					"memoryLimit",
-					"inputFormat",
-					"outputFormat",
-					"solutionText",
-					"createdBy",
-					"isPublished",
-					"associatedContests"
-				],
-				"type": "object",
-				"additionalProperties": false
+			"LANGUAGE": {
+				"type": "string",
+				"enum": [
+					"CPP",
+					"C",
+					"JAVA",
+					"PYTHON"
+				]
 			},
 			"ProblemRequestBody": {
 				"properties": {
@@ -880,6 +990,109 @@
 				}
 			}
 		},
+		"/submission/submit": {
+			"post": {
+				"operationId": "Submit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"code": {
+										"type": "string"
+									},
+									"problemId": {
+										"type": "number",
+										"format": "double"
+									},
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"code",
+									"problemId",
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/submission/get_all_submissions/{id}": {
+			"get": {
+				"operationId": "GetAllSubmissions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Submission"
+									},
+									"type": "array",
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/problem/create_problem": {
 			"post": {
 				"operationId": "CreateProblem",
@@ -906,7 +1119,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"user"
 						]
 					}
 				],
@@ -1193,6 +1406,51 @@
 						}
 					}
 				]
+			}
+		},
+		"/executor/execute": {
+			"post": {
+				"operationId": "Execute",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"stdin": {
+										"type": "string"
+									},
+									"code": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"stdin",
+									"code"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/contest": {

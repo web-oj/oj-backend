@@ -6,7 +6,11 @@ import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserController } from './../controllers/userController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { SubmissionController } from './../controllers/submissionController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ProblemController } from './../controllers/problemController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { ExecutorController } from './../controllers/executorController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ContestController } from './../controllers/contestController';
 import { expressAuthentication } from './../middleware/authentication';
@@ -36,8 +40,61 @@ const models: TsoaRoute.Models = {
             "lastTimeChangeHandle": {"dataType":"double","required":true},
             "lastTimeChangeImage": {"dataType":"double","required":true},
             "country": {"dataType":"string","required":true},
+            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
             "organizedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},
-            "contestParticipations": {"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},
+            "contestParticipations": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Submission": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "deletedAt": {"dataType":"datetime","required":true},
+            "owner": {"ref":"User","required":true},
+            "problem": {"ref":"Problem","required":true},
+            "code": {"dataType":"string","required":true},
+            "language": {"ref":"LANGUAGE","required":true},
+            "executionResult": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Problem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "deletedAt": {"dataType":"datetime","required":true},
+            "title": {"dataType":"string","required":true},
+            "statement": {"dataType":"string","required":true},
+            "difficulty": {"dataType":"double","required":true},
+            "timeLimit": {"dataType":"double","required":true},
+            "memoryLimit": {"dataType":"double","required":true},
+            "inputFormat": {"dataType":"string","required":true},
+            "outputFormat": {"dataType":"string","required":true},
+            "solutionText": {"dataType":"string","required":true},
+            "createdBy": {"dataType":"double","required":true},
+            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
+            "testcases": {"dataType":"array","array":{"dataType":"refObject","ref":"Testcase"},"required":true},
+            "isPublished": {"dataType":"boolean","required":true},
+            "associatedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Testcase": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "deletedAt": {"dataType":"datetime","required":true},
+            "problem": {"ref":"Problem","required":true},
         },
         "additionalProperties": false,
     },
@@ -94,26 +151,9 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Problem": {
-        "dataType": "refObject",
-        "properties": {
-            "id": {"dataType":"double","required":true},
-            "createdAt": {"dataType":"datetime","required":true},
-            "updatedAt": {"dataType":"datetime","required":true},
-            "deletedAt": {"dataType":"datetime","required":true},
-            "title": {"dataType":"string","required":true},
-            "statement": {"dataType":"string","required":true},
-            "difficulty": {"dataType":"double","required":true},
-            "timeLimit": {"dataType":"double","required":true},
-            "memoryLimit": {"dataType":"double","required":true},
-            "inputFormat": {"dataType":"string","required":true},
-            "outputFormat": {"dataType":"string","required":true},
-            "solutionText": {"dataType":"string","required":true},
-            "createdBy": {"dataType":"double","required":true},
-            "isPublished": {"dataType":"boolean","required":true},
-            "associatedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
-        },
-        "additionalProperties": false,
+    "LANGUAGE": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["CPP"]},{"dataType":"enum","enums":["C"]},{"dataType":"enum","enums":["JAVA"]},{"dataType":"enum","enums":["PYTHON"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ProblemRequestBody": {
@@ -407,8 +447,70 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/submission/submit',
+            authenticateMiddleware([{"jwt":["user"]}]),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.submit)),
+
+            async function SubmissionController_submit(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"code":{"dataType":"string","required":true},"problemId":{"dataType":"double","required":true},"userId":{"dataType":"double","required":true}}},
+                    token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SubmissionController();
+
+              await templateService.apiHandler({
+                methodName: 'submit',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/submission/get_all_submissions/:id',
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.getAllSubmissions)),
+
+            async function SubmissionController_getAllSubmissions(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SubmissionController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllSubmissions',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/problem/create_problem',
-            authenticateMiddleware([{"jwt":["admin"]}]),
+            authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.createProblem)),
 
@@ -618,6 +720,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'searchProblems',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/executor/execute',
+            authenticateMiddleware([{"jwt":["user"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ExecutorController)),
+            ...(fetchMiddlewares<RequestHandler>(ExecutorController.prototype.execute)),
+
+            async function ExecutorController_execute(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"stdin":{"dataType":"string","required":true},"code":{"dataType":"string","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new ExecutorController();
+
+              await templateService.apiHandler({
+                methodName: 'execute',
                 controller,
                 response,
                 next,

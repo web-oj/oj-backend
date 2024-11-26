@@ -9,6 +9,7 @@ export class UserService implements IUserService {
     this.userRepo = UserRepository;
   }
   async createUser(userInput: CreateUserInput): Promise<User> {
+    console.log(userInput);
     if (!userInput.handle || !userInput.email || !userInput.password) {
       throw new Error('Missing required fields');
     }
@@ -36,6 +37,7 @@ export class UserService implements IUserService {
     user.password = keccak256(userInput.password).toString("hex");
     user.role = 'user';
     user.isBan = false;
+    user.submissions = [];
     try {
       await this.userRepo.insert(user);
     } catch (err) {

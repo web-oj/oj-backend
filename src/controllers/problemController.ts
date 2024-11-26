@@ -71,7 +71,7 @@ export class ProblemController extends Controller {
   }
 
   @Post("create_problem")
-  @Security("jwt", ["admin"])
+  @Security("jwt", ["user"])
   public async createProblem(
     @Body() body: ProblemRequestBody,
     @Header("x-access-token") token: string,

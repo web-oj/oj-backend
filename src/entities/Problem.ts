@@ -8,6 +8,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Submission } from "./Submission";
+import { Testcase } from "./Testcase";
 import { ProblemInContest } from "./ProblemInContest";
 
 @Entity("problem")
@@ -45,6 +47,12 @@ export class Problem extends BaseEntityWithTimestamps {
 
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;
+
+  @OneToMany(() => Submission, (submission) => submission.problem)
+  submissions: Submission[];
+
+  @OneToMany(() => Testcase, (testcase) => testcase.problem)
+  testcases: Testcase[];
 
   @Column({ nullable: false, default: false })
   isPublished: boolean;
