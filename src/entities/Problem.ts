@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Submission } from "./Submission";
 import { Testcase } from "./Testcase";
+import { ProblemInContest } from "./ProblemInContest";
 
 @Entity("problem")
 export class Problem extends BaseEntityWithTimestamps {
@@ -55,4 +56,10 @@ export class Problem extends BaseEntityWithTimestamps {
 
   @Column({ nullable: false, default: false })
   isPublished: boolean;
+
+  @OneToMany(
+    () => ProblemInContest,
+    (problemInContest) => problemInContest.problem,
+  )
+  associatedContests: ProblemInContest[];
 }

@@ -1,6 +1,6 @@
-import { User } from "@/entities/User";
+import { User } from "../../entities/User";
 import { CreateUserInput, IUserService } from "../IUserService";
-import { IUserRepository, UserRepository } from "@/repositories/UserRepo";
+import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
 import keccak256 from "keccak256";
 
 export class UserService implements IUserService {

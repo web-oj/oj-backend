@@ -26,7 +26,7 @@ export default async function initApp() {
       message: "hello",
     });
   });
-  
+
   app.use(
     "/docs",
     swaggerUi.serve,
