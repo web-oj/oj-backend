@@ -74,6 +74,12 @@
 							"$ref": "#/components/schemas/Contest"
 						},
 						"type": "array"
+					},
+					"achievements": {
+						"items": {
+							"$ref": "#/components/schemas/Achievement"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -93,7 +99,8 @@
 					"country",
 					"submissions",
 					"organizedContests",
-					"contestParticipations"
+					"contestParticipations",
+					"achievements"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -451,6 +458,42 @@
 					"JAVA",
 					"PYTHON"
 				]
+			},
+			"Achievement": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"name": {
+						"type": "string"
+					},
+					"belongsTo": {
+						"$ref": "#/components/schemas/User"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"name",
+					"belongsTo"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"ProblemRequestBody": {
 				"properties": {
