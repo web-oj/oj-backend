@@ -43,6 +43,7 @@ const models: TsoaRoute.Models = {
             "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
             "organizedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},
             "contestParticipations": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},
+            "achievements": {"dataType":"array","array":{"dataType":"refObject","ref":"Achievement"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -154,6 +155,19 @@ const models: TsoaRoute.Models = {
     "LANGUAGE": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["CPP"]},{"dataType":"enum","enums":["C"]},{"dataType":"enum","enums":["JAVA"]},{"dataType":"enum","enums":["PYTHON"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Achievement": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "deletedAt": {"dataType":"datetime","required":true},
+            "name": {"dataType":"string","required":true},
+            "belongsTo": {"ref":"User","required":true},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ProblemRequestBody": {

@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
 import { Submission } from './Submission';
 import { Contest } from './Contest';
+import { Achievement } from './Achievement';
 
 @Entity('user')
 export class User extends BaseEntityWithTimestamps {
@@ -47,4 +48,7 @@ export class User extends BaseEntityWithTimestamps {
 
   @OneToMany(() => Contest, (contest) => contest.participations)
   contestParticipations: Contest[];
+
+  @OneToMany(() => Achievement, (achievement) => achievement.belongsTo)
+  achievements: Achievement[];
 }
