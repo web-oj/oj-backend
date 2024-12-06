@@ -128,7 +128,7 @@
 					"language": {
 						"$ref": "#/components/schemas/LANGUAGE"
 					},
-					"executionResult": {
+					"result": {
 						"type": "string"
 					}
 				},
@@ -141,7 +141,7 @@
 					"problem",
 					"code",
 					"language",
-					"executionResult"
+					"result"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -259,6 +259,15 @@
 					},
 					"problem": {
 						"$ref": "#/components/schemas/Problem"
+					},
+					"submissionResult": {
+						"$ref": "#/components/schemas/SubmissionResult"
+					},
+					"input": {
+						"type": "string"
+					},
+					"output": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -266,7 +275,50 @@
 					"createdAt",
 					"updatedAt",
 					"deletedAt",
-					"problem"
+					"problem",
+					"submissionResult",
+					"input",
+					"output"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SubmissionResult": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"submission": {
+						"$ref": "#/components/schemas/Submission"
+					},
+					"testcase": {
+						"$ref": "#/components/schemas/Testcase"
+					},
+					"result": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"submission",
+					"testcase",
+					"result"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1002,10 +1054,12 @@
 									"properties": {
 										"message": {
 											"type": "string"
-										}
+										},
+										"submissionId": {}
 									},
 									"required": [
-										"message"
+										"message",
+										"submissionId"
 									],
 									"type": "object"
 								}
@@ -1052,6 +1106,85 @@
 									"code",
 									"problemId",
 									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/submission/execute_submission": {
+			"post": {
+				"operationId": "ExecuteSubmission",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"submissionId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"submissionId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/submission/execute_code": {
+			"post": {
+				"operationId": "ExecuteCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"stdin": {
+										"type": "string"
+									},
+									"code": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"stdin",
+									"code"
 								],
 								"type": "object"
 							}
@@ -1406,51 +1539,6 @@
 						}
 					}
 				]
-			}
-		},
-		"/executor/execute": {
-			"post": {
-				"operationId": "Execute",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"jwt": [
-							"user"
-						]
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"stdin": {
-										"type": "string"
-									},
-									"code": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"stdin",
-									"code"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/contest": {

@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 import { BaseEntityWithTimestamps } from './Base';
 import { User } from './User';
 import { Problem } from './Problem';
+import { SubmissionResult } from './SubmissionResult';
 
 export type LANGUAGE = 'CPP' | 'C' | 'JAVA' | 'PYTHON';
 
@@ -23,6 +24,6 @@ export class Submission extends BaseEntityWithTimestamps {
   @Column({ nullable: false })
   language: LANGUAGE;
 
-  @Column({ nullable: false })
-  executionResult: string;
+  @OneToMany(() => SubmissionResult, (submissionResult) => submissionResult.submission)
+  result: string;
 }

@@ -44,10 +44,30 @@ export class SubmissionController extends Controller {
     }
 
     try {
-      await this.submissionService.submit(decoded.id, problem, code);
-      return { message: "Submission created successfully" };
+      const submissionId = await this.submissionService.submit(decoded.id, problem, code);
+      return { submissionId, message: "Submission created successfully" };
     } catch (err) {
       throw new Error(`Error creating submission: ${err}`);
+    }
+  }
+
+  @Post('execute_submission')
+  public async executeSubmission(@Body() body: { submissionId: number }): Promise<string> {
+    const { submissionId } = body;
+    try {
+      return await this.submissionService.executeSubmission(submissionId);
+    } catch (err) {
+      throw new Error(`Error executing code: ${err}`);
+    }
+  }
+
+  @Post('execute_code')
+  public async executeCode(@Body() body: { code: string; stdin: string }): Promise<string> {
+    const { code, stdin } = body;
+    try {
+      return await this.submissionService.executeCode(code, stdin);
+    } catch (err) {
+      throw new Error(`Error executing code: ${err}`);
     }
   }
 

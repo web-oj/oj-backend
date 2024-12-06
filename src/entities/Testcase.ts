@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Submission } from "./Submission";
 import { Problem } from "./Problem";
+import { SubmissionResult } from "./SubmissionResult";
 
 @Entity("testcase")
 export class Testcase extends BaseEntityWithTimestamps {
@@ -19,4 +20,11 @@ export class Testcase extends BaseEntityWithTimestamps {
 
   @ManyToOne(() => Problem, (problem) => problem.testcases)
   problem: Problem;
+
+  @ManyToOne(() => SubmissionResult, (submissionResult) => submissionResult.testcase)
+  submissionResult: SubmissionResult;
+
+  input: string;
+
+  output: string;
 }
