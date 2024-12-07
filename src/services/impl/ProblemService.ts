@@ -8,12 +8,16 @@ import {
   ProblemRepository,
 } from "@/repositories/ProblemRepo";
 import { UserRepository } from "@/repositories/UserRepo";
+import { ITestcaseRepository, TestcaseRepository } from "@/repositories/TestcaseRepo";
+import { Testcase } from "@/entities/Testcase";
 
 export class ProblemService implements IProblemService {
   private readonly problemRepo: IProblemRepository;
+  private readonly testcaseRepo: ITestcaseRepository;
 
   constructor() {
     this.problemRepo = ProblemRepository;
+    this.testcaseRepo = TestcaseRepository;
   }
 
   async createProblem(userInput: CreateProblemInput): Promise<Problem> {
@@ -113,5 +117,21 @@ export class ProblemService implements IProblemService {
 
   async softDeleteProblem(id: number): Promise<void> {
     await this.problemRepo.softDelete(id);
+  }
+  
+  async addTestcase(problemId: number, input: string, output: string) {
+    const problem = await this.problemRepo.findOneBy({ id: problemId });
+    if (!problem) {
+      throw new Error("Problem not found");
+    }
+    const testcase = new Testcase();
+    testcase.input = input;
+    testcase.output = output;
+    testcase.problem = problem;
+    try {
+      await this.testcaseRepo.save(testcase);
+    } catch (error) {
+      throw new Error(`Testcase adding error: ${error}`);
+    }
   }
 }

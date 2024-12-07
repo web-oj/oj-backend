@@ -6,19 +6,21 @@ import { Problem } from "@/entities/Problem";
 import { env } from "@/config/config";
 import axios from "axios";
 import { SubmissionResult } from "@/entities/SubmissionResult";
+import { Contest } from "@/entities/Contest";
+import { ISubmissionResultRepository, SubmissionResultRepository } from "@/repositories/SubmissionResultRepo";
 
 export class SubmissionService implements ISubmissionService {
   private readonly userRepo: IUserRepository;
   private readonly submissionRepo: ISubmissionRepository;
-  private readonly submissionResultRepo: ISubmissionRepository;
+  private readonly submissionResultRepo: ISubmissionResultRepository;
 
   constructor() {
     this.userRepo = UserRepository;
     this.submissionRepo = SubmissionRepository;
-    this.submissionResultRepo = SubmissionRepository;
+    this.submissionResultRepo = SubmissionResultRepository;
   }
 
-  async submit(userId: number, problem: Problem, code: string): Promise<number> {
+  async submit(userId: number, problem: Problem, contest: Contest, code: string) {
     if (!userId || !code) {
       throw new Error('Missing required fields');
     }
@@ -36,20 +38,27 @@ export class SubmissionService implements ISubmissionService {
     submission.owner = user;
     submission.problem = problem;
     submission.code = code;
-    if (user.submissions === undefined) {
-      user.submissions = [];
-    }
-    user.submissions.push(submission);
+    submission.language = 'CPP';
     try {
       await this.userRepo.save(user);
       await this.submissionRepo.save(submission);
-      return submission.id;
+      const now = Date.now();
+      if (now >= contest.startTime && now <= contest.endTime && contest.scoringRule === "ACM") {
+        await this.executeSubmission(submission.id);
+      }
+      return {
+        submissionId: submission.id,
+      }
     } catch (err) {
       throw new Error(`Error creating submission: ${err}`);
-    }
+    }  
   }
 
-  async executeCode(code: string, stdin: string): Promise<string> {
+  async executeCode(code: string, stdin: string, expectedOutput?: string): Promise<string> {
+    stdin = Buffer.from(stdin).toString('base64');
+    if (expectedOutput) {
+      expectedOutput = Buffer.from(expectedOutput).toString('base64');
+    }
     const options = {
       method: 'POST',
       path: 'submissions/?base64_encoded=true&wait=true',
@@ -58,41 +67,52 @@ export class SubmissionService implements ISubmissionService {
         'x-rapidapi-host': env.judge0.hostName,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ source_code: code, language_id: 53, stdin }),
+      body: JSON.stringify({ source_code: code, language_id: 53, stdin, expected_output: expectedOutput }),
     }
     try {
       const res = await axios.post(`https://${env.judge0.hostName}/${options.path}`, options.body, {
         headers: options.headers
       });
-      return res.data;
+      return res.data.status.description;
     } catch (err) {
-      console.log(err);
       throw new Error(`Error executing code: ${err}`);
     }
   }
 
-  async executeSubmission(submissionId: number): Promise<string> {
-    const submission = await this.submissionRepo.findOneBy({ id: submissionId });
+  async executeSubmission(submissionId: number) {
+    const submission = await this.submissionRepo.findOne(
+      {
+        where: { id: submissionId },
+        relations: ['problem', 'problem.testcases'],
+      }
+    );
     if (!submission) {
       throw new Error('Submission not found');
     }
     const problem = submission.problem;
-    for (const test of problem.testcases) {
-      if (test.input === undefined || test.output === undefined) {
-        throw new Error('Testcase input and output are required');
+    if (problem.testcases) {
+      for (const test of problem.testcases) {
+        if (test.input === undefined || test.output === undefined) {
+          continue;
+        }
+        if (test.input.length > 1000 || test.output.length > 1000) {
+          continue;
+        }
+        const submissionResult = new SubmissionResult();
+        submissionResult.testcase = test;
+        submissionResult.submission = submission;
+        submissionResult.result = (await this.executeCode(submission.code, test.input, test.output));
+        this.submissionResultRepo.save(submissionResult);
       }
-      if (test.input.length > 1000 || test.output.length > 1000) {
-        throw new Error('Testcase input and output must be at most 1000 characters long');
-      }
-      const submissionResult = new SubmissionResult();
-      submissionResult.testcase = test;
-      submissionResult.submission = submission;
-      submissionResult.result = await this.executeCode(submission.code, test.input);
-      this.submissionResultRepo.save(submissionResult);
-    }
+    }    
   }
 
-  async getAllSubmissions(userId: number): Promise<Submission[]> {
-    return this.submissionRepo.findBy({ owner: { id: userId } });
+  async getSubmissionById(submissionId: number, options?: {
+    withResult: boolean;
+  }): Promise<Submission | null> {
+    return this.submissionRepo.findOne({
+      where: { id: submissionId },
+      relations: options?.withResult ? ['result'] : [],
+    })
   }
 }

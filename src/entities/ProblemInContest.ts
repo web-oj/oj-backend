@@ -6,7 +6,7 @@ import { Contest } from "./Contest";
 
 @Entity("problem_in_contest")
 export class ProblemInContest extends BaseEntityWithoutId {
-  @PrimaryColumn()
+  @Column({ nullable: false })
   problemId: number;
 
   @PrimaryColumn()
@@ -18,7 +18,7 @@ export class ProblemInContest extends BaseEntityWithoutId {
   @JoinColumn({ name: "problemId" })
   problem: Problem;
 
-  @ManyToOne(() => Contest, (contest) => contest.associatedProblems, {
+  @ManyToOne(() => Contest, (contest) => contest.problemsInContest, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "contestId" })

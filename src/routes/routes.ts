@@ -54,9 +54,10 @@ const models: TsoaRoute.Models = {
             "deletedAt": {"dataType":"datetime","required":true},
             "owner": {"ref":"User","required":true},
             "problem": {"ref":"Problem","required":true},
+            "contest": {"ref":"Contest","required":true},
             "code": {"dataType":"string","required":true},
             "language": {"ref":"LANGUAGE","required":true},
-            "result": {"dataType":"string","required":true},
+            "result": {"dataType":"array","array":{"dataType":"refObject","ref":"SubmissionResult"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -131,7 +132,8 @@ const models: TsoaRoute.Models = {
             "isPublished": {"dataType":"boolean","required":true},
             "organizer": {"ref":"User","required":true},
             "participations": {"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},
-            "associatedProblems": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
+            "problemsInContest": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
+            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -198,7 +200,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ContestResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"payload":{"dataType":"union","subSchemas":[{"ref":"Contest"},{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetAllContestsResponseEntry"}},{"ref":"ContestParticipation"},{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetProblemsResponseEntry"}},{"dataType":"enum","enums":[null]}]},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"payload":{"dataType":"union","subSchemas":[{"ref":"Contest"},{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetAllContestsResponseEntry"}},{"ref":"ContestParticipation"},{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetProblemsResponseEntry"}},{"dataType":"enum","enums":[null]}]},"error":{"dataType":"string"},"message":{"dataType":"string"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
@@ -218,7 +220,7 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        app.post('/user/sign_up',
+        app.post('/user',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.createUser)),
 
@@ -248,7 +250,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/user/get-user-id-from-token',
+        app.get('/user/id',
             authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUserIdFromToken)),
@@ -340,7 +342,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/user/:id',
+        app.delete('/user/id/:id',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.deleteUser)),
 
@@ -438,7 +440,7 @@ export function RegisterRoutes(app: Router) {
 
             async function UserController_login(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}}},
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"handle":{"dataType":"string"},"password":{"dataType":"string","required":true},"email":{"dataType":"string"}}},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -462,14 +464,14 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/submission/submit',
+        app.post('/submission',
             authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.submit)),
 
             async function SubmissionController_submit(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"code":{"dataType":"string","required":true},"problemId":{"dataType":"double","required":true},"userId":{"dataType":"double","required":true}}},
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"code":{"dataType":"string","required":true},"contestId":{"dataType":"double","required":true},"problemId":{"dataType":"double","required":true}}},
                     token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
             };
 
@@ -494,7 +496,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/submission/execute_submission',
+        app.post('/submission/execute',
             ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.executeSubmission)),
 
@@ -524,13 +526,44 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/submission/execute_code',
+        app.get('/submission/:id',
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
+            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.getSubmissionById)),
+
+            async function SubmissionController_getSubmissionById(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new SubmissionController();
+
+              await templateService.apiHandler({
+                methodName: 'getSubmissionById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/submission/execute?code=:code&stdin=:stdin',
             ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.executeCode)),
 
             async function SubmissionController_executeCode(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"stdin":{"dataType":"string","required":true},"code":{"dataType":"string","required":true}}},
+                    code: {"in":"path","name":"code","required":true,"dataType":"string"},
+                    stdin: {"in":"path","name":"stdin","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -554,37 +587,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/submission/get_all_submissions/:id',
-            ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
-            ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.getAllSubmissions)),
-
-            async function SubmissionController_getAllSubmissions(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new SubmissionController();
-
-              await templateService.apiHandler({
-                methodName: 'getAllSubmissions',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/problem/create_problem',
+        app.post('/problem',
             authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.createProblem)),
@@ -638,6 +641,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'updateProblem',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/problem/:id/testcase',
+            ...(fetchMiddlewares<RequestHandler>(ProblemController)),
+            ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.addTestcase)),
+
+            async function ProblemController_addTestcase(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"output":{"dataType":"string","required":true},"input":{"dataType":"string","required":true}}},
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new ProblemController();
+
+              await templateService.apiHandler({
+                methodName: 'addTestcase',
                 controller,
                 response,
                 next,
@@ -1124,7 +1158,7 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/contest/create',
+        app.post('/contest',
             authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.createContest)),

@@ -134,8 +134,21 @@ export class ContestService implements IContestService {
     });
   }
 
-  async getContestById(id: number): Promise<Contest | null> {
-    return this.contestRepo.findOneBy({ id });
+  async getContest(id: number, options?: {
+    loadProblems?: boolean;
+    loadParticipations?: boolean;
+  }): Promise<Contest | null> {
+    const relations: string[] = [];
+    if (options?.loadProblems) {
+      relations.push("problemsInContest");
+    }
+    if (options?.loadParticipations) {
+      relations.push("participations");
+    }
+    return this.contestRepo.findOne({ 
+      where: { id},
+      relations: relations,
+     });
   }
 
   async getContestByTitle(title: string): Promise<Contest | null> {

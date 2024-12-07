@@ -10,7 +10,6 @@ export type TokenInfo = {
 export async function decodeJWT(token: string) {
   const decoded: TokenInfo = await new Promise((resolve, reject) => {
     jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-      console.log(decoded);
       if (err) {
         return reject(err);
       }

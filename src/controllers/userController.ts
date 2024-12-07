@@ -44,7 +44,7 @@ export class UserController extends Controller {
     this.userService = new UserService();
   }
 
-  @Post("sign_up")
+  @Post("")
   public async createUser(
     @Body() body: { handle: string; password: string; email: string },
   ) {
@@ -52,35 +52,34 @@ export class UserController extends Controller {
 
     try {
       await this.userService.createUser({ handle, password, email });
+      this.setStatus(200);
       return { message: "User created successfully" };
     } catch (err) {
-      throw new Error(`Error creating user: ${err}`);
+      this.setStatus(400);
+      const error = `Error creating user: ${err}`;
+      return { error };
     }
   }
 
-  @Get('get-user-id-from-token')
+  @Get('/id')
   @Security("jwt", ["user"])
   public async getUserIdFromToken(
     @Header("x-access-token") token: string,
-  ) : Promise<number | null> {
+  ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded = await decodeJWT(token);
       this.setStatus(200);
-      return decoded.id;
+      return {
+        id: decoded.id,
+      };
     } catch (err) {
-      throw new Error(`Error verifying token: ${err}`);
+      const error = `Error verifying token: ${err}`;
+      this.setStatus(400);
+      return { error };
     }  
   }
 
-  @Get('id/{id}')
+  @Get('id/:id')
   @Security("jwt", ["user"])
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
@@ -99,7 +98,7 @@ export class UserController extends Controller {
     }
   }
 
-  @Delete("{id}")
+  @Delete("id/{id}")
   public async deleteUser(@Path() id: string): Promise<void> {
     try {
       await this.userService.softDeleteUser(parseInt(id));
@@ -135,22 +134,46 @@ export class UserController extends Controller {
   }
 
   @Post("login")
-  public async login(@Body() body: { email: string; password: string }) {
+  public async login(@Body() body: { email?: string; password: string; handle?: string }) {
     try {
-      const { email, password } = body;
-      const user = await this.userService.getUserByEmail(email);
-      if (user) {
-        if (keccak256(password).toString("hex") === user.password) {
-          const payload = { id: user.id, role: user.role };
-          return sign(payload, env.jwt_secret, {
-            expiresIn: "2days",
-          });
+      const { email, password, handle } = body;
+      if (!email && !handle) {
+        this.setStatus(400);
+        return { error: "Email or handle is required" };
+      }
+      if (email) {
+        const user = await this.userService.getUserByEmail(email);
+        if (user) {
+          if (keccak256(password).toString("hex") === user.password) {
+            const payload = { id: user.id, role: user.role };
+            return {
+              token: sign(payload, env.jwt_secret, {
+                expiresIn: "2days",
+              })
+            }          
+          }
+          throw new Error("Invalid password");
+        } 
+      }
+      if (handle) {
+        const user = await this.userService.getUserByHandle(handle);
+        if (user) {
+          if (keccak256(password).toString("hex") === user.password) {
+            const payload = { id: user.id, role: user.role };
+            return {
+              token: sign(payload, env.jwt_secret, {
+                expiresIn: "2days",
+              })
+            }
+          }
+          throw new Error("Invalid password");
         }
-        throw new Error("Invalid password");
       }
       return null;
     } catch (err) {
-      throw new Error(`Error login: ${err}`);
+      const error = `Error login: ${err}`;
+      this.setStatus(400);
+      return { error };
     }
   }
 }

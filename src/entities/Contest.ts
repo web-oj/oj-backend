@@ -7,11 +7,13 @@ import {
   JoinColumn,
   OneToMany,
   Index,
+  JoinTable,
 } from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";
 import { ContestParticipation } from "./ContestParticipation";
 import { ProblemInContest } from "./ProblemInContest";
+import { Submission } from "./Submission";
 
 @Entity("contest")
 export class Contest extends BaseEntityWithTimestamps {
@@ -59,5 +61,11 @@ export class Contest extends BaseEntityWithTimestamps {
     () => ProblemInContest,
     (problemInContest) => problemInContest.contest,
   )
-  associatedProblems: ProblemInContest[];
+  problemsInContest: ProblemInContest[];
+
+  @OneToMany(
+    () => Submission,
+    (submission) => submission.contest,
+  )
+  submissions: Submission[];
 }

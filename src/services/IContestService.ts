@@ -57,7 +57,10 @@ export interface IContestService {
 
   getAllContests(limit?: number, offset?: number): Promise<Contest[] | null>;
 
-  getContestById(id: number): Promise<Contest | null>;
+  getContest(id: number, options?: {
+    loadProblems?: boolean;
+    loadParticipations?: boolean;
+  }): Promise<Contest | null>;
 
   getContestParticipationByContestIdAndUserId(
     contestId: number,

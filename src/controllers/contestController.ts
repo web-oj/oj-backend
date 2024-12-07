@@ -51,8 +51,8 @@ export type GetProblemsResponseEntry = {
 };
 
 export type ContestResponse = {
-  message: string;
-  status: number;
+  message?: string;
+  error?: string;
   payload?:
     | Contest
     | Contest[]
@@ -100,7 +100,6 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
         payload: response,
       };
     } catch (err) {
@@ -111,18 +110,16 @@ export class ContestController extends Controller {
   @Get("{id}")
   public async getContestById(@Path() id: number): Promise<ContestResponse> {
     try {
-      let res = await this.contestService.getContestById(id);
+      let res = await this.contestService.getContest(id);
       if (!res) {
         this.setStatus(404);
         return {
-          message: "Contest not found",
-          status: 404,
+          error: "Contest not found",
         };
       }
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
         payload: res,
       };
     } catch (err) {
@@ -177,7 +174,6 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
         payload: response,
       };
     } catch (err) {
@@ -196,7 +192,6 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
         payload: res,
       };
     } catch (err) {
@@ -227,7 +222,7 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
+
         payload: res,
       };
     } catch (err) {
@@ -243,7 +238,7 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
+
       };
     } catch (err) {
       throw new Error(`Error deleting contest: ${err}`);
@@ -261,7 +256,7 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
+
       };
     } catch (err) {
       throw new Error(`Error deleting problem: ${err}`);
@@ -293,7 +288,7 @@ export class ContestController extends Controller {
         if (!res) {
           return {
             message: "The new creator of the contest cannot be found",
-            status: 404,
+
           };
         }
         organizer = res;
@@ -312,7 +307,7 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
+
         payload: res,
       };
     } catch (err) {
@@ -332,12 +327,12 @@ export class ContestController extends Controller {
   ): Promise<ContestResponse> {
     try {
       let res: any;
-      res = await this.contestService.getContestById(id);
+      res = await this.contestService.getContest(id);
       this.setStatus(404);
       if (!res) {
         return {
           message: "Contest not found",
-          status: 404,
+
         };
       }
 
@@ -346,7 +341,9 @@ export class ContestController extends Controller {
         this.setStatus(404);
         return {
           message: "User not found",
-          status: 404,
+
+          
+
         };
       }
 
@@ -359,7 +356,7 @@ export class ContestController extends Controller {
         this.setStatus(403);
         return {
           message: "User have not registered",
-          status: 403,
+
           payload: res,
         };
       }
@@ -373,7 +370,7 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
+
         payload: res,
       };
     } catch (err) {
@@ -393,12 +390,12 @@ export class ContestController extends Controller {
   ): Promise<ContestResponse> {
     try {
       let res: any;
-      res = await this.contestService.getContestById(id);
+      res = await this.contestService.getContest(id);
       this.setStatus(404);
       if (!res) {
         return {
           message: "Contest not found",
-          status: 404,
+
         };
       }
 
@@ -407,7 +404,8 @@ export class ContestController extends Controller {
         this.setStatus(404);
         return {
           message: "Problem not found",
-          status: 404,
+
+
         };
       }
 
@@ -416,7 +414,6 @@ export class ContestController extends Controller {
         this.setStatus(403);
         return {
           message: "User have not registered",
-          status: 403,
           payload: res,
         };
       }
@@ -430,7 +427,6 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        status: 200,
         payload: res,
       };
     } catch (err) {
@@ -438,7 +434,7 @@ export class ContestController extends Controller {
     }
   }
 
-  @Post("create")
+  @Post("")
   @Security("jwt", ["user"])
   public async createContest(
     @Body()
@@ -469,12 +465,11 @@ export class ContestController extends Controller {
     try {
       let res: any;
 
-      this.setStatus(404);
       res = await this.userService.getUserById(organizerId);
       if (!res) {
+        this.setStatus(400);
         return {
           message: "The creator of the contest cannot be found",
-          status: 404,
         };
       }
 
@@ -489,10 +484,9 @@ export class ContestController extends Controller {
         isPublished,
         organizerId,
       });
-      this.setStatus(201);
+      this.setStatus(200);
       return {
         message: "Contest created successfully",
-        status: 201,
         payload: res,
       };
     } catch (err) {
@@ -511,12 +505,11 @@ export class ContestController extends Controller {
     try {
       let res: any;
 
-      res = await this.contestService.getContestById(id);
+      res = await this.contestService.getContest(id);
       if (!res) {
         this.setStatus(404);
         return {
           message: "Contest not found",
-          status: 404,
         };
       }
 
@@ -525,7 +518,7 @@ export class ContestController extends Controller {
         this.setStatus(404);
         return {
           message: "User not found",
-          status: 404,
+
         };
       }
 
@@ -538,7 +531,7 @@ export class ContestController extends Controller {
         this.setStatus(403);
         return {
           message: "User already registered",
-          status: 403,
+
           payload: res,
         };
       }
@@ -547,7 +540,7 @@ export class ContestController extends Controller {
       this.setStatus(201);
       return {
         message: "Registered successfully",
-        status: 201,
+
         payload: res,
       };
     } catch (err) {
@@ -566,40 +559,34 @@ export class ContestController extends Controller {
     try {
       let res: any;
 
-      res = await this.contestService.getContestById(id);
+      res = await this.contestService.getContest(id);
       if (!res) {
-        this.setStatus(404);
+        this.setStatus(400);
         return {
-          message: "Contest not found",
-          status: 404,
+          error: "Contest not found",
         };
       }
 
       res = await this.problemService.getProblemById(problemId);
       if (!res) {
-        this.setStatus(404);
+        this.setStatus(400);
         return {
-          message: "Problem not found",
-          status: 404,
+          error: "Problem not found",
         };
       }
 
       res = await this.contestService.getProblemIncontest(problemId, id);
       if (res) {
-        this.setStatus(403);
+        this.setStatus(400);
         return {
-          message: "Problem already existed in contest",
-          status: 403,
-          payload: res,
+          error: "Problem already added to contest",
         };
       }
 
       res = await this.contestService.addProblem(id, problemId, score);
-      this.setStatus(201);
+      this.setStatus(200);
       return {
         message: "Problem added to contest successfully",
-        status: 201,
-        payload: res,
       };
     } catch (err) {
       throw new Error(`Error adding problem to contest ${err}`);

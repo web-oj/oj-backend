@@ -25,6 +25,7 @@ import {
   Query,
   Route,
   Security,
+  Tags,
 } from "tsoa";
 import { IProblemService } from "@/services/IProblemService";
 import jwt from "jsonwebtoken";
@@ -70,7 +71,8 @@ export class ProblemController extends Controller {
     this.problemService = new ProblemService();
   }
 
-  @Post("create_problem")
+  @Post("")
+  @Tags("Problem")
   @Security("jwt", ["user"])
   public async createProblem(
     @Body() body: ProblemRequestBody,
@@ -87,11 +89,15 @@ export class ProblemController extends Controller {
         message: "Problem created successfully.",
       };
     } catch (err) {
-      throw new Error(`Error creating problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Error creating problem",
+      }      
     }
   }
 
   @Patch("id/{id}")
+  @Tags("Problem")
   @Security("jwt", ["admin"])
   public async updateProblem(
     @Body() body: ProblemRequestBody,
@@ -101,7 +107,6 @@ export class ProblemController extends Controller {
     try {
       const decoded: any = await new Promise((resolve, reject) => {
         jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
           if (err) {
             return reject(err);
           }
@@ -126,7 +131,48 @@ export class ProblemController extends Controller {
     }
   }
 
+  @Post("/{id}/testcase")
+  @Tags("Problem")
+  public async addTestcase(
+    @Body() body: { input: string; output: string },
+    @Path() id: number,
+  ) {
+    try {
+      await this.problemService.addTestcase(id, body.input, body.output);
+      this.setStatus(200);
+      return {
+        message: "Testcase added successfully.",
+      };
+    } catch (err) {
+      return {
+        error: `Error adding testcase: ${err}`,
+      }
+    }
+  }
+
+  @Post("/{id}/testcases")
+  @Tags("Problem")
+  public async addTestcases(
+    @Body() body: { testcases: { input: string; output: string }[] },
+    @Path() id: number,
+  ) {
+    try {
+      for (let testcase of body.testcases) {
+        await this.addTestcase({ input: testcase.input, output: testcase.output }, id);
+      }
+      this.setStatus(200);
+      return {
+        message: "Testcases added successfully.",
+      };
+    } catch (err) {
+      return {
+        error: `Error adding testcases: ${err}`,
+      }
+    }
+  }
+
   @Get("id/{id}")
+  @Tags("Problem")
   public async getProblemById(@Path() id: number) {
     try {
       return await this.problemService.getProblemById(id);
@@ -136,6 +182,7 @@ export class ProblemController extends Controller {
   }
 
   @Get("title/{title}")
+  @Tags("Problem")
   public async getProblemTitle(@Path() title: string) {
     try {
       return await this.problemService.getProblemByTitle(title);
@@ -145,6 +192,7 @@ export class ProblemController extends Controller {
   }
 
   @Get("")
+  @Tags("Problem")
   public async getAllProblems(
     @Query() limit?: number,
     @Query() offset?: number,
@@ -180,6 +228,7 @@ export class ProblemController extends Controller {
   }
 
   @Delete("id/{id}")
+  @Tags("Problem")
   @Security("jwt", ["admin"])
   public async softDeleteProblem(
     @Path() id: number,
@@ -188,7 +237,6 @@ export class ProblemController extends Controller {
     try {
       const decoded: any = await new Promise((resolve, reject) => {
         jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          console.log(decoded);
           if (err) {
             return reject(err);
           }
@@ -214,6 +262,7 @@ export class ProblemController extends Controller {
   }
 
   @Get("search")
+  @Tags("Problem")
   public async searchProblems(
     @Query() searchKeyword?: string,
     @Query() difficultyLow?: number,

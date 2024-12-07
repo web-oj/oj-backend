@@ -9,7 +9,6 @@ export class UserService implements IUserService {
     this.userRepo = UserRepository;
   }
   async createUser(userInput: CreateUserInput): Promise<User> {
-    console.log(userInput);
     if (!userInput.handle || !userInput.email || !userInput.password) {
       throw new Error('Missing required fields');
     }

@@ -24,7 +24,9 @@ export class Testcase extends BaseEntityWithTimestamps {
   @ManyToOne(() => SubmissionResult, (submissionResult) => submissionResult.testcase)
   submissionResult: SubmissionResult;
 
-  input: string;
+  @Column({ nullable: false })
+  input: string;  
 
+  @Column({ nullable: false })
   output: string;
 }

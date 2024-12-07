@@ -2,15 +2,19 @@ import request from "supertest";
 import { createServer, Server } from "http";
 import initApp from "../src/index";
 import { mysqlDataSource } from "../src/database/MysqlDataSource";
+import { env } from "../src/config/config";
 
-describe("API Tests", () => {
+describe("App Tests", () => {
     let server: Server;
+    let token: string;
 
     beforeAll(async () => {
         const app = await initApp(); // Initialize the app without starting the server
         server = createServer(app); // Create the HTTP server
         await new Promise<void>((resolve) => server.listen(3000, resolve)); // Start the server
-    });
+        await mysqlDataSource.dropDatabase();
+        await mysqlDataSource.synchronize();
+    }, 10000);
 
     afterAll(async () => {
         await new Promise<void>((resolve, reject) => {
@@ -31,5 +35,111 @@ describe("API Tests", () => {
         expect(response.body).toEqual({
             message: "hello",
         });
+    });
+
+    test("POST /user", async () => {
+        const response = await request(server)
+            .post("/user")
+            .send({
+                handle: "test",
+                email: "test@gmail.com",
+                password: "test1234",
+            });
+
+        expect(response.status).toBe(200);
+    });
+
+    test("POST /user/login", async () => {
+        const response = await request(server)
+            .post("/user/login")
+            .send({
+                handle: "test",
+                password: "test1234",
+            });
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("token");
+        token = response.body.token;
+    });
+
+    test("POST /problem", async () => {
+        const response = await request(server)
+            .post("/problem")
+            .set("x-access-token", token)
+            .send({
+                title: "Test Problem",
+                statement: "Test Problem Statement",
+                difficulty: 2000,
+                timeLimit: 100,
+                memoryLimit: 256,
+                isPublished: true,
+            });
+        expect(response.status).toBe(200);
+    });
+
+    test("POST /contest", async () => {
+        const response = await request(server)
+            .post("/contest")
+            .set("x-access-token", token)
+            .send({
+                title: "Test Contest",
+                scoringRule: "ACM",
+                startTime: Date.now(),
+                endTime: Date.now() + 100000,
+                organizerId: 1,
+            });
+
+        expect(response.status).toBe(200);
+    });
+
+    test("POST /contest/{id}/problem", async () => {
+        const response = await request(server)
+            .post("/contest/1/problem")
+            .set("x-access-token", token)
+            .send({
+                problemId: 1,
+                score: 100,
+            });
+
+        expect(response.status).toBe(200);
+    });
+
+    test("POST /problem/{id}/testcase", async () => {
+        const response = await request(server)
+            .post("/problem/1/testcase")
+            .set("x-access-token", token)
+            .send({
+                input: "1 2",
+                output: "3",
+            });
+        expect(response.status).toBe(200);
+    });
+
+    test("POST /submission", async () => {
+        const cppCode = `
+            #include <iostream>
+            int main() {
+                int a, b;
+                std::cin >> a >> b;
+                std::cout << a + b << std::endl;
+                return 0;
+            }
+        `;
+
+        const response = await request(server)
+            .post("/submission")
+            .set("x-access-token", token)
+            .send({
+                problemId: 1,
+                contestId: 1,
+                code: Buffer.from(cppCode).toString("base64"),
+            });
+        expect(response.status).toBe(200);
+    });
+    
+    test("GET /submission/{id}", async () => {
+        const response = await request(server).get("/submission/1");
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("id");
     });
 });

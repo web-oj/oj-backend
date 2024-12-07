@@ -1,12 +1,15 @@
+import { Contest } from "@/entities/Contest";
 import { Problem } from "@/entities/Problem";
 import { Submission } from "@/entities/Submission";
 
 export interface ISubmissionService {
-  submit(userId: number, problem: Problem, code: string): Promise<number>;
+  submit(userId: number, problem: Problem, contest: Contest, code: string) : Promise<{ submissionId: number }>;
 
-  executeSubmission(submissionId: number): Promise<string>;
+  getSubmissionById(submissionId: number, options?: {
+    withResult?: boolean;
+  }): Promise<Submission | null>;
 
-  executeCode(code: string, stdin: string): Promise<string>;
+  executeSubmission(submissionId: number): Promise<void>;
 
-  getAllSubmissions(userId: number): Promise<Submission[]>;
+  executeCode(code: string, stdin: string, expectedOutput?: string): Promise<string>;
 }

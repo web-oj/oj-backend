@@ -122,6 +122,9 @@
 					"problem": {
 						"$ref": "#/components/schemas/Problem"
 					},
+					"contest": {
+						"$ref": "#/components/schemas/Contest"
+					},
 					"code": {
 						"type": "string"
 					},
@@ -129,7 +132,10 @@
 						"$ref": "#/components/schemas/LANGUAGE"
 					},
 					"result": {
-						"type": "string"
+						"items": {
+							"$ref": "#/components/schemas/SubmissionResult"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -139,6 +145,7 @@
 					"deletedAt",
 					"owner",
 					"problem",
+					"contest",
 					"code",
 					"language",
 					"result"
@@ -376,9 +383,15 @@
 						},
 						"type": "array"
 					},
-					"associatedProblems": {
+					"problemsInContest": {
 						"items": {
 							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
 						},
 						"type": "array"
 					}
@@ -398,7 +411,8 @@
 					"isPublished",
 					"organizer",
 					"participations",
-					"associatedProblems"
+					"problemsInContest",
+					"submissions"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -697,18 +711,13 @@
 						],
 						"nullable": true
 					},
-					"status": {
-						"type": "number",
-						"format": "double"
+					"error": {
+						"type": "string"
 					},
 					"message": {
 						"type": "string"
 					}
 				},
-				"required": [
-					"status",
-					"message"
-				],
 				"type": "object"
 			}
 		},
@@ -723,7 +732,7 @@
 		"contact": {}
 	},
 	"paths": {
-		"/user/sign_up": {
+		"/user": {
 			"post": {
 				"operationId": "CreateUser",
 				"responses": {
@@ -732,15 +741,32 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"message": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
 										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
+									]
 								}
 							}
 						}
@@ -774,9 +800,69 @@
 						}
 					}
 				}
+			},
+			"patch": {
+				"operationId": "UpdateUserById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"password": {
+										"type": "string"
+									},
+									"handle": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email",
+									"password",
+									"handle"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
-		"/user/get-user-id-from-token": {
+		"/user/id": {
 			"get": {
 				"operationId": "GetUserIdFromToken",
 				"responses": {
@@ -785,9 +871,30 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "number",
-									"format": "double",
-									"nullable": true
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"id": {}
+											},
+											"required": [
+												"id"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"id": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										}
+									]
 								}
 							}
 						}
@@ -850,6 +957,25 @@
 						}
 					}
 				]
+			},
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/user/handle/{handle}": {
@@ -883,89 +1009,6 @@
 						}
 					}
 				]
-			}
-		},
-		"/user/{id}": {
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/user": {
-			"patch": {
-				"operationId": "UpdateUserById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "x-access-token",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"email": {
-										"type": "string"
-									},
-									"password": {
-										"type": "string"
-									},
-									"handle": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"email",
-									"password",
-									"handle"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/user/admin/{id}": {
@@ -1010,7 +1053,32 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "string"
+									"anyOf": [
+										{
+											"properties": {
+												"token": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"error": {},
+												"token": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"token"
+											],
+											"type": "object"
+										}
+									]
 								}
 							}
 						}
@@ -1024,6 +1092,9 @@
 						"application/json": {
 							"schema": {
 								"properties": {
+									"handle": {
+										"type": "string"
+									},
 									"password": {
 										"type": "string"
 									},
@@ -1032,8 +1103,7 @@
 									}
 								},
 								"required": [
-									"password",
-									"email"
+									"password"
 								],
 								"type": "object"
 							}
@@ -1042,7 +1112,7 @@
 				}
 			}
 		},
-		"/submission/submit": {
+		"/submission": {
 			"post": {
 				"operationId": "Submit",
 				"responses": {
@@ -1051,17 +1121,35 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
+									"anyOf": [
+										{
+											"properties": {
+												"message": {},
+												"submissionId": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
 										},
-										"submissionId": {}
-									},
-									"required": [
-										"message",
-										"submissionId"
-									],
-									"type": "object"
+										{
+											"properties": {
+												"error": {},
+												"message": {
+													"type": "string"
+												},
+												"submissionId": {}
+											},
+											"required": [
+												"message",
+												"submissionId"
+											],
+											"type": "object"
+										}
+									]
 								}
 							}
 						}
@@ -1093,19 +1181,19 @@
 									"code": {
 										"type": "string"
 									},
-									"problemId": {
+									"contestId": {
 										"type": "number",
 										"format": "double"
 									},
-									"userId": {
+									"problemId": {
 										"type": "number",
 										"format": "double"
 									}
 								},
 								"required": [
 									"code",
-									"problemId",
-									"userId"
+									"contestId",
+									"problemId"
 								],
 								"type": "object"
 							}
@@ -1114,7 +1202,7 @@
 				}
 			}
 		},
-		"/submission/execute_submission": {
+		"/submission/execute": {
 			"post": {
 				"operationId": "ExecuteSubmission",
 				"responses": {
@@ -1123,7 +1211,32 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "string"
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"message": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										}
+									]
 								}
 							}
 						}
@@ -1152,62 +1265,15 @@
 				}
 			}
 		},
-		"/submission/execute_code": {
-			"post": {
-				"operationId": "ExecuteCode",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"stdin": {
-										"type": "string"
-									},
-									"code": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"stdin",
-									"code"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/submission/get_all_submissions/{id}": {
+		"/submission/{id}": {
 			"get": {
-				"operationId": "GetAllSubmissions",
+				"operationId": "GetSubmissionById",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Submission"
-									},
-									"type": "array",
-									"nullable": true
-								}
+								"schema": {}
 							}
 						}
 					}
@@ -1226,7 +1292,43 @@
 				]
 			}
 		},
-		"/problem/create_problem": {
+		"/submission/execute?code={code}&stdin={stdin}": {
+			"get": {
+				"operationId": "ExecuteCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "code",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "stdin",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/problem": {
 			"post": {
 				"operationId": "CreateProblem",
 				"responses": {
@@ -1249,6 +1351,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Problem"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -1276,6 +1381,42 @@
 						}
 					}
 				}
+			},
+			"get": {
+				"operationId": "GetAllProblems",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProblemResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/problem/id/{id}": {
@@ -1301,6 +1442,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Problem"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -1413,6 +1557,82 @@
 				]
 			}
 		},
+		"/problem/{id}/testcase": {
+			"post": {
+				"operationId": "AddTestcase",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"message": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"output": {
+										"type": "string"
+									},
+									"input": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"output",
+									"input"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/problem/title/{title}": {
 			"get": {
 				"operationId": "GetProblemTitle",
@@ -1434,44 +1654,6 @@
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/problem": {
-			"get": {
-				"operationId": "GetAllProblems",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ProblemResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "offset",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
 						}
 					}
 				]
@@ -1577,6 +1759,78 @@
 						}
 					}
 				]
+			},
+			"post": {
+				"operationId": "CreateContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ContestResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"organizerId": {
+										"type": "number",
+										"format": "double"
+									},
+									"isPublished": {
+										"type": "boolean"
+									},
+									"isPlagiarismCheckEnabled": {
+										"type": "boolean"
+									},
+									"scoringRule": {
+										"type": "string"
+									},
+									"endTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"startTime": {
+										"type": "number",
+										"format": "double"
+									},
+									"ruleText": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"title": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"organizerId",
+									"scoringRule",
+									"endTime",
+									"startTime",
+									"title"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/contest/{id}": {
@@ -2089,80 +2343,6 @@
 								"required": [
 									"score",
 									"userId"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/contest/create": {
-			"post": {
-				"operationId": "CreateContest",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [
-					{
-						"jwt": [
-							"user"
-						]
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"organizerId": {
-										"type": "number",
-										"format": "double"
-									},
-									"isPublished": {
-										"type": "boolean"
-									},
-									"isPlagiarismCheckEnabled": {
-										"type": "boolean"
-									},
-									"scoringRule": {
-										"type": "string"
-									},
-									"endTime": {
-										"type": "number",
-										"format": "double"
-									},
-									"startTime": {
-										"type": "number",
-										"format": "double"
-									},
-									"ruleText": {
-										"type": "string"
-									},
-									"description": {
-										"type": "string"
-									},
-									"title": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"organizerId",
-									"scoringRule",
-									"endTime",
-									"startTime",
-									"title"
 								],
 								"type": "object"
 							}

@@ -1,9 +1,10 @@
 import 'reflect-metadata';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, TableForeignKey } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, TableForeignKey } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
 import { User } from './User';
 import { Problem } from './Problem';
 import { SubmissionResult } from './SubmissionResult';
+import { Contest } from './Contest';
 
 export type LANGUAGE = 'CPP' | 'C' | 'JAVA' | 'PYTHON';
 
@@ -18,12 +19,15 @@ export class Submission extends BaseEntityWithTimestamps {
   @ManyToOne(() => Problem, (problem) => problem.submissions)
   problem: Problem;
 
-  @Column({ nullable: false })
+  @OneToMany(() => Contest, (contest) => contest.submissions)
+  contest: Contest;
+
+  @Column({ type: "mediumtext", nullable: false })
   code: string;
 
   @Column({ nullable: false })
   language: LANGUAGE;
 
   @OneToMany(() => SubmissionResult, (submissionResult) => submissionResult.submission)
-  result: string;
+  result: SubmissionResult[];
 }

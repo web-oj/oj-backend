@@ -36,4 +36,10 @@ export interface IProblemService {
       limit?: number,
       offset?: number
   ): Promise<Problem[] | null>;
+
+  addTestcase(
+    problemId: number,
+    input: string,
+    output: string,
+  ): Promise<void>;
 }
