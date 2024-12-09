@@ -27,6 +27,7 @@ import {
   Query,
   Route,
   Security,
+  Tags,
 } from "tsoa";
 import { Contest } from "../entities/Contest";
 import { IUserService } from "../services/IUserService";
@@ -77,6 +78,7 @@ export class ContestController extends Controller {
   }
 
   @Get("")
+  @Tags("Contest")
   public async getAllContests(
     @Query() limit?: number,
     @Query() offset?: number,
@@ -108,6 +110,7 @@ export class ContestController extends Controller {
   }
 
   @Get("{id}")
+  @Tags("Contest")
   public async getContestById(@Path() id: number): Promise<ContestResponse> {
     try {
       let res = await this.contestService.getContest(id);
@@ -128,6 +131,7 @@ export class ContestController extends Controller {
   }
 
   @Get("/search")
+  @Tags("Contest")
   public async searchContests(
     @Query() searchKeywords?: string,
     @Query() startTimeLow?: number,
@@ -182,6 +186,7 @@ export class ContestController extends Controller {
   }
 
   @Get("{id}/ranking")
+  @Tags("Contest")
   public async getContestRanking(
     @Path() id: number,
     @Query() limit?: number,
@@ -200,6 +205,7 @@ export class ContestController extends Controller {
   }
 
   @Get("{id}/problem")
+  @Tags("Contest")
   public async getContestProblems(
     @Path() id: number,
   ): Promise<ContestResponse> {
