@@ -212,6 +212,7 @@ export class ContestController extends Controller {
   }
 
   @Delete("{id}")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async deleteContest(@Path() id: number): Promise<ContestResponse> {
     try {
@@ -227,6 +228,7 @@ export class ContestController extends Controller {
   }
 
   @Delete("{id}/problem")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async deleteProblem(
     @Path() id: number,
@@ -245,6 +247,7 @@ export class ContestController extends Controller {
   }
 
   @Patch("{id}")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async editContest(
     @Path() id: number,
@@ -297,6 +300,7 @@ export class ContestController extends Controller {
   }
 
   @Patch("{id}/editScore")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async editScore(
     @Path() id: number,
@@ -360,6 +364,7 @@ export class ContestController extends Controller {
   }
 
   @Patch("{id}/problem")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async editProblem(
     @Path() id: number,
@@ -416,6 +421,7 @@ export class ContestController extends Controller {
   }
 
   @Post("")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async createContest(
     @Body()
@@ -476,6 +482,7 @@ export class ContestController extends Controller {
   }
 
   @Post("{id}/register")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async registerToContest(
     @Path() id: number,
@@ -530,6 +537,7 @@ export class ContestController extends Controller {
   }
 
   @Post("{id}/problem")
+  @Tags("Contest")
   @Security("jwt", ["user"])
   public async addProblem(
     @Path() id: number,

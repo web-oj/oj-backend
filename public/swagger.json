@@ -7,6 +7,15 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"Role": {
+				"enum": [
+					"ADMIN",
+					"USER",
+					"ORGANIZER",
+					"PROBLEM_SETTER"
+				],
+				"type": "string"
+			},
 			"User": {
 				"properties": {
 					"id": {
@@ -41,7 +50,7 @@
 						"type": "string"
 					},
 					"role": {
-						"type": "string"
+						"$ref": "#/components/schemas/Role"
 					},
 					"isBan": {
 						"type": "boolean"
@@ -552,6 +561,8 @@
 					}
 				},
 				"required": [
+					"outputFormat",
+					"inputFormat",
 					"memoryLimit",
 					"timeLimit",
 					"difficulty",
@@ -885,6 +896,63 @@
 										{
 											"properties": {
 												"id": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/user/role": {
+			"get": {
+				"operationId": "GetUserRoleFromToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"role": {}
+											},
+											"required": [
+												"role"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"role": {},
 												"error": {
 													"type": "string"
 												}
@@ -1337,15 +1405,32 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
+									"anyOf": [
+										{
+											"properties": {
+												"error": {},
+												"message": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"message"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"message": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
 										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
+									]
 								}
 							}
 						}
@@ -1885,6 +1970,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -1989,6 +2077,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2022,6 +2113,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2264,6 +2358,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2316,6 +2413,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2372,6 +2472,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2430,6 +2533,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [
@@ -2489,6 +2595,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Contest"
+				],
 				"security": [
 					{
 						"jwt": [

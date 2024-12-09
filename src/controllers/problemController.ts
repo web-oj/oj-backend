@@ -63,7 +63,7 @@ export class ProblemController extends Controller {
     } catch (err) {
       this.setStatus(400);
       return {
-        message: "Error creating problem",
+        error: `Error creating problem ${err}`,
       }      
     }
   }

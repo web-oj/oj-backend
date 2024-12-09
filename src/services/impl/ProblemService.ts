@@ -27,6 +27,7 @@ export class ProblemService implements IProblemService {
     }
     problem.title = userInput.title;
     problem.statement = userInput.statement;
+        console.log(userInput);
 
     if (!userInput.difficulty || userInput.difficulty <= 0) {
       throw new Error("Missing required fields");
@@ -42,9 +43,9 @@ export class ProblemService implements IProblemService {
     problem.memoryLimit = userInput.memoryLimit;
 
     problem.inputFormat =
-      userInput.inputFormat !== undefined ? userInput.inputFormat : "stdin";
+      userInput.inputFormat
     problem.outputFormat =
-      userInput.outputFormat !== undefined ? userInput.outputFormat : "stdout";
+      userInput.outputFormat
     problem.isPublished =
       userInput.isPublished !== undefined ? userInput.isPublished : false;
     problem.createdBy = userInput.creatorId;

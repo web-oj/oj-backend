@@ -27,6 +27,7 @@ import {
   Post,
   Route,
   Security,
+  Tags,
 } from "tsoa";
 import { User } from "../entities/User";
 import { sign } from "jsonwebtoken";
@@ -34,7 +35,7 @@ import { env } from "../config/config";
 import { UserService } from "../services/impl/UserService";
 import jwt from "jsonwebtoken";
 import { decodeJWT } from "@/middleware/authentication";
-import { TokenInfo } from "@/types/types";
+import { Role, TokenInfo } from "@/types/types";
 
 @Route("user")
 export class UserController extends Controller {
@@ -46,6 +47,7 @@ export class UserController extends Controller {
   }
 
   @Post("")
+  @Tags("User")
   public async createUser(
     @Body() body: { handle: string; password: string; email: string },
   ) {
@@ -63,6 +65,7 @@ export class UserController extends Controller {
   }
 
   @Get('/id')
+  @Tags("User")
   @Security("jwt", ["user"])
   public async getUserIdFromToken(
     @Header("x-access-token") token: string,
@@ -80,7 +83,27 @@ export class UserController extends Controller {
     }  
   }
 
+  @Get('/role')
+  @Tags("User")
+  @Security("jwt", ["user"])
+  public async getUserRoleFromToken(
+    @Header("x-access-token") token: string,
+  ) {
+    try {
+      const decoded = await decodeJWT(token);
+      this.setStatus(200);
+      return {
+        role: decoded.role,
+      };
+    } catch (err) {
+      const error = `Error verifying token: ${err}`;
+      this.setStatus(400);
+      return { error };
+    }
+  }
+
   @Get('id/:id')
+  @Tags("User")
   @Security("jwt", ["user"])
   public async getUserById(@Path() id: number): Promise<User | null> {
     try {
@@ -91,6 +114,7 @@ export class UserController extends Controller {
   }
 
   @Get("handle/{handle}")
+  @Tags("User")
   public async getUserByHandle(@Path() handle: string): Promise<User | null> {
     try {
       return await this.userService.getUserByHandle(handle);
@@ -100,6 +124,7 @@ export class UserController extends Controller {
   }
 
   @Delete("id/{id}")
+  @Tags("User")
   public async deleteUser(@Path() id: string): Promise<void> {
     try {
       await this.userService.softDeleteUser(parseInt(id));
@@ -109,6 +134,7 @@ export class UserController extends Controller {
   }
 
   @Patch()
+  @Tags("User")
   public async updateUserById(
     @Body() body: { handle: string; password: string; email: string },
     @Header("x-access-token") token: string,
@@ -125,10 +151,11 @@ export class UserController extends Controller {
   }
 
   @Patch("admin/{id}")
+  @Tags("User")
   @Security("jwt", ["admin"])
   public async addAdmin(@Path() id: number) {
     try {
-      return await this.userService.updateUser(id, { role: "admin" });
+      return await this.userService.updateUser(id, { role: Role.Admin });
     } catch (err) {
       throw new Error(`Error adding admin: ${err}`);
     }

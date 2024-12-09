@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntityWithTimestamps } from './Base';
 import { Submission } from './Submission';
 import { Contest } from './Contest';
+import { Role } from '../types/types';
 
 @Entity('user')
 export class User extends BaseEntityWithTimestamps {
@@ -25,7 +26,7 @@ export class User extends BaseEntityWithTimestamps {
   password: string;
 
   @Column({ nullable: false })
-  role: string;
+  role: Role;
 
   @Column({ nullable: false, default: false })
   isBan: boolean;

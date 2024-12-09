@@ -58,13 +58,20 @@ export type ProblemRequestBody = {
   difficulty: number;
   timeLimit: number;
   memoryLimit: number;
-  inputFormat?: string;
-  outputFormat?: string;
+  inputFormat: string;
+  outputFormat: string;
   solutionText?: string;
   isPublished?: boolean;
 };
 
 export type LANGUAGE = 'CPP' | 'C' | 'JAVA' | 'PYTHON';
+
+export enum Role {
+  Admin = 'ADMIN',
+  User = 'USER',
+  Organizer = 'ORGANIZER',
+  ProblemSetter = 'PROBLEM_SETTER',
+}
 
 export type TokenInfo = {
   id: number;
@@ -129,8 +136,8 @@ export type CreateProblemInput = {
   difficulty: number;
   timeLimit: number;
   memoryLimit: number;
-  inputFormat?: string;
-  outputFormat?: string;
+  inputFormat: string;
+  outputFormat: string;
   solutionText?: string;
   isPublished?: boolean;
   creatorId: number;

@@ -2,7 +2,7 @@ import { User } from "../../entities/User";
 import { IUserService } from "../IUserService";
 import { UserRepository } from "../../repositories/UserRepo";
 import keccak256 from "keccak256";
-import { CreateUserInput, IUserRepository } from "@/types/types";
+import { CreateUserInput, IUserRepository, Role } from "@/types/types";
 
 export class UserService implements IUserService {
   private readonly userRepo: IUserRepository;
@@ -35,7 +35,7 @@ export class UserService implements IUserService {
     user.handle = userInput.handle;
     user.email = userInput.email;
     user.password = keccak256(userInput.password).toString("hex");
-    user.role = 'user';
+    user.role = Role.User;
     user.isBan = false;
     user.submissions = [];
     try {
