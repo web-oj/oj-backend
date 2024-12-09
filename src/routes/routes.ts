@@ -683,6 +683,37 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/problem/:id/testcases',
+            ...(fetchMiddlewares<RequestHandler>(ProblemController)),
+            ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.addTestcases)),
+
+            async function ProblemController_addTestcases(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"testcases":{"dataType":"array","array":{"dataType":"nestedObjectLiteral","nestedProperties":{"output":{"dataType":"string","required":true},"input":{"dataType":"string","required":true}}},"required":true}}},
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new ProblemController();
+
+              await templateService.apiHandler({
+                methodName: 'addTestcases',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/problem/id/:id',
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.getProblemById)),

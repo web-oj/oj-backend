@@ -1,18 +1,7 @@
 import { Contest } from "../entities/Contest";
 import { ContestParticipation } from "@/entities/ContestParticipation";
 import { ProblemInContest } from "@/entities/ProblemInContest";
-
-export type CreateContestInput = {
-  title: string;
-  description?: string;
-  ruleText?: string;
-  startTime: number;
-  endTime: number;
-  scoringRule: string;
-  isPlagiarismCheckEnabled?: boolean;
-  isPublished?: boolean;
-  organizerId: number;
-};
+import { CreateContestInput } from "../types/types";
 
 export interface IContestService {
   addContestParticipation(

@@ -1,15 +1,14 @@
 import {
-  CreateProblemInput,
   IProblemService,
 } from "@/services/IProblemService";
 import { Problem } from "@/entities/Problem";
 import {
-  IProblemRepository,
   ProblemRepository,
 } from "@/repositories/ProblemRepo";
 import { UserRepository } from "@/repositories/UserRepo";
-import { ITestcaseRepository, TestcaseRepository } from "@/repositories/TestcaseRepo";
+import {  TestcaseRepository } from "@/repositories/TestcaseRepo";
 import { Testcase } from "@/entities/Testcase";
+import { CreateProblemInput, IProblemRepository, ITestcaseRepository } from "@/types/types";
 
 export class ProblemService implements IProblemService {
   private readonly problemRepo: IProblemRepository;

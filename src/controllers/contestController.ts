@@ -37,32 +37,7 @@ import { UserService } from "../services/impl/UserService";
 import { ContestService } from "../services/impl/ContestService";
 import { IProblemService } from "../services/IProblemService";
 import { ProblemService } from "../services/impl/ProblemService";
-
-export type GetAllContestsResponseEntry = {
-  id: number;
-  title: string;
-  startTime: number;
-  endTime: number;
-};
-
-export type GetProblemsResponseEntry = {
-  id: number;
-  title: string;
-  score: number;
-};
-
-export type ContestResponse = {
-  message?: string;
-  error?: string;
-  payload?:
-    | Contest
-    | Contest[]
-    | GetAllContestsResponseEntry[]
-    | ContestParticipation
-    | ContestParticipation[]
-    | GetProblemsResponseEntry[]
-    | null;
-};
+import { ContestResponse, GetAllContestsResponseEntry, GetProblemsResponseEntry } from "../types/types";
 
 @Route("contest")
 export class ContestController extends Controller {

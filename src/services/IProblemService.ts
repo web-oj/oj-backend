@@ -1,17 +1,5 @@
 import { Problem } from "@/entities/Problem";
-
-export type CreateProblemInput = {
-  title: string;
-  statement: string;
-  difficulty: number;
-  timeLimit: number;
-  memoryLimit: number;
-  inputFormat?: string;
-  outputFormat?: string;
-  solutionText?: string;
-  isPublished?: boolean;
-  creatorId: number;
-};
+import { CreateProblemInput } from "../types/types";
 
 export interface IProblemService {
   createProblem(userInput: CreateProblemInput): Promise<Problem>;

@@ -5,8 +5,7 @@ import { User } from './User';
 import { Problem } from './Problem';
 import { SubmissionResult } from './SubmissionResult';
 import { Contest } from './Contest';
-
-export type LANGUAGE = 'CPP' | 'C' | 'JAVA' | 'PYTHON';
+import { LANGUAGE } from '../types/types';
 
 @Entity('submission')
 export class Submission extends BaseEntityWithTimestamps {

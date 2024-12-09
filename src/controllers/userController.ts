@@ -33,7 +33,8 @@ import { sign } from "jsonwebtoken";
 import { env } from "../config/config";
 import { UserService } from "../services/impl/UserService";
 import jwt from "jsonwebtoken";
-import { decodeJWT, TokenInfo } from "@/middleware/authentication";
+import { decodeJWT } from "@/middleware/authentication";
+import { TokenInfo } from "@/types/types";
 
 @Route("user")
 export class UserController extends Controller {

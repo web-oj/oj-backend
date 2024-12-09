@@ -1,13 +1,14 @@
 import { Submission } from "@/entities/Submission";
 import { ISubmissionService } from "../ISubmissionService";
-import { ISubmissionRepository, SubmissionRepository } from "@/repositories/SubmissionRepo";
-import { IUserRepository, UserRepository } from "@/repositories/UserRepo";
+import { SubmissionRepository } from "@/repositories/SubmissionRepo";
+import { UserRepository } from "@/repositories/UserRepo";
 import { Problem } from "@/entities/Problem";
 import { env } from "@/config/config";
 import axios from "axios";
 import { SubmissionResult } from "@/entities/SubmissionResult";
 import { Contest } from "@/entities/Contest";
-import { ISubmissionResultRepository, SubmissionResultRepository } from "@/repositories/SubmissionResultRepo";
+import { SubmissionResultRepository } from "@/repositories/SubmissionResultRepo";
+import { ISubmissionRepository, ISubmissionResultRepository, IUserRepository } from "../../types/types";
 
 export class SubmissionService implements ISubmissionService {
   private readonly userRepo: IUserRepository;

@@ -1,20 +1,18 @@
 import { Contest } from "../../entities/Contest";
-import { CreateContestInput, IContestService } from "../IContestService";
+import { IContestService } from "../IContestService";
 import {
-  IContestRepository,
   ContestRepository,
 } from "../../repositories/ContestRepo";
 import {
   ContestParticipationRepository,
-  IContestParticipationRepository,
 } from "../../repositories/ContestParticipationRepo";
-import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
+import { UserRepository } from "../../repositories/UserRepo";
 import { ContestParticipation } from "../../entities/ContestParticipation";
 import {
-  IProblemInContestRepository,
   ProblemInContestRepository,
 } from "../../repositories/ProblemInContestRepo";
 import { ProblemInContest } from "../../entities/ProblemInContest";
+import { CreateContestInput, IContestParticipationRepository, IContestRepository, IProblemInContestRepository, IUserRepository } from "@/types/types";
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;

@@ -1,11 +1,7 @@
 import { env } from "@/config/config";
+import { TokenInfo } from "../types/types";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-
-export type TokenInfo = {
-  id: number;
-  role: string;
-}
 
 export async function decodeJWT(token: string) {
   const decoded: TokenInfo = await new Promise((resolve, reject) => {

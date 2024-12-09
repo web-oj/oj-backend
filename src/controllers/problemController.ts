@@ -31,36 +31,8 @@ import { IProblemService } from "@/services/IProblemService";
 import jwt from "jsonwebtoken";
 import { env } from "@/config/config";
 import { ProblemService } from "@/services/impl/ProblemService";
-import { decodeJWT, TokenInfo } from "@/middleware/authentication";
-
-export type GetAllProblemResponseEntity = {
-  id: number;
-  title: string;
-  statement: string;
-  difficulty: number;
-  timeLimit: number;
-  memoryLimit: number;
-  createdAt: string;
-  createdBy: number;
-};
-
-export type ProblemResponse = {
-  message: string;
-  status: number;
-  data?: GetAllProblemResponseEntity[] | null;
-};
-
-export type ProblemRequestBody = {
-  title: string;
-  statement: string;
-  difficulty: number;
-  timeLimit: number;
-  memoryLimit: number;
-  inputFormat?: string;
-  outputFormat?: string;
-  solutionText?: string;
-  isPublished?: boolean;
-};
+import { decodeJWT } from "@/middleware/authentication";
+import { GetAllProblemResponseEntity, ProblemRequestBody, ProblemResponse, TokenInfo } from "../types/types";
 
 @Route("problem")
 export class ProblemController extends Controller {

@@ -1,10 +1,5 @@
-import { User } from "@/entities/User";
-
-export type CreateUserInput = {
-  handle: string;
-  email: string;
-  password: string;
-};  
+import { User } from "@/entities/User"; 
+import { CreateUserInput } from "../types/types";
 
 export interface IUserService {
   createUser(userInput: CreateUserInput): Promise<User>;

@@ -1,10 +1,7 @@
 import { Submission } from "@/entities/Submission";
 import { mysqlDataSource } from "../database/MysqlDataSource";
 import { Repository } from "typeorm";
-
-export type ISubmissionRepository = Repository<Submission> & {
-  // some specific methods for this repository
-};
+import { ISubmissionRepository } from "../types/types";
 
 export const SubmissionRepository: ISubmissionRepository = mysqlDataSource.getRepository(Submission).extend({
   // implement the specific methods here

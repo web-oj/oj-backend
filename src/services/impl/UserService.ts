@@ -1,7 +1,8 @@
 import { User } from "../../entities/User";
-import { CreateUserInput, IUserService } from "../IUserService";
-import { IUserRepository, UserRepository } from "../../repositories/UserRepo";
+import { IUserService } from "../IUserService";
+import { UserRepository } from "../../repositories/UserRepo";
 import keccak256 from "keccak256";
+import { CreateUserInput, IUserRepository } from "@/types/types";
 
 export class UserService implements IUserService {
   private readonly userRepo: IUserRepository;
