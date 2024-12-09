@@ -6,7 +6,7 @@ import { ProblemInContest } from "@/entities/ProblemInContest";
 import { Submission } from "@/entities/Submission";
 import { SubmissionResult } from "@/entities/SubmissionResult";
 import { Testcase } from "@/entities/Testcase";
-import { User } from "@/entities/User";
+import { User } from "../entities/User";
 import { Repository } from "typeorm";
 
 export type GetAllContestsResponseEntry = {
@@ -43,7 +43,7 @@ export type GetAllProblemResponseEntity = {
   timeLimit: number;
   memoryLimit: number;
   createdAt: string;
-  createdBy: number;
+  owner: User;
 };
 
 export type ProblemResponse = {

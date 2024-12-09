@@ -21,7 +21,7 @@ export class SubmissionService implements ISubmissionService {
     this.submissionResultRepo = SubmissionResultRepository;
   }
 
-  async submit(userId: number, problem: Problem, contest: Contest, code: string) {
+  async submit(userId: number, problem: Problem, code: string, contest?: Contest) {
     if (!userId || !code) {
       throw new Error('Missing required fields');
     }
@@ -44,7 +44,9 @@ export class SubmissionService implements ISubmissionService {
       await this.userRepo.save(user);
       await this.submissionRepo.save(submission);
       const now = Date.now();
-      if (now >= contest.startTime && now <= contest.endTime && contest.scoringRule === "ACM") {
+      if (contest && now >= contest.startTime && now <= contest.endTime && contest.scoringRule === "ACM") {
+        await this.executeSubmission(submission.id);
+      } else if (!contest) {
         await this.executeSubmission(submission.id);
       }
       return {

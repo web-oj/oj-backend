@@ -3,7 +3,7 @@ import { Problem } from "@/entities/Problem";
 import { Submission } from "@/entities/Submission";
 
 export interface ISubmissionService {
-  submit(userId: number, problem: Problem, contest: Contest, code: string) : Promise<{ submissionId: number }>;
+  submit(userId: number, problem: Problem, code: string, contest?: Contest) : Promise<{ submissionId: number }>;
 
   getSubmissionById(submissionId: number, options?: {
     withResult?: boolean;

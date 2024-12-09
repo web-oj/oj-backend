@@ -5,12 +5,14 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Submission } from "./Submission";
 import { Testcase } from "./Testcase";
 import { ProblemInContest } from "./ProblemInContest";
+import { User } from "./User";
 
 @Entity("problem")
 export class Problem extends BaseEntityWithTimestamps {
@@ -42,8 +44,8 @@ export class Problem extends BaseEntityWithTimestamps {
   @Column({ nullable: false, default: "" })
   solutionText: string;
 
-  @Column({ nullable: false })
-  createdBy: number;
+  @ManyToOne(() => User, (user) => user.problems)
+  owner: User;
 
   @DeleteDateColumn({ name: "deleted_at" })
   deletedAt: Date;

@@ -8,15 +8,17 @@ import {
 import { UserRepository } from "@/repositories/UserRepo";
 import {  TestcaseRepository } from "@/repositories/TestcaseRepo";
 import { Testcase } from "@/entities/Testcase";
-import { CreateProblemInput, IProblemRepository, ITestcaseRepository } from "@/types/types";
+import { CreateProblemInput, IProblemRepository, ITestcaseRepository, IUserRepository } from "@/types/types";
 
 export class ProblemService implements IProblemService {
   private readonly problemRepo: IProblemRepository;
   private readonly testcaseRepo: ITestcaseRepository;
+  private readonly userRepo: IUserRepository;
 
   constructor() {
     this.problemRepo = ProblemRepository;
     this.testcaseRepo = TestcaseRepository;
+    this.userRepo = UserRepository;
   }
 
   async createProblem(userInput: CreateProblemInput): Promise<Problem> {
@@ -48,7 +50,13 @@ export class ProblemService implements IProblemService {
       userInput.outputFormat
     problem.isPublished =
       userInput.isPublished !== undefined ? userInput.isPublished : false;
-    problem.createdBy = userInput.creatorId;
+
+    const user = await this.userRepo.findOneBy({ id: userInput.creatorId });
+    if (!user) {
+      throw new Error("User not found");
+    } 
+    
+    problem.owner = user;
 
     try {
       await this.problemRepo.save(problem);
@@ -77,7 +85,7 @@ export class ProblemService implements IProblemService {
   }
 
   async getProblemById(id: number): Promise<Problem | null> {
-    return this.problemRepo.findOneBy({ id });
+    return this.problemRepo.findOne({ where: { id }, relations: ["owner"] });
   }
 
   async getProblemByTitle(title: string): Promise<Problem | null> {

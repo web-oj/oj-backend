@@ -4,6 +4,7 @@ import { BaseEntityWithTimestamps } from './Base';
 import { Submission } from './Submission';
 import { Contest } from './Contest';
 import { Role } from '../types/types';
+import { Problem } from './Problem';
 
 @Entity('user')
 export class User extends BaseEntityWithTimestamps {
@@ -39,6 +40,9 @@ export class User extends BaseEntityWithTimestamps {
 
   @Column({ nullable: true })
   country: string;  // Optional country for regional ranking purposes
+
+  @OneToMany(() => Problem, (problem) => problem.owner)
+  problems: Problem[];
 
   @OneToMany(() => Submission, (submission) => submission.owner)
   submissions: Submission[];

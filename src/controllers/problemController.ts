@@ -68,26 +68,20 @@ export class ProblemController extends Controller {
     }
   }
 
-  @Patch("id/{id}")
+  @Patch("{id}")
   @Tags("Problem")
-  @Security("jwt", ["admin"])
+  @Security("jwt", ["user"])
   public async updateProblem(
     @Body() body: ProblemRequestBody,
     @Header("x-access-token") token: string,
     @Path() id: number,
   ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded = await decodeJWT(token);
 
       const oldProblem = await this.problemService.getProblemById(id);
-      if (oldProblem?.createdBy === decoded.id) {
+      
+      if (oldProblem?.owner.id === decoded.id) {
         await this.problemService.editProblem(id, body);
         return {
           message: "Problem updated successfully.",
@@ -178,7 +172,7 @@ export class ProblemController extends Controller {
           if (problem.isPublished) {
             response.push({
               createdAt: problem.createdAt.toString(),
-              createdBy: problem.createdBy,
+              owner: problem.owner,
               difficulty: problem.difficulty,
               id: problem.id,
               memoryLimit: problem.memoryLimit,
@@ -207,17 +201,10 @@ export class ProblemController extends Controller {
     @Header("x-access-token") token: string,
   ) {
     try {
-      const decoded: any = await new Promise((resolve, reject) => {
-        jwt.verify(token, env.jwt_secret, (err: any, decoded: any) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(decoded);
-        });
-      });
+      const decoded = await decodeJWT(token);
 
       let problem = await this.problemService.getProblemById(id);
-      if (problem?.createdBy === decoded.id) {
+      if (problem?.owner.id === decoded.id) {
         await this.problemService.softDeleteProblem(id);
         return {
           message: "Problem deleted successful",
@@ -263,7 +250,7 @@ export class ProblemController extends Controller {
           if (problem.isPublished) {
             response.push({
               createdAt: problem.createdAt.toString(),
-              createdBy: problem.createdBy,
+              owner: problem.owner,
               difficulty: problem.difficulty,
               id: problem.id,
               memoryLimit: problem.memoryLimit,
