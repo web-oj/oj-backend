@@ -746,13 +746,11 @@
 					}
 				},
 				"required": [
-					"password",
-					"handle",
-					"email"
+					"password"
 				],
 				"type": "object"
 			},
-			"ProblemRequestBody": {
+			"NewProblemRequest": {
 				"properties": {
 					"isPublished": {
 						"type": "boolean"
@@ -790,18 +788,23 @@
 					"inputFormat",
 					"memoryLimit",
 					"timeLimit",
-					"difficulty",
 					"statement",
 					"title"
 				],
 				"type": "object"
 			},
-			"GetAllProblemResponseEntity": {
+			"UpdateProblemRequest": {
 				"properties": {
-					"owner": {
-						"$ref": "#/components/schemas/User"
+					"isPublished": {
+						"type": "boolean"
 					},
-					"createdAt": {
+					"solutionText": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"inputFormat": {
 						"type": "string"
 					},
 					"memoryLimit": {
@@ -821,32 +824,48 @@
 					},
 					"title": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"GetProblemResponse": {
+				"$ref": "#/components/schemas/Problem"
+			},
+			"ApiResponse_GetProblemResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
 					},
-					"id": {
+					"data": {
+						"$ref": "#/components/schemas/GetProblemResponse"
+					},
+					"status": {
 						"type": "number",
 						"format": "double"
+					},
+					"message": {
+						"type": "string"
 					}
 				},
 				"required": [
-					"owner",
-					"createdAt",
-					"memoryLimit",
-					"timeLimit",
-					"difficulty",
-					"statement",
-					"title",
-					"id"
+					"status",
+					"message"
 				],
 				"type": "object"
 			},
-			"ProblemResponse": {
+			"GetAllProblemsResponse": {
+				"items": {
+					"$ref": "#/components/schemas/Problem"
+				},
+				"type": "array"
+			},
+			"ApiResponse_GetAllProblemsResponse_": {
 				"properties": {
+					"error": {
+						"type": "string"
+					},
 					"data": {
-						"items": {
-							"$ref": "#/components/schemas/GetAllProblemResponseEntity"
-						},
-						"type": "array",
-						"nullable": true
+						"$ref": "#/components/schemas/GetAllProblemsResponse"
 					},
 					"status": {
 						"type": "number",
@@ -1059,7 +1078,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -1096,7 +1115,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -1133,7 +1152,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -1234,7 +1253,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"ADMIN"
 						]
 					}
 				],
@@ -1326,13 +1345,7 @@
 						}
 					}
 				},
-				"security": [
-					{
-						"jwt": [
-							"user"
-						]
-					}
-				],
+				"security": [],
 				"parameters": [
 					{
 						"in": "header",
@@ -1507,32 +1520,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"message": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -1544,7 +1532,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -1563,7 +1551,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ProblemRequestBody"
+								"$ref": "#/components/schemas/NewProblemRequest"
 							}
 						}
 					}
@@ -1577,7 +1565,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ProblemResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetAllProblemsResponse_"
 								}
 							}
 						}
@@ -1618,15 +1606,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -1638,7 +1618,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -1666,7 +1646,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ProblemRequestBody"
+								"$ref": "#/components/schemas/UpdateProblemRequest"
 							}
 						}
 					}
@@ -1682,32 +1662,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"message": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -1761,32 +1716,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"message": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -1850,7 +1780,9 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_GetProblemResponse_"
+								}
 							}
 						}
 					}
@@ -1879,15 +1811,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -1899,7 +1823,7 @@
 				"security": [
 					{
 						"jwt": [
-							"admin"
+							"ADMIN"
 						]
 					}
 				],
@@ -1926,13 +1850,15 @@
 		},
 		"/problem/title/{title}": {
 			"get": {
-				"operationId": "GetProblemTitle",
+				"operationId": "GetProblemByTitle",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_GetProblemResponse_"
+								}
 							}
 						}
 					}
@@ -1962,7 +1888,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ProblemResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetAllProblemsResponse_"
 								}
 							}
 						}
@@ -2080,7 +2006,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2187,7 +2113,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2223,7 +2149,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2468,7 +2394,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2523,7 +2449,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2582,7 +2508,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2643,7 +2569,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],
@@ -2705,7 +2631,7 @@
 				"security": [
 					{
 						"jwt": [
-							"user"
+							"USER"
 						]
 					}
 				],

@@ -28,11 +28,9 @@ import {
   Tags,
 } from "tsoa";
 import { IProblemService } from "@/services/IProblemService";
-import jwt from "jsonwebtoken";
-import { env } from "@/config/config";
 import { ProblemService } from "@/services/impl/ProblemService";
 import { decodeJWT } from "@/middleware/authentication";
-import { GetAllProblemResponseEntity, ProblemRequestBody, ProblemResponse, TokenInfo } from "../types/types";
+import { ApiResponse, GetAllProblemsResponse, GetProblemResponse, NewProblemRequest, Role, TokenInfo, UpdateProblemRequest } from "../types/types";
 
 @Route("problem")
 export class ProblemController extends Controller {
@@ -45,11 +43,11 @@ export class ProblemController extends Controller {
 
   @Post("")
   @Tags("Problem")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async createProblem(
-    @Body() body: ProblemRequestBody,
+    @Body() body: NewProblemRequest,
     @Header("x-access-token") token: string,
-  ) {
+  ): Promise<ApiResponse<null>> {
     try {
       const decoded: TokenInfo = await decodeJWT(token);
 
@@ -57,25 +55,29 @@ export class ProblemController extends Controller {
         ...body,
         creatorId: decoded.id,
       });
+      this.setStatus(200);
       return {
         message: "Problem created successfully.",
+        status: 200,
       };
     } catch (err) {
       this.setStatus(400);
       return {
         error: `Error creating problem ${err}`,
+        status: 400,
+        message: "Problem not created.",
       }      
     }
   }
 
   @Patch("{id}")
   @Tags("Problem")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async updateProblem(
-    @Body() body: ProblemRequestBody,
+    @Body() body: UpdateProblemRequest,
     @Header("x-access-token") token: string,
     @Path() id: number,
-  ) {
+  ): Promise<ApiResponse<null>> {
     try {
       const decoded = await decodeJWT(token);
 
@@ -85,15 +87,23 @@ export class ProblemController extends Controller {
         await this.problemService.editProblem(id, body);
         return {
           message: "Problem updated successfully.",
+          status: 200,
         };
       } else {
         this.setStatus(403);
         return {
           message: "Forbidden",
+          error: "You are not the owner of this problem.",
+          status: 403,
         };
       }
     } catch (err) {
-      throw new Error(`Error updating problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Problem not updated.",
+        error: `Error updating problem: ${err}`,
+        status: 400,
+      };
     }
   }
 
@@ -102,15 +112,19 @@ export class ProblemController extends Controller {
   public async addTestcase(
     @Body() body: { input: string; output: string },
     @Path() id: number,
-  ) {
+  ): Promise<ApiResponse<null>> {
     try {
       await this.problemService.addTestcase(id, body.input, body.output);
       this.setStatus(200);
       return {
         message: "Testcase added successfully.",
+        status: 200,
       };
     } catch (err) {
+      this.setStatus(400);
       return {
+        message: "Testcase not added.",
+        status: 400,
         error: `Error adding testcase: ${err}`,
       }
     }
@@ -121,7 +135,7 @@ export class ProblemController extends Controller {
   public async addTestcases(
     @Body() body: { testcases: { input: string; output: string }[] },
     @Path() id: number,
-  ) {
+  ): Promise<ApiResponse<null>> {
     try {
       for (let testcase of body.testcases) {
         await this.addTestcase({ input: testcase.input, output: testcase.output }, id);
@@ -129,31 +143,73 @@ export class ProblemController extends Controller {
       this.setStatus(200);
       return {
         message: "Testcases added successfully.",
+        status: 200,
       };
     } catch (err) {
+      this.setStatus(400);
       return {
+        status: 400,
+        message: "Testcases not added.",
         error: `Error adding testcases: ${err}`,
       }
     }
-  }
+}
 
   @Get("id/{id}")
   @Tags("Problem")
-  public async getProblemById(@Path() id: number) {
+  public async getProblemById(@Path() id: number): Promise<ApiResponse<GetProblemResponse>> {
     try {
-      return await this.problemService.getProblemById(id);
+      const problem = await this.problemService.getProblemById(id);
+      if (problem === null) {
+        this.setStatus(404);
+        return {
+          message: "Problem not found.",
+          status: 404,
+          error: "Problem not found.",
+        };
+      } else {
+        return {
+          message: "Problem retrieved successfully.",
+          status: 200,
+          data: problem,
+        }
+      }
     } catch (err) {
-      throw new Error(`Error getting problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Problem not retrieved.",
+        status: 400,
+        error: `Error getting problem: ${err}`,
+      }
     }
   }
 
   @Get("title/{title}")
   @Tags("Problem")
-  public async getProblemTitle(@Path() title: string) {
+  public async getProblemByTitle(@Path() title: string): Promise<ApiResponse<GetProblemResponse>> {
     try {
-      return await this.problemService.getProblemByTitle(title);
+      const problem = await this.problemService.getProblemByTitle(title);
+      if (problem === null) {
+        this.setStatus(404);
+        return {
+          message: "Problem not found.",
+          status: 404,
+          error: "Problem not found.",
+        };
+      } else {
+        return {
+          message: "Problem retrieved successfully.",
+          status: 200,
+          data: problem,
+        }
+      }
     } catch (err) {
-      throw new Error(`Error getting problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Problem not retrieved.",
+        status: 400,
+        error: `Error getting problem: ${err}`,
+      }
     }
   }
 
@@ -162,61 +218,58 @@ export class ProblemController extends Controller {
   public async getAllProblems(
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<ProblemResponse> {
+  ): Promise<ApiResponse<GetAllProblemsResponse>> {
     try {
-      let allProblem = await this.problemService.getAllProblems(limit, offset);
-
-      let response: GetAllProblemResponseEntity[] = [];
-      if (allProblem !== null) {
-        for (let problem of allProblem) {
-          if (problem.isPublished) {
-            response.push({
-              createdAt: problem.createdAt.toString(),
-              owner: problem.owner,
-              difficulty: problem.difficulty,
-              id: problem.id,
-              memoryLimit: problem.memoryLimit,
-              statement: problem.statement,
-              timeLimit: problem.timeLimit,
-              title: problem.title,
-            });
-          }
-        }
-      }
+      let allProblem = await this.problemService.getAllProblems(limit, offset, false);
+      this.setStatus(200);
       return {
         status: 200,
         message: `Problems founded.`,
-        data: response,
+        data: allProblem,
       };
     } catch (err) {
-      throw new Error(`Error getting all problems: ${err}`);
+      this.setStatus(400);
+      return {
+        status: 400,
+        message: "Problems not founded.",
+        error: `Error getting all problems: ${err}`,
+      };
     }
   }
 
   @Delete("id/{id}")
   @Tags("Problem")
-  @Security("jwt", ["admin"])
+  @Security("jwt", [Role.Admin])
   public async softDeleteProblem(
     @Path() id: number,
     @Header("x-access-token") token: string,
-  ) {
+  ): Promise<ApiResponse<null>> {
     try {
       const decoded = await decodeJWT(token);
 
       let problem = await this.problemService.getProblemById(id);
       if (problem?.owner.id === decoded.id) {
         await this.problemService.softDeleteProblem(id);
+        this.setStatus(200);
         return {
           message: "Problem deleted successful",
+          status: 200,
         };
       } else {
         this.setStatus(403);
         return {
+          status: 403,
+          error: "You are not the owner of this problem.",
           message: "Forbidden",
         };
       }
     } catch (err) {
-      throw new Error(`Error deleting problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Problem not deleted",
+        status: 400,
+        error: `Error deleting problem: ${err}`,
+      };
     }
   }
 
@@ -228,7 +281,7 @@ export class ProblemController extends Controller {
     @Query() difficultyHigh?: number,
     @Query() offset?: number,
     @Query() limit?: number,
-  ): Promise<ProblemResponse> {
+  ): Promise<ApiResponse<GetAllProblemsResponse>> {
     try {
       if (difficultyLow === undefined) {
         difficultyLow = 0;
@@ -244,27 +297,10 @@ export class ProblemController extends Controller {
         limit,
         offset,
       );
-      let response: GetAllProblemResponseEntity[] = [];
-      if (problems !== null) {
-        for (let problem of problems) {
-          if (problem.isPublished) {
-            response.push({
-              createdAt: problem.createdAt.toString(),
-              owner: problem.owner,
-              difficulty: problem.difficulty,
-              id: problem.id,
-              memoryLimit: problem.memoryLimit,
-              statement: problem.statement,
-              timeLimit: problem.timeLimit,
-              title: problem.title,
-            });
-          }
-        }
-      }
       return {
         message: "Searching successful",
         status: 200,
-        data: response,
+        data: problems,
       };
     } catch (err) {
       throw new Error(`Error searching problem: ${err}`);

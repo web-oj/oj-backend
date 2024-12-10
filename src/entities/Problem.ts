@@ -26,7 +26,7 @@ export class Problem extends BaseEntityWithTimestamps {
   @Column({ nullable: false })
   statement: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true, default: 800 })
   difficulty: number;
 
   @Column({ nullable: false })

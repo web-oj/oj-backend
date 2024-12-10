@@ -21,6 +21,7 @@ import { IContestService } from "@/services/IContestService";
 import { ProblemInContest } from "@/entities/ProblemInContest";
 import { ContestService } from "@/services/impl/ContestService";
 import { error } from "console";
+import { Role } from "@/types/types";
 
 @Route("submission")
 export class SubmissionController extends Controller {
@@ -36,7 +37,6 @@ export class SubmissionController extends Controller {
   }
 
   @Post("")
-  @Security("jwt", ["user"])
   public async submit(
     @Body() body: { problemId: number; contestId?: number, code: string },
     @Header("x-access-token") token: string

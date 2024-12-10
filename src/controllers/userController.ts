@@ -73,7 +73,7 @@ export class UserController extends Controller {
 
   @Get('/id')
   @Tags("User")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async getUserIdFromToken(
     @Header("x-access-token") token: string,
   ): Promise<ApiResponse<GetUserIdFromTokenResponse>> {
@@ -99,7 +99,7 @@ export class UserController extends Controller {
 
   @Get('/role')
   @Tags("User")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async getUserRoleFromToken(
     @Header("x-access-token") token: string,
   ): Promise<ApiResponse<GetUserRoleFromTokenResponse>> {
@@ -126,7 +126,7 @@ export class UserController extends Controller {
 
   @Get('{id}')
   @Tags("User")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async getUserById(@Path() id: number): Promise<ApiResponse<User | null>> {
     try {
       const user = await this.userService.getUserById(id);
@@ -214,7 +214,7 @@ export class UserController extends Controller {
 
   @Patch("admin/{id}")
   @Tags("User")
-  @Security("jwt", ["admin"])
+  @Security("jwt", [Role.Admin])
   public async addAdmin(@Path() id: number): Promise<ApiResponse<null>> {
     try {
       await this.userService.updateUser(id, { role: Role.Admin });

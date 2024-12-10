@@ -13,7 +13,7 @@ export interface IProblemService {
 
   getProblemById(id: number): Promise<Problem | null>;
 
-  getAllProblems(limit?: number, offset?: number): Promise<Problem[] | null>;
+  getAllProblems(limit?: number, offset?: number, isPublished?: boolean): Promise<Problem[]>;
 
   getProblemByTitle(title: string): Promise<Problem | null>;
 
@@ -23,7 +23,7 @@ export interface IProblemService {
       difficultyHigh?: number,
       limit?: number,
       offset?: number
-  ): Promise<Problem[] | null>;
+  ): Promise<Problem[]>;
 
   addTestcase(
     problemId: number,

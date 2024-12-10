@@ -37,7 +37,7 @@ import { UserService } from "../services/impl/UserService";
 import { ContestService } from "../services/impl/ContestService";
 import { IProblemService } from "../services/IProblemService";
 import { ProblemService } from "../services/impl/ProblemService";
-import { ContestResponse, GetAllContestsResponseEntry, GetProblemsResponseEntry } from "../types/types";
+import { ContestResponse, GetAllContestsResponseEntry, GetProblemsResponseEntry, Role } from "../types/types";
 
 @Route("contest")
 export class ContestController extends Controller {
@@ -213,7 +213,7 @@ export class ContestController extends Controller {
 
   @Delete("{id}")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async deleteContest(@Path() id: number): Promise<ContestResponse> {
     try {
       let res = await this.contestService.softDeleteContest(id);
@@ -229,7 +229,7 @@ export class ContestController extends Controller {
 
   @Delete("{id}/problem")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async deleteProblem(
     @Path() id: number,
     @Body() body: { problemId: number },
@@ -248,7 +248,7 @@ export class ContestController extends Controller {
 
   @Patch("{id}")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async editContest(
     @Path() id: number,
     @Body()
@@ -301,7 +301,7 @@ export class ContestController extends Controller {
 
   @Patch("{id}/editScore")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async editScore(
     @Path() id: number,
     @Body()
@@ -365,7 +365,7 @@ export class ContestController extends Controller {
 
   @Patch("{id}/problem")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async editProblem(
     @Path() id: number,
     @Body()
@@ -422,7 +422,7 @@ export class ContestController extends Controller {
 
   @Post("")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async createContest(
     @Body()
     body: {
@@ -483,7 +483,7 @@ export class ContestController extends Controller {
 
   @Post("{id}/register")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async registerToContest(
     @Path() id: number,
     @Body() body: { userId: number },
@@ -538,7 +538,7 @@ export class ContestController extends Controller {
 
   @Post("{id}/problem")
   @Tags("Contest")
-  @Security("jwt", ["user"])
+  @Security("jwt", [Role.User])
   public async addProblem(
     @Path() id: number,
     @Body() body: { problemId: number; score?: number },

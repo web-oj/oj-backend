@@ -29,25 +29,24 @@ export class ProblemService implements IProblemService {
     }
     problem.title = userInput.title;
     problem.statement = userInput.statement;
-        console.log(userInput);
 
-    if (!userInput.difficulty || userInput.difficulty <= 0) {
-      throw new Error("Missing required fields");
-    }
     if (!userInput.timeLimit || userInput.timeLimit <= 0) {
       throw new Error("Missing required fields");
     }
     if (!userInput.memoryLimit || userInput.memoryLimit <= 0) {
       throw new Error("Missing required fields");
     }
-    problem.difficulty = userInput.difficulty;
+    if (userInput.difficulty) {
+      if (userInput.difficulty <= 0) {
+        throw new Error("Difficulty must be greater than 0");
+      }
+      problem.difficulty = userInput.difficulty;
+    }
     problem.timeLimit = userInput.timeLimit;
     problem.memoryLimit = userInput.memoryLimit;
 
-    problem.inputFormat =
-      userInput.inputFormat
-    problem.outputFormat =
-      userInput.outputFormat
+    problem.inputFormat = userInput.inputFormat
+    problem.outputFormat = userInput.outputFormat
     problem.isPublished =
       userInput.isPublished !== undefined ? userInput.isPublished : false;
 
@@ -77,10 +76,12 @@ export class ProblemService implements IProblemService {
   async getAllProblems(
     limit?: number,
     offset?: number,
-  ): Promise<Problem[] | null> {
+    isPublished?: boolean,
+  ): Promise<Problem[]> {
     return this.problemRepo.find({
       skip: offset,
       take: limit,
+      where: { isPublished },
     });
   }
 
@@ -98,7 +99,7 @@ export class ProblemService implements IProblemService {
     difficultyHigh?: number,
     limit?: number,
     offset?: number,
-  ): Promise<Problem[] | null> {
+  ): Promise<Problem[]> {
     if (searchKeyword !== undefined) {
       return this.problemRepo
         .createQueryBuilder()

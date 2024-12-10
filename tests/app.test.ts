@@ -3,6 +3,7 @@ import { createServer, Server } from "http";
 import initApp from "../src/index";
 import { mysqlDataSource } from "../src/database/MysqlDataSource";
 import { env } from "../src/config/config";
+import { ApiResponse, LoginResponse } from "../src/types/types";
 
 describe("App Tests", () => {
     let server: Server;
@@ -57,8 +58,8 @@ describe("App Tests", () => {
                 password: "test1234",
             });
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("token");
-        token = response.body.token;
+        expect(response.body).toHaveProperty("data");
+        token = response.body.data.token;
     });
 
     test("POST /problem", async () => {
@@ -68,10 +69,10 @@ describe("App Tests", () => {
             .send({
                 title: "Test Problem",
                 statement: "Test Problem Statement",
-                difficulty: 2000,
                 timeLimit: 100,
                 memoryLimit: 256,
-                isPublished: true,
+                inputFormat: "Test Input Format",
+                outputFormat: "Test Output Format",
             });
         expect(response.status).toBe(200);
     });
@@ -140,6 +141,6 @@ describe("App Tests", () => {
         const response = await request(server).get("/submission/1");
 
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty("id");
+        expect(response.body).toHaveProperty("data");
     });
 });

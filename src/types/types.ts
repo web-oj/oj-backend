@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { Contest } from "../entities/Contest";
 import { ContestParticipation } from "../entities/ContestParticipation";
-import { Problem } from "@/entities/Problem";
+import { Problem } from "../entities/Problem";
 import { ProblemInContest } from "@/entities/ProblemInContest";
 import { Submission } from "@/entities/Submission";
 import { SubmissionResult } from "@/entities/SubmissionResult";
@@ -40,8 +40,8 @@ export type UpdateUserRequest = {
 }
 
 export type LoginRequest = {
-  email: string;
-  handle: string;
+  email?: string;
+  handle?: string;
   password: string;
 }
 
@@ -75,27 +75,14 @@ export type ContestResponse = {
     | null;
 };
 
-export type GetAllProblemResponseEntity = {
-  id: number;
+export type GetProblemResponse = Problem;
+
+export type GetAllProblemsResponse = Problem[];
+
+export type NewProblemRequest = {
   title: string;
   statement: string;
-  difficulty: number;
-  timeLimit: number;
-  memoryLimit: number;
-  createdAt: string;
-  owner: User;
-};
-
-export type ProblemResponse = {
-  message: string;
-  status: number;
-  data?: GetAllProblemResponseEntity[] | null;
-};
-
-export type ProblemRequestBody = {
-  title: string;
-  statement: string;
-  difficulty: number;
+  difficulty?: number;
   timeLimit: number;
   memoryLimit: number;
   inputFormat: string;
@@ -103,6 +90,18 @@ export type ProblemRequestBody = {
   solutionText?: string;
   isPublished?: boolean;
 };
+
+export type UpdateProblemRequest = {
+  title?: string;
+  statement?: string;
+  difficulty?: number;
+  timeLimit?: number;
+  memoryLimit?: number;
+  inputFormat?: string;
+  outputFormat?: string;
+  solutionText?: string;
+  isPublished?: boolean;
+}
 
 export type LANGUAGE = 'CPP' | 'C' | 'JAVA' | 'PYTHON';
 
@@ -169,20 +168,9 @@ export type CreateContestInput = {
   organizerId: number;
 };
 
-
-export type CreateProblemInput = {
-  title: string;
-  statement: string;
-  difficulty: number;
-  timeLimit: number;
-  memoryLimit: number;
-  inputFormat: string;
-  outputFormat: string;
-  solutionText?: string;
-  isPublished?: boolean;
+export type CreateProblemInput = NewProblemRequest & {
   creatorId: number;
-};
-
+}
 
 export type CreateUserInput = {
   handle: string;

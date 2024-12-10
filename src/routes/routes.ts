@@ -231,22 +231,37 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LoginRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"handle":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"handle":{"dataType":"string"},"email":{"dataType":"string"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ProblemRequestBody": {
+    "NewProblemRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isPublished":{"dataType":"boolean"},"solutionText":{"dataType":"string"},"outputFormat":{"dataType":"string","required":true},"inputFormat":{"dataType":"string","required":true},"memoryLimit":{"dataType":"double","required":true},"timeLimit":{"dataType":"double","required":true},"difficulty":{"dataType":"double","required":true},"statement":{"dataType":"string","required":true},"title":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isPublished":{"dataType":"boolean"},"solutionText":{"dataType":"string"},"outputFormat":{"dataType":"string","required":true},"inputFormat":{"dataType":"string","required":true},"memoryLimit":{"dataType":"double","required":true},"timeLimit":{"dataType":"double","required":true},"difficulty":{"dataType":"double"},"statement":{"dataType":"string","required":true},"title":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetAllProblemResponseEntity": {
+    "UpdateProblemRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"owner":{"ref":"User","required":true},"createdAt":{"dataType":"string","required":true},"memoryLimit":{"dataType":"double","required":true},"timeLimit":{"dataType":"double","required":true},"difficulty":{"dataType":"double","required":true},"statement":{"dataType":"string","required":true},"title":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isPublished":{"dataType":"boolean"},"solutionText":{"dataType":"string"},"outputFormat":{"dataType":"string"},"inputFormat":{"dataType":"string"},"memoryLimit":{"dataType":"double"},"timeLimit":{"dataType":"double"},"difficulty":{"dataType":"double"},"statement":{"dataType":"string"},"title":{"dataType":"string"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ProblemResponse": {
+    "GetProblemResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"data":{"dataType":"union","subSchemas":[{"dataType":"array","array":{"dataType":"refAlias","ref":"GetAllProblemResponseEntity"}},{"dataType":"enum","enums":[null]}]},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+        "type": {"ref":"Problem","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_GetProblemResponse_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetProblemResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetAllProblemsResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"refObject","ref":"Problem"},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_GetAllProblemsResponse_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetAllProblemsResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "GetAllContestsResponseEntry": {
@@ -312,7 +327,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/user/id',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUserIdFromToken)),
 
@@ -343,7 +358,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/user/role',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUserRoleFromToken)),
 
@@ -374,7 +389,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/user/:id',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUserById)),
 
@@ -496,7 +511,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/user/admin/:id',
-            authenticateMiddleware([{"jwt":["admin"]}]),
+            authenticateMiddleware([{"jwt":["ADMIN"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.addAdmin)),
 
@@ -557,7 +572,6 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/submission',
-            authenticateMiddleware([{"jwt":["user"]}]),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController)),
             ...(fetchMiddlewares<RequestHandler>(SubmissionController.prototype.submit)),
 
@@ -680,13 +694,13 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/problem',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.createProblem)),
 
             async function ProblemController_createProblem(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    body: {"in":"body","name":"body","required":true,"ref":"ProblemRequestBody"},
+                    body: {"in":"body","name":"body","required":true,"ref":"NewProblemRequest"},
                     token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
             };
 
@@ -712,13 +726,13 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/problem/:id',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.updateProblem)),
 
             async function ProblemController_updateProblem(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    body: {"in":"body","name":"body","required":true,"ref":"ProblemRequestBody"},
+                    body: {"in":"body","name":"body","required":true,"ref":"UpdateProblemRequest"},
                     token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
                     id: {"in":"path","name":"id","required":true,"dataType":"double"},
             };
@@ -838,9 +852,9 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/problem/title/:title',
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
-            ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.getProblemTitle)),
+            ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.getProblemByTitle)),
 
-            async function ProblemController_getProblemTitle(request: ExRequest, response: ExResponse, next: any) {
+            async function ProblemController_getProblemByTitle(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     title: {"in":"path","name":"title","required":true,"dataType":"string"},
             };
@@ -854,7 +868,7 @@ export function RegisterRoutes(app: Router) {
                 const controller = new ProblemController();
 
               await templateService.apiHandler({
-                methodName: 'getProblemTitle',
+                methodName: 'getProblemByTitle',
                 controller,
                 response,
                 next,
@@ -898,7 +912,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.delete('/problem/id/:id',
-            authenticateMiddleware([{"jwt":["admin"]}]),
+            authenticateMiddleware([{"jwt":["ADMIN"]}]),
             ...(fetchMiddlewares<RequestHandler>(ProblemController)),
             ...(fetchMiddlewares<RequestHandler>(ProblemController.prototype.softDeleteProblem)),
 
@@ -1123,7 +1137,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.delete('/contest/:id',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.deleteContest)),
 
@@ -1154,7 +1168,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.delete('/contest/:id/problem',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.deleteProblem)),
 
@@ -1186,7 +1200,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/contest/:id',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.editContest)),
 
@@ -1218,7 +1232,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/contest/:id/editScore',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.editScore)),
 
@@ -1250,7 +1264,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/contest/:id/problem',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.editProblem)),
 
@@ -1282,7 +1296,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/contest',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.createContest)),
 
@@ -1313,7 +1327,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/contest/:id/register',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.registerToContest)),
 
@@ -1345,7 +1359,7 @@ export function RegisterRoutes(app: Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/contest/:id/problem',
-            authenticateMiddleware([{"jwt":["user"]}]),
+            authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(ContestController)),
             ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.addProblem)),
 
