@@ -9,6 +9,46 @@ import { Testcase } from "@/entities/Testcase";
 import { User } from "../entities/User";
 import { Repository } from "typeorm";
 
+export type ApiResponse<T> = {
+  message: string;
+  status: number;
+  data?: T;
+  error?: string;
+}
+
+export type CreateNewUserRequest = {
+  handle: string;
+  email: string;
+  password: string;
+}
+
+export type GetUserIdFromTokenResponse = {
+  id: number;
+}
+
+export type GetUserRoleFromTokenResponse = {
+  role: string;
+} 
+
+export type UpdateUserRequest = {
+  handle?: string;
+  email?: string;
+  password?: string;
+  bio?: string;
+  avatar_image?: string;
+  country?: string;
+}
+
+export type LoginRequest = {
+  email: string;
+  handle: string;
+  password: string;
+}
+
+export type LoginResponse = {
+  token: string;
+}
+
 export type GetAllContestsResponseEntry = {
   id: number;
   title: string;

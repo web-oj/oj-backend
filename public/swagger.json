@@ -7,6 +7,118 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"ApiResponse_null_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"type": "number",
+						"enum": [
+							null
+						],
+						"nullable": true
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"CreateNewUserRequest": {
+				"properties": {
+					"password": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"handle": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"password",
+					"email",
+					"handle"
+				],
+				"type": "object"
+			},
+			"GetUserIdFromTokenResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"id"
+				],
+				"type": "object"
+			},
+			"ApiResponse_GetUserIdFromTokenResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetUserIdFromTokenResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetUserRoleFromTokenResponse": {
+				"properties": {
+					"role": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"role"
+				],
+				"type": "object"
+			},
+			"ApiResponse_GetUserRoleFromTokenResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetUserRoleFromTokenResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
 			"Role": {
 				"enum": [
 					"ADMIN",
@@ -533,6 +645,113 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ApiResponse_User-or-null_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/User"
+							}
+						],
+						"nullable": true
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"UpdateUserRequest": {
+				"properties": {
+					"country": {
+						"type": "string"
+					},
+					"avatar_image": {
+						"type": "string"
+					},
+					"bio": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"handle": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"LoginResponse": {
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token"
+				],
+				"type": "object"
+			},
+			"ApiResponse_LoginResponse-or-null_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LoginResponse"
+							}
+						],
+						"nullable": true
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"LoginRequest": {
+				"properties": {
+					"password": {
+						"type": "string"
+					},
+					"handle": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"password",
+					"handle",
+					"email"
+				],
+				"type": "object"
+			},
 			"ProblemRequestBody": {
 				"properties": {
 					"isPublished": {
@@ -757,32 +976,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"message": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"message"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"message": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -798,23 +992,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"email": {
-										"type": "string"
-									},
-									"password": {
-										"type": "string"
-									},
-									"handle": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"email",
-									"password",
-									"handle"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/CreateNewUserRequest"
 							}
 						}
 					}
@@ -828,15 +1006,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -861,23 +1031,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"email": {
-										"type": "string"
-									},
-									"password": {
-										"type": "string"
-									},
-									"handle": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"email",
-									"password",
-									"handle"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/UpdateUserRequest"
 							}
 						}
 					}
@@ -893,30 +1047,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"id": {}
-											},
-											"required": [
-												"id"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"id": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_GetUserIdFromTokenResponse_"
 								}
 							}
 						}
@@ -953,30 +1084,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"error": {},
-												"role": {}
-											},
-											"required": [
-												"role"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"role": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_GetUserRoleFromTokenResponse_"
 								}
 							}
 						}
@@ -1004,7 +1112,7 @@
 				]
 			}
 		},
-		"/user/id/{id}": {
+		"/user/{id}": {
 			"get": {
 				"operationId": "GetUserById",
 				"responses": {
@@ -1013,12 +1121,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/User"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/ApiResponse_User-or-null_"
 								}
 							}
 						}
@@ -1045,28 +1148,6 @@
 						}
 					}
 				]
-			},
-			"delete": {
-				"operationId": "DeleteUser",
-				"responses": {
-					"204": {
-						"description": "No content"
-					}
-				},
-				"tags": [
-					"User"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
 			}
 		},
 		"/user/handle/{handle}": {
@@ -1078,12 +1159,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/User"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/ApiResponse_User-or-null_"
 								}
 							}
 						}
@@ -1105,6 +1181,38 @@
 				]
 			}
 		},
+		"/user/id/{id}": {
+			"delete": {
+				"operationId": "DeleteUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_null_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/user/admin/{id}": {
 			"patch": {
 				"operationId": "AddAdmin",
@@ -1113,7 +1221,9 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_null_"
+								}
 							}
 						}
 					}
@@ -1150,37 +1260,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"properties": {
-												"token": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
-												"error": {},
-												"token": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"token"
-											],
-											"type": "object"
-										}
-									]
+									"$ref": "#/components/schemas/ApiResponse_LoginResponse-or-null_"
 								}
 							}
 						}
 					}
 				},
+				"tags": [
+					"User"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1188,21 +1276,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"handle": {
-										"type": "string"
-									},
-									"password": {
-										"type": "string"
-									},
-									"email": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"password"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/LoginRequest"
 							}
 						}
 					}
