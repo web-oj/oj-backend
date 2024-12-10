@@ -113,6 +113,12 @@ export class SubmissionService implements ISubmissionService {
   async getSubmissionById(submissionId: number, options?: {
     withResult: boolean;
   }): Promise<Submission | null> {
+    console.log(options?.withResult);
+    const submission = await this.submissionRepo.findOne({
+      where: { id: submissionId },
+      relations: options?.withResult ? ['result'] : [],
+    });
+    console.log(submission);
     return this.submissionRepo.findOne({
       where: { id: submissionId },
       relations: options?.withResult ? ['result'] : [],

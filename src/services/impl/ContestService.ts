@@ -13,6 +13,7 @@ import {
 } from "../../repositories/ProblemInContestRepo";
 import { ProblemInContest } from "../../entities/ProblemInContest";
 import { CreateContestInput, IContestParticipationRepository, IContestRepository, IProblemInContestRepository, IUserRepository } from "@/types/types";
+import { Problem } from "@/entities/Problem";
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;
@@ -125,7 +126,7 @@ export class ContestService implements IContestService {
   async getAllContests(
     limit?: number,
     offset?: number,
-  ): Promise<Contest[] | null> {
+  ): Promise<Contest[]> {
     return this.contestRepo.find({
       skip: offset,
       take: limit,
@@ -164,7 +165,7 @@ export class ContestService implements IContestService {
     id: number,
     limit?: number,
     offset?: number,
-  ): Promise<ContestParticipation[] | null> {
+  ): Promise<ContestParticipation[]> {
     return this.contestParticipationRepo.find({
       where: {
         contestId: id,
@@ -177,11 +178,17 @@ export class ContestService implements IContestService {
     });
   }
 
-  async getProblemIncontest(
+  async getProblemsInContest(
     contestId: number,
-    problemId: number,
-  ): Promise<ProblemInContest | null> {
-    return this.problemInContestRepo.findOneBy({ contestId, problemId });
+  ): Promise<Problem[]> {
+    const problemInContest = await this.problemInContestRepo.findBy({
+      contestId,
+    });
+    const problems: Problem[] = [];
+    for (const pic of problemInContest) {
+      problems.push(pic.problem);
+    }
+    return problems;
   }
 
   async getProblemList(contestId: number): Promise<ProblemInContest[]> {
@@ -203,7 +210,7 @@ export class ContestService implements IContestService {
     endTimeHigh?: number,
     limit?: number,
     offset?: number,
-  ): Promise<Contest[] | null> {
+  ): Promise<Contest[]> {
     if (searchKeyword !== undefined) {
       return this.contestRepo
         .createQueryBuilder()

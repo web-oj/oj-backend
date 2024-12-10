@@ -62,22 +62,17 @@ export type GetProblemsResponseEntry = {
   score: number;
 };
 
-export type ContestResponse = {
-  message?: string;
-  error?: string;
-  payload?:
-    | Contest
-    | Contest[]
-    | GetAllContestsResponseEntry[]
-    | ContestParticipation
-    | ContestParticipation[]
-    | GetProblemsResponseEntry[]
-    | null;
-};
+export type GetAllContestsResponse = Contest[];
+
+export type GetContestResponse = Contest;
 
 export type GetProblemResponse = Problem;
 
 export type GetAllProblemsResponse = Problem[];
+
+export type GetContestRankingResponse = ContestParticipation[];
+
+export type GetContestProblemResponse = Problem[];
 
 export type NewProblemRequest = {
   title: string;
@@ -177,3 +172,18 @@ export type CreateUserInput = {
   email: string;
   password: string;
 }; 
+
+export type DeleteProblemInContestRequest = {
+  problemId: number;
+}
+
+export type UpdateContestRequest = {
+  title?: string;
+  description?: string;
+  ruleText?: string;
+  startTime?: number;
+  endTime?: number;
+  scoringRule?: string;
+  isPlagiarismCheckEnabled?: boolean;
+  isPublished?: boolean;
+}

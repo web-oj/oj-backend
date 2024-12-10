@@ -2,6 +2,7 @@ import { Contest } from "../entities/Contest";
 import { ContestParticipation } from "@/entities/ContestParticipation";
 import { ProblemInContest } from "@/entities/ProblemInContest";
 import { CreateContestInput } from "../types/types";
+import { Problem } from "@/entities/Problem";
 
 export interface IContestService {
   addContestParticipation(
@@ -42,9 +43,9 @@ export interface IContestService {
     endTimeHigh?: number,
     limit?: number,
     offset?: number,
-  ): Promise<Contest[] | null>;
+  ): Promise<Contest[]>;
 
-  getAllContests(limit?: number, offset?: number): Promise<Contest[] | null>;
+  getAllContests(limit?: number, offset?: number): Promise<Contest[]>;
 
   getContest(id: number, options?: {
     loadProblems?: boolean;
@@ -60,12 +61,11 @@ export interface IContestService {
     contestId: number,
     limit?: number,
     offset?: number,
-  ): Promise<ContestParticipation[] | null>;
+  ): Promise<ContestParticipation[]>;
 
-  getProblemIncontest(
+  getProblemsInContest(
     contestId: number,
-    problemId: number,
-  ): Promise<ProblemInContest | null>;
+  ): Promise<Problem[]>;
 
   getProblemList(contestId: number): Promise<ProblemInContest[]>;
 

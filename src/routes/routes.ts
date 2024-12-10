@@ -264,19 +264,54 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetAllProblemsResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetAllContestsResponseEntry": {
+    "GetAllContestsResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"endTime":{"dataType":"double","required":true},"startTime":{"dataType":"double","required":true},"title":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetProblemsResponseEntry": {
+    "ApiResponse_GetAllContestsResponse_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"score":{"dataType":"double","required":true},"title":{"dataType":"string","required":true},"id":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetAllContestsResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ContestResponse": {
+    "GetContestResponse": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"payload":{"dataType":"union","subSchemas":[{"ref":"Contest"},{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetAllContestsResponseEntry"}},{"ref":"ContestParticipation"},{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"}},{"dataType":"array","array":{"dataType":"refAlias","ref":"GetProblemsResponseEntry"}},{"dataType":"enum","enums":[null]}]},"error":{"dataType":"string"},"message":{"dataType":"string"}},"validators":{}},
+        "type": {"ref":"Contest","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_GetContestResponse_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetContestResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetContestRankingResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_GetContestRankingResponse_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetContestRankingResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetContestProblemResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"array","array":{"dataType":"refObject","ref":"Problem"},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_GetContestProblemResponse_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"ref":"GetContestProblemResponse"},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DeleteProblemInContestRequest": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"problemId":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateContestRequest": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isPublished":{"dataType":"boolean"},"isPlagiarismCheckEnabled":{"dataType":"boolean"},"scoringRule":{"dataType":"string"},"endTime":{"dataType":"double"},"startTime":{"dataType":"double"},"ruleText":{"dataType":"string"},"description":{"dataType":"string"},"title":{"dataType":"string"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
@@ -1175,7 +1210,7 @@ export function RegisterRoutes(app: Router) {
             async function ContestController_deleteProblem(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     id: {"in":"path","name":"id","required":true,"dataType":"double"},
-                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"problemId":{"dataType":"double","required":true}}},
+                    body: {"in":"body","name":"body","required":true,"ref":"DeleteProblemInContestRequest"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1207,7 +1242,8 @@ export function RegisterRoutes(app: Router) {
             async function ContestController_editContest(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     id: {"in":"path","name":"id","required":true,"dataType":"double"},
-                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"organizerId":{"dataType":"double"},"isPublished":{"dataType":"boolean"},"isPlagiarismCheckEnabled":{"dataType":"boolean"},"scoringRule":{"dataType":"string"},"endTime":{"dataType":"double"},"startTime":{"dataType":"double"},"ruleText":{"dataType":"string"},"description":{"dataType":"string"},"title":{"dataType":"string"}}},
+                    body: {"in":"body","name":"body","required":true,"ref":"UpdateContestRequest"},
+                    token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

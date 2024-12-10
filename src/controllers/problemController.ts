@@ -168,6 +168,7 @@ export class ProblemController extends Controller {
           error: "Problem not found.",
         };
       } else {
+        this.setStatus(200);
         return {
           message: "Problem retrieved successfully.",
           status: 200,
@@ -197,6 +198,7 @@ export class ProblemController extends Controller {
           error: "Problem not found.",
         };
       } else {
+        this.setStatus(200);
         return {
           message: "Problem retrieved successfully.",
           status: 200,
@@ -303,7 +305,12 @@ export class ProblemController extends Controller {
         data: problems,
       };
     } catch (err) {
-      throw new Error(`Error searching problem: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Searching not successful",
+        status: 400,
+        error: `Error searching problem: ${err}`,
+      };
     }
   }
 }

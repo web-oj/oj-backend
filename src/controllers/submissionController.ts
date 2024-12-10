@@ -122,7 +122,9 @@ export class SubmissionController extends Controller {
           error: "Submission not found",
         }
       }
-      return submission;
+      return {
+        data: submission,
+      };
     } catch (err) {
       const error = `Error getting submission: ${err}`;
       this.setStatus(400);

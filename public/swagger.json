@@ -881,8 +881,138 @@
 				],
 				"type": "object"
 			},
-			"GetAllContestsResponseEntry": {
+			"GetAllContestsResponse": {
+				"items": {
+					"$ref": "#/components/schemas/Contest"
+				},
+				"type": "array"
+			},
+			"ApiResponse_GetAllContestsResponse_": {
 				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetAllContestsResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetContestResponse": {
+				"$ref": "#/components/schemas/Contest"
+			},
+			"ApiResponse_GetContestResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetContestResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetContestRankingResponse": {
+				"items": {
+					"$ref": "#/components/schemas/ContestParticipation"
+				},
+				"type": "array"
+			},
+			"ApiResponse_GetContestRankingResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetContestRankingResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"GetContestProblemResponse": {
+				"items": {
+					"$ref": "#/components/schemas/Problem"
+				},
+				"type": "array"
+			},
+			"ApiResponse_GetContestProblemResponse_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/GetContestProblemResponse"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
+			"DeleteProblemInContestRequest": {
+				"properties": {
+					"problemId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"problemId"
+				],
+				"type": "object"
+			},
+			"UpdateContestRequest": {
+				"properties": {
+					"isPublished": {
+						"type": "boolean"
+					},
+					"isPlagiarismCheckEnabled": {
+						"type": "boolean"
+					},
+					"scoringRule": {
+						"type": "string"
+					},
 					"endTime": {
 						"type": "number",
 						"format": "double"
@@ -891,84 +1021,13 @@
 						"type": "number",
 						"format": "double"
 					},
-					"title": {
+					"ruleText": {
 						"type": "string"
 					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"endTime",
-					"startTime",
-					"title",
-					"id"
-				],
-				"type": "object"
-			},
-			"GetProblemsResponseEntry": {
-				"properties": {
-					"score": {
-						"type": "number",
-						"format": "double"
+					"description": {
+						"type": "string"
 					},
 					"title": {
-						"type": "string"
-					},
-					"id": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"score",
-					"title",
-					"id"
-				],
-				"type": "object"
-			},
-			"ContestResponse": {
-				"properties": {
-					"payload": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Contest"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/Contest"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/GetAllContestsResponseEntry"
-								},
-								"type": "array"
-							},
-							{
-								"$ref": "#/components/schemas/ContestParticipation"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/ContestParticipation"
-								},
-								"type": "array"
-							},
-							{
-								"items": {
-									"$ref": "#/components/schemas/GetProblemsResponseEntry"
-								},
-								"type": "array"
-							}
-						],
-						"nullable": true
-					},
-					"error": {
-						"type": "string"
-					},
-					"message": {
 						"type": "string"
 					}
 				},
@@ -1955,7 +2014,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetAllContestsResponse_"
 								}
 							}
 						}
@@ -1994,7 +2053,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2071,7 +2130,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetContestResponse_"
 								}
 							}
 						}
@@ -2101,7 +2160,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2137,7 +2196,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2162,6 +2221,14 @@
 							"format": "double",
 							"type": "number"
 						}
+					},
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"requestBody": {
@@ -2169,39 +2236,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"organizerId": {
-										"type": "number",
-										"format": "double"
-									},
-									"isPublished": {
-										"type": "boolean"
-									},
-									"isPlagiarismCheckEnabled": {
-										"type": "boolean"
-									},
-									"scoringRule": {
-										"type": "string"
-									},
-									"endTime": {
-										"type": "number",
-										"format": "double"
-									},
-									"startTime": {
-										"type": "number",
-										"format": "double"
-									},
-									"ruleText": {
-										"type": "string"
-									},
-									"description": {
-										"type": "string"
-									},
-									"title": {
-										"type": "string"
-									}
-								},
-								"type": "object"
+								"$ref": "#/components/schemas/UpdateContestRequest"
 							}
 						}
 					}
@@ -2217,7 +2252,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetAllContestsResponse_"
 								}
 							}
 						}
@@ -2302,7 +2337,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetContestRankingResponse_"
 								}
 							}
 						}
@@ -2352,7 +2387,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_GetContestProblemResponse_"
 								}
 							}
 						}
@@ -2382,7 +2417,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2414,16 +2449,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"problemId": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"required": [
-									"problemId"
-								],
-								"type": "object"
+								"$ref": "#/components/schemas/DeleteProblemInContestRequest"
 							}
 						}
 					}
@@ -2437,7 +2463,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2496,7 +2522,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2557,7 +2583,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}
@@ -2619,7 +2645,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ContestResponse"
+									"$ref": "#/components/schemas/ApiResponse_null_"
 								}
 							}
 						}

@@ -21,6 +21,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Patch,
   Path,
   Post,
@@ -37,7 +38,8 @@ import { UserService } from "../services/impl/UserService";
 import { ContestService } from "../services/impl/ContestService";
 import { IProblemService } from "../services/IProblemService";
 import { ProblemService } from "../services/impl/ProblemService";
-import { ContestResponse, GetAllContestsResponseEntry, GetProblemsResponseEntry, Role } from "../types/types";
+import { ApiResponse, DeleteProblemInContestRequest, GetAllContestsResponse, GetAllContestsResponseEntry, GetContestProblemResponse, GetContestRankingResponse, GetContestResponse, GetProblemsResponseEntry, Role, UpdateContestRequest } from "../types/types";
+import { decodeJWT } from "@/middleware/authentication";
 
 @Route("contest")
 export class ContestController extends Controller {
@@ -57,51 +59,55 @@ export class ContestController extends Controller {
   public async getAllContests(
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<GetAllContestsResponse>> {
     try {
       const allContests = await this.contestService.getAllContests(
         limit,
         offset,
       );
-      let response: GetAllContestsResponseEntry[] = [];
-      if (allContests !== null) {
-        for (let contest of allContests) {
-          response.push({
-            id: contest.id,
-            title: contest.title,
-            startTime: contest.startTime,
-            endTime: contest.endTime,
-          });
-        }
-      }
       this.setStatus(200);
       return {
-        message: "OK",
-        payload: response,
+        message: "Contests fetched successfully",
+        status: 200,
+        data: allContests,
       };
     } catch (err) {
-      throw new Error(`Error getting contest: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error fetching contests ${err}`,
+        status: 400,
+        message: "Contests not fetched.",
+      };
     }
   }
 
   @Get("{id}")
   @Tags("Contest")
-  public async getContestById(@Path() id: number): Promise<ContestResponse> {
+  public async getContestById(@Path() id: number): Promise<ApiResponse<GetContestResponse>> {
     try {
-      let res = await this.contestService.getContest(id);
-      if (!res) {
+      const contest = await this.contestService.getContest(id);
+      if (!contest) {
         this.setStatus(404);
         return {
           error: "Contest not found",
+          status: 404,
+          message: "Contest not found.",
+        };
+      } else {
+        this.setStatus(200);
+        return {
+          message: "OK",
+          status: 200,
+          data: contest,
         };
       }
-      this.setStatus(200);
-      return {
-        message: "OK",
-        payload: res,
-      };
     } catch (err) {
-      throw new Error(`Error getting contest: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error getting contest: ${err}`,
+        status: 400,
+        message: "Contest not found.",
+      };
     }
   }
 
@@ -115,7 +121,7 @@ export class ContestController extends Controller {
     @Query() endTimeHigh?: number,
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<GetAllContestsResponse>> {
     try {
       if (startTimeLow === undefined) {
         startTimeLow = 0;
@@ -139,24 +145,19 @@ export class ContestController extends Controller {
         limit,
         offset,
       );
-      let response: GetAllContestsResponseEntry[] = [];
-      if (contests !== null) {
-        for (let contest of contests) {
-          response.push({
-            id: contest.id,
-            title: contest.title,
-            startTime: contest.startTime,
-            endTime: contest.endTime,
-          });
-        }
-      }
       this.setStatus(200);
       return {
         message: "OK",
-        payload: response,
+        status: 200,
+        data: contests,
       };
     } catch (err) {
-      throw new Error(`Error searching contest: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error searching contests ${err}`,
+        status: 400,
+        message: "Contests not found.",
+      }
     }
   }
 
@@ -166,13 +167,14 @@ export class ContestController extends Controller {
     @Path() id: number,
     @Query() limit?: number,
     @Query() offset?: number,
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<GetContestRankingResponse>> {
     try {
-      let res = await this.contestService.getContestRanking(id, limit, offset);
+      let ranking = await this.contestService.getContestRanking(id, limit, offset);
       this.setStatus(200);
       return {
         message: "OK",
-        payload: res,
+        status: 200,
+        data: ranking,
       };
     } catch (err) {
       throw new Error(`Error getting contest ranking: ${err}`);
@@ -183,47 +185,43 @@ export class ContestController extends Controller {
   @Tags("Contest")
   public async getContestProblems(
     @Path() id: number,
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<GetContestProblemResponse>> {
     try {
-      let problemList = await this.contestService.getProblemList(id);
-      let res: GetProblemsResponseEntry[] = [];
-      for (let problemInContest of problemList) {
-        let problemDetails = await this.problemService.getProblemById(
-          problemInContest.problemId,
-        );
-        if (!problemDetails) {
-          throw new Error("Error getting contest problem list");
-        }
-        res.push({
-          id: problemInContest.problemId,
-          title: problemDetails.title,
-          score: problemInContest.score,
-        });
-      };
+      const problem = await this.contestService.getProblemsInContest(id);
       this.setStatus(200);
       return {
         message: "OK",
-
-        payload: res,
+        status: 200,
+        data: problem,
       };
     } catch (err) {
-      throw new Error(`Error getting contest ranking: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error getting contest problems ${err}`,
+        status: 400,
+        message: "Problems not found.",
+      }
     }
   }
 
   @Delete("{id}")
   @Tags("Contest")
   @Security("jwt", [Role.User])
-  public async deleteContest(@Path() id: number): Promise<ContestResponse> {
+  public async deleteContest(@Path() id: number): Promise<ApiResponse<null>> {
     try {
-      let res = await this.contestService.softDeleteContest(id);
+      await this.contestService.softDeleteContest(id);
       this.setStatus(200);
       return {
-        message: "OK",
-
+        message: "Deleted contest successfully",
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error deleting contest: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error deleting contest ${err}`,
+        status: 400,
+        message: "Contest not deleted.",
+      }
     }
   }
 
@@ -232,17 +230,22 @@ export class ContestController extends Controller {
   @Security("jwt", [Role.User])
   public async deleteProblem(
     @Path() id: number,
-    @Body() body: { problemId: number },
-  ): Promise<ContestResponse> {
+    @Body() body: DeleteProblemInContestRequest,
+  ): Promise<ApiResponse<null>> {
     try {
-      let res = await this.contestService.softDeleteProblem(id, body.problemId);
+      await this.contestService.softDeleteProblem(id, body.problemId);
       this.setStatus(200);
       return {
-        message: "OK",
-
+        message: "Deleted problem successfully",
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error deleting problem: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error deleting problem ${err}`,
+        status: 400,
+        message: "Problem not deleted.",
+      }
     }
   }
 
@@ -251,31 +254,29 @@ export class ContestController extends Controller {
   @Security("jwt", [Role.User])
   public async editContest(
     @Path() id: number,
-    @Body()
-    body: {
-      title?: string;
-      description?: string;
-      ruleText?: string;
-      startTime?: number;
-      endTime?: number;
-      scoringRule?: string;
-      isPlagiarismCheckEnabled?: boolean;
-      isPublished?: boolean;
-      organizerId?: number;
-    },
-  ): Promise<ContestResponse> {
+    @Body() body: UpdateContestRequest,
+    @Header('x-access-token') token: string,
+  ): Promise<ApiResponse<null>> {
     try {
-      let organizer: User | undefined = undefined;
-      if (body.organizerId !== undefined) {
-        let res = await this.userService.getUserById(body.organizerId);
-        this.setStatus(404);
-        if (!res) {
-          return {
-            message: "The new creator of the contest cannot be found",
+      const decoded = await decodeJWT(token);
+      const contest = await this.contestService.getContest(id);
 
-          };
-        }
-        organizer = res;
+      if (!contest) {
+        this.setStatus(404);
+        return {
+          error: "Contest not found",
+          status: 404,
+          message: "Contest not found.",
+        };
+      }
+
+      if (contest.organizer.id !== decoded.id) {
+        this.setStatus(403);
+        return {
+          error: "Forbidden",
+          status: 403,
+          message: "You are not the organizer of this contest.",
+        };
       }
 
       let res = await this.contestService.editContest(id, {
@@ -290,12 +291,16 @@ export class ContestController extends Controller {
       });
       this.setStatus(200);
       return {
-        message: "OK",
-
-        payload: res,
+        message: "Contest edited successfully",
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error editing contest: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error editing contest ${err}`,
+        status: 400,
+        message: "Contest not edited.",
+      };
     }
   }
 
@@ -309,44 +314,27 @@ export class ContestController extends Controller {
       userId: number;
       score: number;
     },
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<null>> {
     try {
-      let res: any;
-      res = await this.contestService.getContest(id);
-      this.setStatus(404);
-      if (!res) {
+      const contest = await this.contestService.getContest(id);
+      if (!contest) {
+        this.setStatus(404);
         return {
           message: "Contest not found",
-
+          status: 404,
         };
       }
 
-      res = await this.userService.getUserById(body.userId);
-      if (!res) {
+      const user = await this.userService.getUserById(body.userId);
+      if (!user) {
         this.setStatus(404);
         return {
           message: "User not found",
-
-          
-
+          status: 404,
         };
       }
 
-      res =
-        await this.contestService.getContestParticipationByContestIdAndUserId(
-          id,
-          body.userId,
-        );
-      if (!res) {
-        this.setStatus(403);
-        return {
-          message: "User have not registered",
-
-          payload: res,
-        };
-      }
-
-      res = await this.contestService.editUserScoreInContest(
+      await this.contestService.editUserScoreInContest(
         id,
         body.userId,
         body.score,
@@ -354,12 +342,16 @@ export class ContestController extends Controller {
 
       this.setStatus(200);
       return {
-        message: "OK",
-
-        payload: res,
+        message: "User score edited successfully",
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error editing user score: ${err}`);
+      this.setStatus(400);
+      return {
+        error: `Error editing user score ${err}`,
+        status: 400,
+        message: "User score not edited.",
+      };
     }
   }
 
@@ -373,38 +365,27 @@ export class ContestController extends Controller {
       problemId: number;
       score?: number;
     },
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<null>> {
     try {
-      let res: any;
-      res = await this.contestService.getContest(id);
+      const contest = await this.contestService.getContest(id);
       this.setStatus(404);
-      if (!res) {
+      if (!contest) {
         return {
           message: "Contest not found",
-
+          status: 404,
         };
       }
 
-      res = await this.problemService.getProblemById(body.problemId);
-      if (!res) {
+      const problem = await this.problemService.getProblemById(body.problemId);
+      if (!problem) {
         this.setStatus(404);
         return {
           message: "Problem not found",
-
-
+          status: 404,
         };
       }
 
-      res = await this.contestService.getProblemIncontest(id, body.problemId);
-      if (!res) {
-        this.setStatus(403);
-        return {
-          message: "User have not registered",
-          payload: res,
-        };
-      }
-
-      res = await this.contestService.editProblemScore(
+      await this.contestService.editProblemScore(
         id,
         body.problemId,
         body.score,
@@ -413,10 +394,15 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "OK",
-        payload: res,
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error editing problem: ${err}`);
+      this.setStatus(400);
+      return {
+        status: 400,
+        error: `Error editing problem ${err}`,
+        message: "Problem not edited.",
+      }
     }
   }
 
@@ -436,7 +422,7 @@ export class ContestController extends Controller {
       isPublished?: boolean;
       organizerId: number;
     },
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<null>> {
     const {
       title,
       description,
@@ -450,17 +436,17 @@ export class ContestController extends Controller {
     } = body;
 
     try {
-      let res: any;
-
-      res = await this.userService.getUserById(organizerId);
-      if (!res) {
+      const user = await this.userService.getUserById(organizerId);
+      if (!user) {
         this.setStatus(400);
         return {
           message: "The creator of the contest cannot be found",
+          status: 400,
+          error: "User not found",
         };
       }
 
-      res = await this.contestService.createContest({
+      await this.contestService.createContest({
         title,
         description,
         ruleText,
@@ -474,10 +460,15 @@ export class ContestController extends Controller {
       this.setStatus(200);
       return {
         message: "Contest created successfully",
-        payload: res,
+        status: 200,
       };
     } catch (err) {
-      throw new Error(`Error creating contest: ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Contest not created",
+        status: 400,
+        error: `Error creating contest ${err}`,
+      };
     }
   }
 
@@ -487,52 +478,41 @@ export class ContestController extends Controller {
   public async registerToContest(
     @Path() id: number,
     @Body() body: { userId: number },
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<null>> {
     const { userId } = body;
 
     try {
-      let res: any;
-
-      res = await this.contestService.getContest(id);
+      const res = await this.contestService.getContest(id);
       if (!res) {
         this.setStatus(404);
         return {
           message: "Contest not found",
+          status: 404,
         };
       }
 
-      res = await this.userService.getUserById(userId);
-      if (!res) {
+      const user = await this.userService.getUserById(userId);
+      if (!user) {
         this.setStatus(404);
         return {
           message: "User not found",
-
+          status: 404,
         };
       }
 
-      res =
-        await this.contestService.getContestParticipationByContestIdAndUserId(
-          id,
-          userId,
-        );
-      if (res) {
-        this.setStatus(403);
-        return {
-          message: "User already registered",
-
-          payload: res,
-        };
-      }
-
-      res = await this.contestService.addContestParticipation(id, userId);
+      await this.contestService.addContestParticipation(id, userId);
       this.setStatus(201);
       return {
         message: "Registered successfully",
-
-        payload: res,
+        status: 201,
       };
     } catch (err) {
-      throw new Error(`Error registering user to contest ${err}`);
+      this.setStatus(400);
+      return {
+        message: "Registration failed",
+        status: 400,
+        error: `Error registering to contest ${err}`,
+      };
     }
   }
 
@@ -542,43 +522,23 @@ export class ContestController extends Controller {
   public async addProblem(
     @Path() id: number,
     @Body() body: { problemId: number; score?: number },
-  ): Promise<ContestResponse> {
+  ): Promise<ApiResponse<null>> {
     const { problemId, score } = body;
 
     try {
-      let res: any;
-
-      res = await this.contestService.getContest(id);
-      if (!res) {
-        this.setStatus(400);
-        return {
-          error: "Contest not found",
-        };
-      }
-
-      res = await this.problemService.getProblemById(problemId);
-      if (!res) {
-        this.setStatus(400);
-        return {
-          error: "Problem not found",
-        };
-      }
-
-      res = await this.contestService.getProblemIncontest(problemId, id);
-      if (res) {
-        this.setStatus(400);
-        return {
-          error: "Problem already added to contest",
-        };
-      }
-
-      res = await this.contestService.addProblem(id, problemId, score);
+      await this.contestService.addProblem(id, problemId, score);
       this.setStatus(200);
       return {
+        status: 200,
         message: "Problem added to contest successfully",
       };
     } catch (err) {
-      throw new Error(`Error adding problem to contest ${err}`);
+      this.setStatus(400);
+      return {
+        status: 400,
+        message: "Problem not added to contest",
+        error: `Error adding problem to contest ${err}`,
+      };
     }
   }
 
