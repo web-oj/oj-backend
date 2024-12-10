@@ -222,7 +222,7 @@ export class ProblemController extends Controller {
     @Query() offset?: number,
   ): Promise<ApiResponse<GetAllProblemsResponse>> {
     try {
-      let allProblem = await this.problemService.getAllProblems(limit, offset, false);
+      let allProblem = await this.problemService.getAllProblems(limit, offset, true);
       this.setStatus(200);
       return {
         status: 200,

@@ -70,7 +70,7 @@ export class ProblemService implements IProblemService {
     updatedData: Partial<Problem>,
   ): Promise<Problem | null> {
     await this.problemRepo.update(id, updatedData);
-    return this.problemRepo.findOneBy({ id });
+    return this.problemRepo.getProblem({ query: { id } });
   }
 
   async getAllProblems(
@@ -86,11 +86,27 @@ export class ProblemService implements IProblemService {
   }
 
   async getProblemById(id: number): Promise<Problem | null> {
-    return this.problemRepo.findOne({ where: { id }, relations: ["owner"] });
+    return this.problemRepo.getProblem({ 
+      query: { id }, 
+      relations: {
+        owner: true,
+        testcases: true,
+        submissions: true,
+        associatedContests: true,
+      } 
+    });
   }
 
   async getProblemByTitle(title: string): Promise<Problem | null> {
-    return this.problemRepo.findOneBy({ title });
+    return this.problemRepo.getProblem({ 
+      query: { title }, 
+      relations: {
+        owner: true,
+        testcases: true,
+        submissions: true,
+        associatedContests: true,
+      } 
+    });
   }
 
   async searchProblems(
@@ -129,7 +145,9 @@ export class ProblemService implements IProblemService {
   }
   
   async addTestcase(problemId: number, input: string, output: string) {
-    const problem = await this.problemRepo.findOneBy({ id: problemId });
+    const problem = await this.problemRepo.getProblem({
+      query: { id: problemId },
+    })
     if (!problem) {
       throw new Error("Problem not found");
     }

@@ -1,27 +1,18 @@
 import "reflect-metadata";
-import { Column, Entity, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
-import { BaseEntityWithoutId } from "./Base";
+import { Column, Entity, ManyToOne, JoinColumn, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntityWithTimestamps } from "./Base";
 import { Problem } from "./Problem";
 import { Contest } from "./Contest";
 
 @Entity("problem_in_contest")
-export class ProblemInContest extends BaseEntityWithoutId {
-  @Column({ nullable: false })
-  problemId: number;
+export class ProblemInContest extends BaseEntityWithTimestamps {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @PrimaryColumn()
-  contestId: number;
-
-  @ManyToOne(() => Problem, (problem) => problem.associatedContests, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "problemId" })
+  @ManyToOne(() => Problem, (problem) => problem.associatedContests)
   problem: Problem;
 
-  @ManyToOne(() => Contest, (contest) => contest.problemsInContest, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "contestId" })
+  @ManyToOne(() => Contest, (contest) => contest.problemsInContest)
   contest: Contest;
 
   @Column({ nullable: false, type: "int", default: 0 })

@@ -18,7 +18,7 @@ export class Submission extends BaseEntityWithTimestamps {
   @ManyToOne(() => Problem, (problem) => problem.submissions)
   problem: Problem;
 
-  @OneToMany(() => Contest, (contest) => contest.submissions)
+  @ManyToOne(() => Contest, (contest) => contest.submissions)
   contest: Contest;
 
   @Column({ type: "mediumtext", nullable: false })

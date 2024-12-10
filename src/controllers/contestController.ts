@@ -187,7 +187,7 @@ export class ContestController extends Controller {
     @Path() id: number,
   ): Promise<ApiResponse<GetContestProblemResponse>> {
     try {
-      const problem = await this.contestService.getProblemsInContest(id);
+      const problem = await this.contestService.getProblemList(id);
       this.setStatus(200);
       return {
         message: "OK",

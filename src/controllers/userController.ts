@@ -35,7 +35,7 @@ import { env } from "../config/config";
 import { UserService } from "../services/impl/UserService";
 import jwt from "jsonwebtoken";
 import { decodeJWT } from "@/middleware/authentication";
-import { ApiResponse, CreateNewUserRequest, GetUserIdFromTokenResponse, GetUserRoleFromTokenResponse, LoginRequest, LoginResponse, Role, TokenInfo, UpdateUserRequest } from "../types/types";
+import { ApiResponse, CreateNewUserRequest, GetUserIdFromTokenResponse, GetUserResponse, GetUserRoleFromTokenResponse, LoginRequest, LoginResponse, Role, TokenInfo, UpdateUserRequest } from "../types/types";
 import { signToken, signUserToken, validatePassword } from "@/utils/utils";
 
 @Route("user")
@@ -127,7 +127,7 @@ export class UserController extends Controller {
   @Get('{id}')
   @Tags("User")
   @Security("jwt", [Role.User])
-  public async getUserById(@Path() id: number): Promise<ApiResponse<User | null>> {
+  public async getUserById(@Path() id: number): Promise<ApiResponse<GetUserResponse>> {
     try {
       const user = await this.userService.getUserById(id);
       this.setStatus(200);
@@ -148,7 +148,7 @@ export class UserController extends Controller {
 
   @Get("handle/{handle}")
   @Tags("User")
-  public async getUserByHandle(@Path() handle: string): Promise<ApiResponse<User | null>> {
+  public async getUserByHandle(@Path() handle: string): Promise<ApiResponse<GetUserResponse>> {
     try {
       const user = await this.userService.getUserByHandle(handle);
       this.setStatus(200);
@@ -235,7 +235,7 @@ export class UserController extends Controller {
 
   @Post("login")
   @Tags("User")
-  public async login(@Body() body: LoginRequest): Promise<ApiResponse<LoginResponse | null>> {
+  public async login(@Body() body: LoginRequest): Promise<ApiResponse<LoginResponse>> {
     try {
       const { email, password, handle } = body;
       if (!email && !handle) {

@@ -65,9 +65,9 @@ export interface IContestService {
 
   getProblemsInContest(
     contestId: number,
-  ): Promise<Problem[]>;
+  ): Promise<ProblemInContest[]>;
 
-  getProblemList(contestId: number): Promise<ProblemInContest[]>;
+  getProblemList(contestId: number): Promise<Problem[]>;
 
   softDeleteContest(id: number): Promise<void>;
 

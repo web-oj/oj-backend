@@ -15,6 +15,9 @@ import { Testcase } from "./Testcase";
 
 @Entity("submission_result")
 export class SubmissionResult extends BaseEntityWithTimestamps {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @ManyToOne(() => Submission, (submission) => submission.result)
   submission: Submission;
 

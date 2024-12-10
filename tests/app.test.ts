@@ -4,6 +4,7 @@ import initApp from "../src/index";
 import { mysqlDataSource } from "../src/database/MysqlDataSource";
 import { env } from "../src/config/config";
 import { ApiResponse, LoginResponse } from "../src/types/types";
+import { SubmissionResult } from "../src/entities/SubmissionResult";
 
 describe("App Tests", () => {
     let server: Server;
@@ -142,5 +143,7 @@ describe("App Tests", () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("data");
+        const results = response.body.data.result as SubmissionResult[];
+        expect(results.length).toBeGreaterThan(0);
     });
 });

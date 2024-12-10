@@ -62,6 +62,8 @@ export type GetProblemsResponseEntry = {
   score: number;
 };
 
+export type GetUserResponse = Omit<User, 'password'> | null;
+
 export type GetAllContestsResponse = Contest[];
 
 export type GetContestResponse = Contest;
@@ -112,25 +114,71 @@ export type TokenInfo = {
   role: string;
 }
 
+export type ContestParticipationQueryOptions = {
+  query: {
+    contest?: Contest;
+    user?: User;
+  },
+  pagination?: {
+    limit?: number;
+    offset?: number;
+    sort?: {
+      field: keyof ContestParticipation;
+      order: 'ASC' | 'DESC';
+    }
+  }
+}
+
 export type IContestParticipationRepository =
   Repository<ContestParticipation> & {
-    // some specific methods for this repository
+    getContestParticipation(options: ContestParticipationQueryOptions): Promise<ContestParticipation | null>;
+
+    getContestParticipations(options: ContestParticipationQueryOptions): Promise<ContestParticipation[]>;
   };
 
+export type ContestQueryOptions = {
+  query: {
+    id?: number;
+    title?: string;
+  },
+  relations?: {
+    problemsInContest?: boolean;
+    participations?: boolean;
+    submissions?: boolean;
+    organizer?: boolean;
+  };
+}
 
 export type IContestRepository = Repository<Contest> & {
-  // some specific methods for this repository
+  getContest(options: ContestQueryOptions): Promise<Contest | null>;
 };
 
-export type IProblemInContestRepository =
-  Repository<ProblemInContest> & {
-    // some specific methods for this repository
-  };
+export type ProblemInContestQueryOptions = {
+  query: {
+    contest: Contest;
+    problem: Problem;
+  }
+}
 
-  export type IProblemRepository = Repository<Problem> & {
-    getProblem(id: number, options?: {
-        relations?: string[];
-    }): Promise<Problem | null>;
+export type IProblemInContestRepository = Repository<ProblemInContest> & {
+  getProblemInContest(options: ProblemInContestQueryOptions): Promise<ProblemInContest | null>;
+};
+
+export type ProblemQueryOptions = {
+  query: {
+    id?: number;
+    title?: string;
+  },
+  relations?: {
+    owner?: boolean;
+    submissions?: boolean;
+    testcases?: boolean;
+    associatedContests?: boolean;
+  };
+}
+
+export type IProblemRepository = Repository<Problem> & {
+  getProblem(options: ProblemQueryOptions): Promise<Problem | null>;
 }
 
 
@@ -146,8 +194,22 @@ export type ITestcaseRepository = Repository<Testcase> & {
 
 }
 
+export type UserQueryOptions = {
+  query: {
+    id?: number;
+    handle?: string;
+    email?: string;
+  };
+  relations?: {
+    problems?: boolean;
+    submissions?: boolean;
+    organizedContests?: boolean;
+    participatedContest?: boolean;
+  };
+};
+
 export type IUserRepository = Repository<User> & {
-  // some specific methods for this repository
+  getUser(options: UserQueryOptions): Promise<User | null>;
 };
 
 

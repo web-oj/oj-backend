@@ -43,55 +43,15 @@ export class SubmissionController extends Controller {
   ) {
     const { problemId, code, contestId } = body;
     const decoded = await decodeJWT(token);
-    const problem = await this.problemService.getProblemById(problemId);
-    if (!problem) {
-      const error = `Problem with ID ${problemId} not found`;
+    try {
+      const submissionId = await this.submissionService.submit(decoded.id, problemId, code, contestId);
+      return { submissionId, message: "Submission created successfully" };
+    } catch (err) {
+      const error = `Error creating submission: ${err}`;
       this.setStatus(400);
       return { error };
-    }
-    if (contestId) {
-      const contest = await this.contestService.getContest(contestId, {
-        loadProblems: true,
-      });  
-      if (!contest) {
-        const error = `Contest with ID ${contestId} not found`;
-        this.setStatus(400);
-        return { error };
-      }
-      const current = Date.now();
-      if (current < contest.startTime) {
-        const error = `Contest has not started yet`;
-        this.setStatus(400);
-        return { error };
-      }
-      if (current > contest.endTime) {
-        const error = `Contest has ended`;
-        this.setStatus(400);
-        return { error };
-      }
-      if (contest.problemsInContest.findIndex((p: ProblemInContest) => p.problemId === problemId) === -1) {
-        const error = `Problem with ID ${problemId} not associated with contest`;
-        this.setStatus(400);
-        return { error };
-      }
-      try {
-        const submissionId = await this.submissionService.submit(decoded.id, problem, code, contest);
-        return { submissionId, message: "Submission created successfully" };
-      } catch (err) {
-        const error = `Error creating submission: ${err}`;
-        this.setStatus(400);
-        return { error };
-      }  
-    } else {
-      try {
-        const submissionId = await this.submissionService.submit(decoded.id, problem, code);
-        return { submissionId, message: "Submission created successfully" };
-      } catch (err) {
-        const error = `Error creating submission: ${err}`;
-        this.setStatus(400);
-        return { error };
-      }
-    }
+    }  
+
   }
 
   @Post('/execute')

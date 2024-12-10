@@ -128,104 +128,6 @@
 				],
 				"type": "string"
 			},
-			"User": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"deletedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"handle": {
-						"type": "string"
-					},
-					"avatar_image": {
-						"type": "string"
-					},
-					"bio": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"role": {
-						"$ref": "#/components/schemas/Role"
-					},
-					"isBan": {
-						"type": "boolean"
-					},
-					"lastTimeChangeHandle": {
-						"type": "number",
-						"format": "double"
-					},
-					"lastTimeChangeImage": {
-						"type": "number",
-						"format": "double"
-					},
-					"country": {
-						"type": "string"
-					},
-					"problems": {
-						"items": {
-							"$ref": "#/components/schemas/Problem"
-						},
-						"type": "array"
-					},
-					"submissions": {
-						"items": {
-							"$ref": "#/components/schemas/Submission"
-						},
-						"type": "array"
-					},
-					"organizedContests": {
-						"items": {
-							"$ref": "#/components/schemas/Contest"
-						},
-						"type": "array"
-					},
-					"contestParticipations": {
-						"items": {
-							"$ref": "#/components/schemas/Contest"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"id",
-					"createdAt",
-					"updatedAt",
-					"deletedAt",
-					"handle",
-					"avatar_image",
-					"bio",
-					"email",
-					"password",
-					"role",
-					"isBan",
-					"lastTimeChangeHandle",
-					"lastTimeChangeImage",
-					"country",
-					"problems",
-					"submissions",
-					"organizedContests",
-					"contestParticipations"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Problem": {
 				"properties": {
 					"id": {
@@ -314,6 +216,104 @@
 					"testcases",
 					"isPublished",
 					"associatedContests"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"User": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"handle": {
+						"type": "string"
+					},
+					"avatar_image": {
+						"type": "string"
+					},
+					"bio": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"role": {
+						"$ref": "#/components/schemas/Role"
+					},
+					"isBan": {
+						"type": "boolean"
+					},
+					"lastTimeChangeHandle": {
+						"type": "number",
+						"format": "double"
+					},
+					"lastTimeChangeImage": {
+						"type": "number",
+						"format": "double"
+					},
+					"country": {
+						"type": "string"
+					},
+					"problems": {
+						"items": {
+							"$ref": "#/components/schemas/Problem"
+						},
+						"type": "array"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
+					},
+					"organizedContests": {
+						"items": {
+							"$ref": "#/components/schemas/Contest"
+						},
+						"type": "array"
+					},
+					"participatedContest": {
+						"items": {
+							"$ref": "#/components/schemas/ContestParticipation"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"handle",
+					"avatar_image",
+					"bio",
+					"email",
+					"password",
+					"role",
+					"isBan",
+					"lastTimeChangeHandle",
+					"lastTimeChangeImage",
+					"country",
+					"problems",
+					"submissions",
+					"organizedContests",
+					"participatedContest"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -407,6 +407,10 @@
 			},
 			"ContestParticipation": {
 				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time"
@@ -439,6 +443,7 @@
 					}
 				},
 				"required": [
+					"id",
 					"createdAt",
 					"updatedAt",
 					"deletedAt",
@@ -453,6 +458,10 @@
 			},
 			"ProblemInContest": {
 				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
 					"createdAt": {
 						"type": "string",
 						"format": "date-time"
@@ -464,14 +473,6 @@
 					"deletedAt": {
 						"type": "string",
 						"format": "date-time"
-					},
-					"problemId": {
-						"type": "number",
-						"format": "double"
-					},
-					"contestId": {
-						"type": "number",
-						"format": "double"
 					},
 					"problem": {
 						"$ref": "#/components/schemas/Problem"
@@ -485,11 +486,10 @@
 					}
 				},
 				"required": [
+					"id",
 					"createdAt",
 					"updatedAt",
 					"deletedAt",
-					"problemId",
-					"contestId",
 					"problem",
 					"contest",
 					"score"
@@ -561,6 +561,46 @@
 					"PYTHON"
 				]
 			},
+			"Testcase": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"problem": {
+						"$ref": "#/components/schemas/Problem"
+					},
+					"input": {
+						"type": "string"
+					},
+					"output": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"problem",
+					"input",
+					"output"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SubmissionResult": {
 				"properties": {
 					"id": {
@@ -601,11 +641,64 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Testcase": {
+			"Pick_User.Exclude_keyofUser.password__": {
 				"properties": {
 					"id": {
 						"type": "number",
 						"format": "double"
+					},
+					"handle": {
+						"type": "string"
+					},
+					"avatar_image": {
+						"type": "string"
+					},
+					"bio": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"role": {
+						"$ref": "#/components/schemas/Role"
+					},
+					"isBan": {
+						"type": "boolean"
+					},
+					"lastTimeChangeHandle": {
+						"type": "number",
+						"format": "double"
+					},
+					"lastTimeChangeImage": {
+						"type": "number",
+						"format": "double"
+					},
+					"country": {
+						"type": "string"
+					},
+					"problems": {
+						"items": {
+							"$ref": "#/components/schemas/Problem"
+						},
+						"type": "array"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
+					},
+					"organizedContests": {
+						"items": {
+							"$ref": "#/components/schemas/Contest"
+						},
+						"type": "array"
+					},
+					"participatedContest": {
+						"items": {
+							"$ref": "#/components/schemas/ContestParticipation"
+						},
+						"type": "array"
 					},
 					"createdAt": {
 						"type": "string",
@@ -618,45 +711,49 @@
 					"deletedAt": {
 						"type": "string",
 						"format": "date-time"
-					},
-					"problem": {
-						"$ref": "#/components/schemas/Problem"
-					},
-					"submissionResult": {
-						"$ref": "#/components/schemas/SubmissionResult"
-					},
-					"input": {
-						"type": "string"
-					},
-					"output": {
-						"type": "string"
 					}
 				},
 				"required": [
 					"id",
+					"handle",
+					"avatar_image",
+					"bio",
+					"email",
+					"role",
+					"isBan",
+					"lastTimeChangeHandle",
+					"lastTimeChangeImage",
+					"country",
+					"problems",
+					"submissions",
+					"organizedContests",
+					"participatedContest",
 					"createdAt",
 					"updatedAt",
-					"deletedAt",
-					"problem",
-					"submissionResult",
-					"input",
-					"output"
+					"deletedAt"
 				],
 				"type": "object",
-				"additionalProperties": false
+				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
-			"ApiResponse_User-or-null_": {
+			"Omit_User.password_": {
+				"$ref": "#/components/schemas/Pick_User.Exclude_keyofUser.password__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"GetUserResponse": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Omit_User.password_"
+					}
+				],
+				"nullable": true
+			},
+			"ApiResponse_GetUserResponse_": {
 				"properties": {
 					"error": {
 						"type": "string"
 					},
 					"data": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/User"
-							}
-						],
-						"nullable": true
+						"$ref": "#/components/schemas/GetUserResponse"
 					},
 					"status": {
 						"type": "number",
@@ -706,18 +803,13 @@
 				],
 				"type": "object"
 			},
-			"ApiResponse_LoginResponse-or-null_": {
+			"ApiResponse_LoginResponse_": {
 				"properties": {
 					"error": {
 						"type": "string"
 					},
 					"data": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/LoginResponse"
-							}
-						],
-						"nullable": true
+						"$ref": "#/components/schemas/LoginResponse"
 					},
 					"status": {
 						"type": "number",
@@ -1199,7 +1291,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_User-or-null_"
+									"$ref": "#/components/schemas/ApiResponse_GetUserResponse_"
 								}
 							}
 						}
@@ -1237,7 +1329,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_User-or-null_"
+									"$ref": "#/components/schemas/ApiResponse_GetUserResponse_"
 								}
 							}
 						}
@@ -1338,7 +1430,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_LoginResponse-or-null_"
+									"$ref": "#/components/schemas/ApiResponse_LoginResponse_"
 								}
 							}
 						}
@@ -1373,19 +1465,6 @@
 									"anyOf": [
 										{
 											"properties": {
-												"message": {},
-												"submissionId": {},
-												"error": {
-													"type": "string"
-												}
-											},
-											"required": [
-												"error"
-											],
-											"type": "object"
-										},
-										{
-											"properties": {
 												"error": {},
 												"message": {
 													"type": "string"
@@ -1395,6 +1474,19 @@
 											"required": [
 												"message",
 												"submissionId"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"message": {},
+												"submissionId": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
 											],
 											"type": "object"
 										}
@@ -1515,7 +1607,32 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"anyOf": [
+										{
+											"properties": {
+												"data": {},
+												"error": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"error"
+											],
+											"type": "object"
+										},
+										{
+											"properties": {
+												"error": {},
+												"data": {}
+											},
+											"required": [
+												"data"
+											],
+											"type": "object"
+										}
+									]
+								}
 							}
 						}
 					}

@@ -8,47 +8,70 @@ import axios from "axios";
 import { SubmissionResult } from "@/entities/SubmissionResult";
 import { Contest } from "@/entities/Contest";
 import { SubmissionResultRepository } from "@/repositories/SubmissionResultRepo";
-import { ISubmissionRepository, ISubmissionResultRepository, IUserRepository } from "../../types/types";
+import { IContestRepository, IProblemRepository, ISubmissionRepository, ISubmissionResultRepository, IUserRepository } from "../../types/types";
+import { ProblemRepository } from "@/repositories/ProblemRepo";
+import { ContestRepository } from "@/repositories/ContestRepo";
 
 export class SubmissionService implements ISubmissionService {
   private readonly userRepo: IUserRepository;
   private readonly submissionRepo: ISubmissionRepository;
   private readonly submissionResultRepo: ISubmissionResultRepository;
+  private readonly problemRepo: IProblemRepository;
+  private readonly contestRepo: IContestRepository;
 
   constructor() {
     this.userRepo = UserRepository;
     this.submissionRepo = SubmissionRepository;
     this.submissionResultRepo = SubmissionResultRepository;
+    this.problemRepo = ProblemRepository;
+    this.contestRepo = ContestRepository;
   }
 
-  async submit(userId: number, problem: Problem, code: string, contest?: Contest) {
+  async submit(userId: number, problemId: number, code: string, contestId?: number) {
     if (!userId || !code) {
       throw new Error('Missing required fields');
     }
-    if (problem.id === undefined) {
-      throw new Error('Problem ID is required');
+    const problem = await this.problemRepo.getProblem({
+      query: { id: problemId },
+      relations: { testcases: true },
+    });
+    if (!problem) {
+      throw new Error('Problem not found');
+    }
+    const user = await this.userRepo.getUser({
+      query: { id: userId },
+    });
+    if (!user) {
+      throw new Error('User not found');
     }
     if (code.length > 1000) {
       throw new Error('Code must be at most 1000 characters long');
     }
-    const user = await this.userRepo.findOneBy({ id: userId });
-    if (!user) {
-      throw new Error('User not found');
-    }
     const submission = new Submission();
+    if (contestId) {
+      const contest = await this.contestRepo.getContest({
+        query: { id: contestId },
+      })
+      if (!contest) {
+        throw new Error('Contest not found');
+      }
+      if (contest.startTime > Date.now()) {
+        throw new Error('Contest has not started yet');
+      }
+      if (contest.endTime < Date.now()) {
+        throw new Error('Contest has ended');
+      }
+      submission.contest = contest;
+    }
     submission.owner = user;
     submission.problem = problem;
     submission.code = code;
     submission.language = 'CPP';
+    submission.result = [];
     try {
       await this.userRepo.save(user);
       await this.submissionRepo.save(submission);
-      const now = Date.now();
-      if (contest && now >= contest.startTime && now <= contest.endTime && contest.scoringRule === "ACM") {
-        await this.executeSubmission(submission.id);
-      } else if (!contest) {
-        await this.executeSubmission(submission.id);
-      }
+      await this.executeSubmission(submission.id);
       return {
         submissionId: submission.id,
       }
@@ -113,15 +136,10 @@ export class SubmissionService implements ISubmissionService {
   async getSubmissionById(submissionId: number, options?: {
     withResult: boolean;
   }): Promise<Submission | null> {
-    console.log(options?.withResult);
-    const submission = await this.submissionRepo.findOne({
-      where: { id: submissionId },
-      relations: options?.withResult ? ['result'] : [],
-    });
-    console.log(submission);
     return this.submissionRepo.findOne({
       where: { id: submissionId },
       relations: options?.withResult ? ['result'] : [],
+      loadEagerRelations: true,
     })
   }
 }

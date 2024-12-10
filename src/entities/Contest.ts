@@ -3,11 +3,10 @@ import {
   Column,
   Entity,
   ManyToOne,
-  PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
   Index,
-  JoinTable,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { BaseEntityWithTimestamps } from "./Base";
 import { User } from "./User";

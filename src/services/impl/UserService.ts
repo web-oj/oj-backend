@@ -6,9 +6,11 @@ import { CreateUserInput, IUserRepository, Role } from "@/types/types";
 
 export class UserService implements IUserService {
   private readonly userRepo: IUserRepository;
+
   constructor() {
     this.userRepo = UserRepository;
   }
+
   async createUser(userInput: CreateUserInput): Promise<User> {
     if (!userInput.handle || !userInput.email || !userInput.password) {
       throw new Error('Missing required fields');
@@ -56,14 +58,44 @@ export class UserService implements IUserService {
   }
 
   async getUserById(id: number): Promise<User | null> {
-    return this.userRepo.findOneBy({ id });
+    return this.userRepo.getUser({
+      query: {
+        id,
+      },
+      relations: {
+        problems: true,
+        submissions: true,
+        organizedContests: true,
+        participatedContest: true,
+      },
+    })
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOneBy({ email });
+    return this.userRepo.getUser({
+      query: {
+        email,
+      },
+      relations: {
+        problems: true,
+        submissions: true,
+        organizedContests: true,
+        participatedContest: true,
+      },
+    });
   }
 
   async getUserByHandle(handle: string): Promise<User | null> {
-    return this.userRepo.findOneBy({ handle });
+    return this.userRepo.getUser({
+      query: {
+        handle,
+      },
+      relations: {
+        problems: true,
+        submissions: true,
+        organizedContests: true,
+        participatedContest: true,
+      },
+    });
   }
 }
