@@ -141,12 +141,7 @@ export type ContestQueryOptions = {
     id?: number;
     title?: string;
   },
-  relations?: {
-    problemsInContest?: boolean;
-    participations?: boolean;
-    submissions?: boolean;
-    organizer?: boolean;
-  };
+  relations?: Array<string>;
 }
 
 export type IContestRepository = Repository<Contest> & {
@@ -220,7 +215,6 @@ export type CreateContestInput = {
   startTime: number;
   endTime: number;
   scoringRule: string;
-  isPlagiarismCheckEnabled?: boolean;
   isPublished?: boolean;
   organizerId: number;
 };
@@ -246,6 +240,5 @@ export type UpdateContestRequest = {
   startTime?: number;
   endTime?: number;
   scoringRule?: string;
-  isPlagiarismCheckEnabled?: boolean;
   isPublished?: boolean;
 }

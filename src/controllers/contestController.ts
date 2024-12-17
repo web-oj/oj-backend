@@ -286,7 +286,6 @@ export class ContestController extends Controller {
         startTime: body.startTime,
         endTime: body.endTime,
         scoringRule: body.scoringRule,
-        isPlagiarismCheckEnabled: body.isPlagiarismCheckEnabled,
         isPublished: body.isPublished,
       });
       this.setStatus(200);
@@ -418,7 +417,6 @@ export class ContestController extends Controller {
       startTime: number;
       endTime: number;
       scoringRule: string;
-      isPlagiarismCheckEnabled?: boolean;
       isPublished?: boolean;
       organizerId: number;
     },
@@ -430,7 +428,6 @@ export class ContestController extends Controller {
       startTime,
       endTime,
       scoringRule,
-      isPlagiarismCheckEnabled,
       isPublished,
       organizerId,
     } = body;
@@ -453,7 +450,6 @@ export class ContestController extends Controller {
         startTime,
         endTime,
         scoringRule,
-        isPlagiarismCheckEnabled,
         isPublished,
         organizerId,
       });
@@ -542,15 +538,27 @@ export class ContestController extends Controller {
     }
   }
 
-  // @Get("{handle}")
-  // public async getContestByHandle(
-  //   @Path() handle: string,
-  // ): Promise<Contest | null> {
-  //   try {
-  //     const contest = await this.contestService.getContestByHandle(handle);
-  //     return contest;
-  //   } catch (err) {
-  //     throw new Error(`Error getting contest: ${err}`);
-  //   }
-  // }
+  @Post("{id}/moss")
+  @Tags("Contest")
+  @Security("jwt", [Role.User])
+  public async runMoss(
+    @Path() id: number,
+    @Header('x-access-token') _: string,
+  ): Promise<ApiResponse<null>> {
+    try {
+      await this.contestService.runMoss(id);
+      this.setStatus(200);
+      return {
+        message: "Moss run successfully",
+        status: 200,
+      };
+    } catch (err) {
+      this.setStatus(400);
+      return {
+        message: "Moss not run",
+        status: 400,
+        error: `Error running moss ${err}`,
+      };
+    }
+  }
 }

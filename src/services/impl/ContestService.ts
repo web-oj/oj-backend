@@ -15,6 +15,10 @@ import { ProblemInContest } from "../../entities/ProblemInContest";
 import { CreateContestInput, IContestParticipationRepository, IContestRepository, IProblemInContestRepository, IProblemRepository, IUserRepository } from "@/types/types";
 import { Problem } from "@/entities/Problem";
 import { ProblemRepository } from "@/repositories/ProblemRepo";
+import fs from "fs";
+import path from "path";
+import { exec } from "child_process";
+import { stdout } from "process";
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;
@@ -37,9 +41,7 @@ export class ContestService implements IContestService {
   ): Promise<ContestParticipation> {
     const contest = await this.contestRepo.getContest({
       query: { id: contestId },
-      relations: {
-        participations: true,
-      },
+      relations: ["participations"],
     });
     if (!contest) {
       throw new Error(`Contest with ID ${contestId} not found`);
@@ -66,9 +68,7 @@ export class ContestService implements IContestService {
   ): Promise<ProblemInContest> {
     const contest = await this.contestRepo.getContest({
       query: { id: contestId },
-      relations: {
-        problemsInContest: true,
-      },
+      relations: ["problemsInContest"],
     });
     if (!contest) {
       throw new Error(`Contest with ID ${contestId} not found`);
@@ -104,9 +104,6 @@ export class ContestService implements IContestService {
       contest.startTime = userInput.startTime;
       contest.endTime = userInput.endTime;
       contest.scoringRule = userInput.scoringRule;
-      if (typeof userInput.isPlagiarismCheckEnabled !== "undefined") {
-        contest.isPlagiarismCheckEnabled = userInput.isPlagiarismCheckEnabled;
-      }
       if (typeof userInput.isPublished !== "undefined") {
         contest.isPublished = userInput.isPublished;
       }
@@ -126,15 +123,7 @@ export class ContestService implements IContestService {
     updatedData: Partial<Contest>,
   ): Promise<Contest | null> {
     await this.contestRepo.update(id, updatedData);
-    return this.contestRepo.getContest({ 
-      query: { id },
-      relations: {
-        problemsInContest: true,
-        participations: true,
-        submissions: true,
-        organizer: true,
-      }
-    });
+    return this.getContest(id);
   }
 
   async editProblemScore(
@@ -251,12 +240,7 @@ export class ContestService implements IContestService {
       query: {
         title,
       },
-      relations: {
-        problemsInContest: true,
-        participations: true,
-        submissions: true,
-        organizer: true,
-      },
+      relations: ["problemsInContest", "participations", "submissions", "organizer"],
     })
   }
 
@@ -393,5 +377,77 @@ export class ContestService implements IContestService {
       throw new Error(`Problem with ID ${problemId} not found`);
     }
     await this.problemInContestRepo.softDelete({ contest, problem });
+  }
+
+  async runMoss(contestId: number): Promise<void> {
+    const contest = await this.contestRepo.getContest({
+      query: { id: contestId },
+      relations: ["submissions", "submissions.owner"],
+    });
+    if (!contest) {
+      throw new Error(`Contest with ID ${contestId} not found`);
+    }
+    const currentDir = process.cwd();
+    const dir = path.join(currentDir, 'moss', contestId.toString());
+    
+    // Create directory if it doesn't exist
+    try {
+      if (fs.existsSync(dir)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Directory created: ${dir}`);
+    } catch (error) {
+      console.error(`Error creating directory: ${error}`);
+    }
+    // Write submissions to files
+    for (const submission of contest.submissions) {
+      const code = Buffer.from(submission.code, 'base64').toString();
+      const owner = submission.owner;
+      const filePath = path.join(dir, `${owner.handle}.cpp`);
+      try {
+        fs.writeFileSync(filePath, code);
+      } catch (error) {
+        console.error(`Error writing file: ${error}`);
+      }
+    } 
+    // Ensure the moss script has execution permissions
+    const mossScriptPath = path.join(currentDir, 'moss/moss');
+    exec(`chmod +x ${mossScriptPath}`, (chmodError) => {
+      if (chmodError) {
+        console.error(`Error setting execution permissions for moss script: ${chmodError.message}`);
+        return;
+      }
+
+      // Run MOSS
+      const command = `${mossScriptPath} -l cc ${dir}/*.cpp`;
+      exec(command, async (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error running MOSS: ${error.message}`);
+          return;
+        }
+        console.log(`MOSS output: ${stdout}`);
+        if (stderr) {
+          console.error(`MOSS stderr: ${stderr}`);
+        }
+
+        const output = stdout.toString();
+        console.log(`MOSS output: ${output}`);
+        if (stderr) {
+          console.error(`MOSS stderr: ${stderr}`);
+        }
+    
+        // Extract the result link
+        const resultLinkMatch = output.match(/http:\/\/moss\.stanford\.edu\/results\/\d+\/\d+/);
+        if (resultLinkMatch) {
+          const resultLink = resultLinkMatch[0];
+          console.log(`MOSS result link: ${resultLink}`);
+          contest.mossUrl = resultLink;
+          await this.editContest(contestId, { mossUrl: resultLink });
+        } else {
+          console.error('MOSS result link not found in the output.');
+        }    
+      });
+    });  
   }
 }

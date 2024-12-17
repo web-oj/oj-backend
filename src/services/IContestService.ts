@@ -72,4 +72,6 @@ export interface IContestService {
   softDeleteContest(id: number): Promise<void>;
 
   softDeleteProblem(contestId: number, problemId: number): Promise<void>;
+
+  runMoss(contestId: number): Promise<void>;
 }

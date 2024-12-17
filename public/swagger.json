@@ -356,11 +356,11 @@
 					"scoringRule": {
 						"type": "string"
 					},
-					"isPlagiarismCheckEnabled": {
-						"type": "boolean"
-					},
 					"isPublished": {
 						"type": "boolean"
+					},
+					"mossUrl": {
+						"type": "string"
 					},
 					"organizer": {
 						"$ref": "#/components/schemas/User"
@@ -395,8 +395,8 @@
 					"startTime",
 					"endTime",
 					"scoringRule",
-					"isPlagiarismCheckEnabled",
 					"isPublished",
+					"mossUrl",
 					"organizer",
 					"participations",
 					"problemsInContest",
@@ -1097,9 +1097,6 @@
 			"UpdateContestRequest": {
 				"properties": {
 					"isPublished": {
-						"type": "boolean"
-					},
-					"isPlagiarismCheckEnabled": {
 						"type": "boolean"
 					},
 					"scoringRule": {
@@ -2200,9 +2197,6 @@
 									"isPublished": {
 										"type": "boolean"
 									},
-									"isPlagiarismCheckEnabled": {
-										"type": "boolean"
-									},
 									"scoringRule": {
 										"type": "string"
 									},
@@ -2808,6 +2802,52 @@
 						}
 					}
 				}
+			}
+		},
+		"/contest/{id}/moss": {
+			"post": {
+				"operationId": "RunMoss",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_null_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contest"
+				],
+				"security": [
+					{
+						"jwt": [
+							"USER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

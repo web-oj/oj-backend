@@ -37,12 +37,12 @@ export class Contest extends BaseEntityWithTimestamps {
 
   @Column({ nullable: false })
   scoringRule: string;
-
-  @Column({ nullable: false, default: false })
-  isPlagiarismCheckEnabled: boolean;
-
+  
   @Column({ nullable: false, default: false })
   isPublished: boolean;
+
+  @Column({ nullable: true })
+  mossUrl: string;
 
   @ManyToOne(() => User, (user) => user.organizedContests, {
     onDelete: "SET NULL",
