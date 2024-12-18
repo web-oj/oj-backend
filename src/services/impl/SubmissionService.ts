@@ -99,6 +99,7 @@ export class SubmissionService implements ISubmissionService {
       const res = await axios.post(`https://${env.judge0.hostName}/${options.path}`, options.body, {
         headers: options.headers
       });
+      console.log(res);
       return res.data.status.description;
     } catch (err) {
       throw new Error(`Error executing code: ${err}`);
