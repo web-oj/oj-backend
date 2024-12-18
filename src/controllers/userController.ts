@@ -324,7 +324,8 @@ export class UserController extends Controller {
   @Get("leaderboard")
   @Tags("User")
   public async getLeaderboard(
-    @Query() limit: number = 10, offset: number = 0
+    @Query() limit: number = 10,
+    @Query() offset: number = 0
   ): Promise<ApiResponse<User[]>> {
     try {
       const users = await this.userService.getLeaderboard({

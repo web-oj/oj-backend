@@ -94,6 +94,7 @@ const models: TsoaRoute.Models = {
             "password": {"dataType":"string","required":true},
             "role": {"ref":"Role","required":true},
             "isBan": {"dataType":"boolean","required":true},
+            "rating": {"dataType":"double","required":true},
             "lastTimeChangeHandle": {"dataType":"double","required":true},
             "lastTimeChangeImage": {"dataType":"double","required":true},
             "country": {"dataType":"string","required":true},
@@ -210,7 +211,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_User.Exclude_keyofUser.password__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"double","required":true},"handle":{"dataType":"string","required":true},"avatar_image":{"dataType":"string","required":true},"bio":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"role":{"ref":"Role","required":true},"isBan":{"dataType":"boolean","required":true},"lastTimeChangeHandle":{"dataType":"double","required":true},"lastTimeChangeImage":{"dataType":"double","required":true},"country":{"dataType":"string","required":true},"problems":{"dataType":"array","array":{"dataType":"refObject","ref":"Problem"},"required":true},"submissions":{"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},"organizedContests":{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},"participatedContest":{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},"createdAt":{"dataType":"datetime","required":true},"updatedAt":{"dataType":"datetime","required":true},"deletedAt":{"dataType":"datetime","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"double","required":true},"handle":{"dataType":"string","required":true},"avatar_image":{"dataType":"string","required":true},"bio":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"role":{"ref":"Role","required":true},"isBan":{"dataType":"boolean","required":true},"rating":{"dataType":"double","required":true},"lastTimeChangeHandle":{"dataType":"double","required":true},"lastTimeChangeImage":{"dataType":"double","required":true},"country":{"dataType":"string","required":true},"problems":{"dataType":"array","array":{"dataType":"refObject","ref":"Problem"},"required":true},"submissions":{"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},"organizedContests":{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},"participatedContest":{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},"createdAt":{"dataType":"datetime","required":true},"updatedAt":{"dataType":"datetime","required":true},"deletedAt":{"dataType":"datetime","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_User.password_": {
@@ -246,6 +247,11 @@ const models: TsoaRoute.Models = {
     "LoginRequest": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"handle":{"dataType":"string"},"email":{"dataType":"string"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_User-Array_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"dataType":"array","array":{"dataType":"refObject","ref":"User"}},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "NewProblemRequest": {
@@ -609,6 +615,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'login',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/user/leaderboard',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getLeaderboard)),
+
+            async function UserController_getLeaderboard(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    limit: {"default":10,"in":"query","name":"limit","dataType":"double"},
+                    offset: {"default":0,"in":"query","name":"offset","dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new UserController();
+
+              await templateService.apiHandler({
+                methodName: 'getLeaderboard',
                 controller,
                 response,
                 next,
@@ -1461,6 +1498,36 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'runMoss',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/contest/:id/rate',
+            ...(fetchMiddlewares<RequestHandler>(ContestController)),
+            ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.rateContest)),
+
+            async function ContestController_rateContest(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new ContestController();
+
+              await templateService.apiHandler({
+                methodName: 'rateContest',
                 controller,
                 response,
                 next,

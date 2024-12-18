@@ -259,6 +259,10 @@
 					"isBan": {
 						"type": "boolean"
 					},
+					"rating": {
+						"type": "number",
+						"format": "double"
+					},
 					"lastTimeChangeHandle": {
 						"type": "number",
 						"format": "double"
@@ -307,6 +311,7 @@
 					"password",
 					"role",
 					"isBan",
+					"rating",
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
 					"country",
@@ -665,6 +670,10 @@
 					"isBan": {
 						"type": "boolean"
 					},
+					"rating": {
+						"type": "number",
+						"format": "double"
+					},
 					"lastTimeChangeHandle": {
 						"type": "number",
 						"format": "double"
@@ -721,6 +730,7 @@
 					"email",
 					"role",
 					"isBan",
+					"rating",
 					"lastTimeChangeHandle",
 					"lastTimeChangeImage",
 					"country",
@@ -839,6 +849,31 @@
 				},
 				"required": [
 					"password"
+				],
+				"type": "object"
+			},
+			"ApiResponse_User-Array_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/User"
+						},
+						"type": "array"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
 				],
 				"type": "object"
 			},
@@ -1448,6 +1483,49 @@
 						}
 					}
 				}
+			}
+		},
+		"/user/leaderboard": {
+			"get": {
+				"operationId": "GetLeaderboard",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "offset",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/submission": {
@@ -2845,6 +2923,38 @@
 						"required": true,
 						"schema": {
 							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/contest/{id}/rate": {
+			"post": {
+				"operationId": "RateContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_null_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contest"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
 						}
 					}
 				]
