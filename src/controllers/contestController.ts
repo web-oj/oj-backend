@@ -561,4 +561,26 @@ export class ContestController extends Controller {
       };
     }
   }
+
+  @Post("{id}/rate")
+  @Tags("Contest")
+  public async rateContest(
+    @Path() id: number,
+  ): Promise<ApiResponse<null>> {
+    try {
+      await this.contestService.rateContest(id);
+      this.setStatus(200);
+      return {
+        message: "Contest rated successfully",
+        status: 200,
+      };
+    } catch (err) {
+      this.setStatus(400);
+      return {
+        message: "Contest not rated",
+        status: 400,
+        error: `Error rating contest ${err}`,
+      };
+    }
+  }
 }

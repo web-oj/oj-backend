@@ -23,7 +23,7 @@ export class Problem extends BaseEntityWithTimestamps {
   @Column({ nullable: false })
   title: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, type: "longtext" })
   statement: string;
 
   @Column({ nullable: true, default: 800 })

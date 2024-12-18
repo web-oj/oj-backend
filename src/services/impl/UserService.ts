@@ -98,4 +98,16 @@ export class UserService implements IUserService {
       },
     });
   }
+
+  async getAllUsers(): Promise<User[]> {
+    return await this.userRepo.find();
+  }
+
+  async getLeaderboard(options: { limit: number; offset: number }): Promise<User[]> {
+    const users = await this.getAllUsers();
+    const sortedUsers = users.sort((a, b) => {
+      return b.rating - a.rating;
+    });
+    return sortedUsers.slice(options.offset, options.offset + options.limit);
+  }
 }

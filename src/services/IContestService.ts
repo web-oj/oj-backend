@@ -74,4 +74,6 @@ export interface IContestService {
   softDeleteProblem(contestId: number, problemId: number): Promise<void>;
 
   runMoss(contestId: number): Promise<void>;
+
+  rateContest(contestId: number): Promise<void>;
 }

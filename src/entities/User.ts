@@ -33,6 +33,9 @@ export class User extends BaseEntityWithTimestamps {
   @Column({ nullable: false, default: false })
   isBan: boolean;
 
+  @Column({ nullable: false, default: 0 })
+  rating: number;
+
   @Column({ nullable: true, type: 'bigint' })
   lastTimeChangeHandle: number;
 

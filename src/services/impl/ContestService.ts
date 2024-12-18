@@ -450,4 +450,20 @@ export class ContestService implements IContestService {
       });
     });  
   }
+
+  async rateContest(contestId: number): Promise<void> {
+    const contest = await this.contestRepo.getContest({
+      query: { id: contestId },
+      relations: ["participations", "participations.user"],
+    });
+    if (!contest) {
+      throw new Error(`Contest with ID ${contestId} not found`);
+    }
+    const ranking = await this.getContestRanking(contestId);
+    for (let i = 0; i < ranking.length; i++) {
+      const participation = ranking[i];
+      participation.user.rating += 100 * (ranking.length - i);
+      await this.userRepo.update(participation.user.id, { rating: participation.user.rating });
+    }
+  }
 }

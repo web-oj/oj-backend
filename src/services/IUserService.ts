@@ -13,4 +13,11 @@ export interface IUserService {
   getUserByEmail(email: string): Promise<User | null>;
 
   getUserByHandle(handle: string): Promise<User | null>;
+
+  getAllUsers(): Promise<User[]>;
+
+  getLeaderboard(options: {
+    limit: number;
+    offset: number
+  }): Promise<User[]>;
 }

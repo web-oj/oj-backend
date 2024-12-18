@@ -25,6 +25,7 @@ import {
   Patch,
   Path,
   Post,
+  Query,
   Route,
   Security,
   Tags,
@@ -316,6 +317,32 @@ export class UserController extends Controller {
         status: 400,
         message: "Login failed",
         error: `Error logging in: ${err}`,
+      }
+    }
+  }
+
+  @Get("leaderboard")
+  @Tags("User")
+  public async getLeaderboard(
+    @Query() limit: number = 10, offset: number = 0
+  ): Promise<ApiResponse<User[]>> {
+    try {
+      const users = await this.userService.getLeaderboard({
+        limit,
+        offset,
+      });
+      this.setStatus(200);
+      return {
+        status: 200,
+        message: "Leaderboard retrieved successfully",
+        data: users,
+      }
+    } catch (err) {
+      this.setStatus(400);
+      return {
+        status: 400,
+        message: "Leaderboard not retrieved",
+        error: `Error getting leaderboard: ${err}`,
       }
     }
   }
