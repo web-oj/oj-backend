@@ -139,7 +139,7 @@ export class SubmissionService implements ISubmissionService {
   }): Promise<Submission | null> {
     return this.submissionRepo.findOne({
       where: { id: submissionId },
-      relations: options?.withResult ? ['result'] : [],
+      relations: ['result', 'problem', 'problem.testcases'],
       loadEagerRelations: true,
     })
   }

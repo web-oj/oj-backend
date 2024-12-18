@@ -29,6 +29,10 @@ services:
       - MYSQL_HOST=db
       - MYSQL_PORT=3306
       - MYSQL_USER=root
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_PORT=${APP_PORT}
+      - JUDGE0_HOST_NAME=${JUDGE0_HOST_NAME}
+      - JUDGE0_API_KEY=${JUDGE0_API_KEY}
     depends_on:
       - db
 volumes:
