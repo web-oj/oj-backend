@@ -195,12 +195,7 @@ export type UserQueryOptions = {
     handle?: string;
     email?: string;
   };
-  relations?: {
-    problems?: boolean;
-    submissions?: boolean;
-    organizedContests?: boolean;
-    participatedContest?: boolean;
-  };
+  relations?: Array<string>,
 };
 
 export type IUserRepository = Repository<User> & {

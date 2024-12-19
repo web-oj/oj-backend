@@ -1380,6 +1380,14 @@
 							"format": "double",
 							"type": "number"
 						}
+					},
+					{
+						"in": "header",
+						"name": "x-access-token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
 			}

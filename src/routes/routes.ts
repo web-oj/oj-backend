@@ -482,6 +482,7 @@ export function RegisterRoutes(app: Router) {
             async function UserController_getUserById(request: ExRequest, response: ExResponse, next: any) {
             const args: Record<string, TsoaRoute.ParameterSchema> = {
                     id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                    token: {"in":"header","name":"x-access-token","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

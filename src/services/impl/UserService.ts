@@ -62,12 +62,7 @@ export class UserService implements IUserService {
       query: {
         id,
       },
-      relations: {
-        problems: true,
-        submissions: true,
-        organizedContests: true,
-        participatedContest: true,
-      },
+      relations: ["problems", "submissions", "organizedContests", "participatedContest", "participatedContest.contest"],
     })
   }
 
@@ -76,12 +71,7 @@ export class UserService implements IUserService {
       query: {
         email,
       },
-      relations: {
-        problems: true,
-        submissions: true,
-        organizedContests: true,
-        participatedContest: true,
-      },
+      relations: ["problems", "submissions", "organizedContests", "participatedContest", "participatedContest.contest"],
     });
   }
 
@@ -90,12 +80,7 @@ export class UserService implements IUserService {
       query: {
         handle,
       },
-      relations: {
-        problems: true,
-        submissions: true,
-        organizedContests: true,
-        participatedContest: true,
-      },
+      relations: ["problems", "submissions", "organizedContests", "participatedContest", "participatedContest.contest"],
     });
   }
 

@@ -153,7 +153,10 @@ export class UserController extends Controller {
   @Get('{id}')
   @Tags("User")
   @Security("jwt", [Role.User])
-  public async getUserById(@Path() id: number): Promise<ApiResponse<GetUserResponse>> {
+  public async getUserById(
+    @Path() id: number,
+    @Header("x-access-token") token: string,
+  ): Promise<ApiResponse<GetUserResponse>> {
     try {
       const user = await this.userService.getUserById(id);
       this.setStatus(200);

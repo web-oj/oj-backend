@@ -18,7 +18,9 @@ import { ProblemRepository } from "@/repositories/ProblemRepo";
 import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
-import { stdout } from "process";
+import axios from "axios";
+import { env } from "@/config/config";
+
 
 export class ContestService implements IContestService {
   private readonly userRepo: IUserRepository;
@@ -408,68 +410,27 @@ export class ContestService implements IContestService {
     if (!contest) {
       throw new Error(`Contest with ID ${contestId} not found`);
     }
-    const currentDir = process.cwd();
-    const dir = path.join(currentDir, 'moss', contestId.toString());
-    
-    // Create directory if it doesn't exist
-    try {
-      if (fs.existsSync(dir)) {
-        fs.rmSync(dir, { recursive: true, force: true });
-      }
-      fs.mkdirSync(dir, { recursive: true });
-      console.log(`Directory created: ${dir}`);
-    } catch (error) {
-      console.error(`Error creating directory: ${error}`);
-    }
     // Write submissions to files
+    const submissions = [];
     for (const submission of contest.submissions) {
-      const code = Buffer.from(submission.code, 'base64').toString();
-      const owner = submission.owner;
-      const filePath = path.join(dir, `${owner.handle}.cpp`);
-      try {
-        fs.writeFileSync(filePath, code);
-      } catch (error) {
-        console.error(`Error writing file: ${error}`);
-      }
-    } 
-    // Ensure the moss script has execution permissions
-    const mossScriptPath = path.join(currentDir, 'moss/moss');
-    exec(`chmod ug+x ${mossScriptPath}`, (chmodError) => {
-      if (chmodError) {
-        console.error(`Error setting execution permissions for moss script: ${chmodError.message}`);
-        return;
-      }
-
-      // Run MOSS
-      const command = `perl ${mossScriptPath} -l cc ${dir}/*.cpp`;
-      exec(command, async (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error running MOSS: ${error.message}`);
-          return;
+      const handle = submission.owner.handle;
+      submissions.push({ code: submission.code, handle });
+    }; 
+    try {
+      const data = await axios.post(env.moss.host, {
+        submissions,
+      }, {
+        headers: {
+          "Content-Type": "application/json"
         }
-        console.log(`MOSS output: ${stdout}`);
-        if (stderr) {
-          console.error(`MOSS stderr: ${stderr}`);
-        }
-
-        const output = stdout.toString();
-        console.log(`MOSS output: ${output}`);
-        if (stderr) {
-          console.error(`MOSS stderr: ${stderr}`);
-        }
-    
-        // Extract the result link
-        const resultLinkMatch = output.match(/http:\/\/moss\.stanford\.edu\/results\/\d+\/\d+/);
-        if (resultLinkMatch) {
-          const resultLink = resultLinkMatch[0];
-          console.log(`MOSS result link: ${resultLink}`);
-          contest.mossUrl = resultLink;
-          await this.editContest(contestId, { mossUrl: resultLink });
-        } else {
-          console.error('MOSS result link not found in the output.');
-        }    
       });
-    });  
+      console.log(data);
+      contest.mossUrl = data.data;
+      await this.contestRepo.update(contestId, { mossUrl: data.data.url });  
+    } catch (err) {
+      console.log(err);
+      throw new Error(`Error running MOSS: ${err}`);
+    }
   }
 
   async rateContest(contestId: number): Promise<void> {

@@ -18,6 +18,7 @@ const envVarsSchema = Joi.object()
     APP_PORT: Joi.number().required(),
     JUDGE0_HOST_NAME: Joi.string().required(),
     JUDGE0_API_KEY: Joi.string().required(),
+    MOSS_API_URL: Joi.string().required(),
   })
   .unknown();
 
@@ -54,4 +55,7 @@ export const env = {
     hostName: envVars.JUDGE0_HOST_NAME,
     apiKey: envVars.JUDGE0_API_KEY,
   },
+  moss: {
+    host: envVars.MOSS_API_URL,
+  }
 };
