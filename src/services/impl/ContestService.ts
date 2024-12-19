@@ -61,6 +61,30 @@ export class ContestService implements IContestService {
     });
   }
 
+  async removeContestParticipation(
+    contestId: number,
+    userId: number,
+  ): Promise<void> {
+    const contest = await this.contestRepo.getContest({
+      query: { id: contestId },
+      relations: ["participations"],
+    });
+    if (!contest) {
+      throw new Error(`Contest with ID ${contestId} not found`);
+    }
+    const user = await this.userRepo.getUser({
+      query: { id: userId },
+    });
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+    const participation = contest.participations.find((p) => p.user.id === userId);
+    if (!participation) {
+      throw new Error(`User with ID ${userId} not participating in contest with ID ${contestId}`);
+    }
+    await this.contestParticipationRepo.delete(participation.id);
+  }
+
   async addProblem(
     contestId: number,
     problemId: number,

@@ -56,30 +56,6 @@ const models: TsoaRoute.Models = {
         "enums": ["ADMIN","USER","ORGANIZER","PROBLEM_SETTER"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Problem": {
-        "dataType": "refObject",
-        "properties": {
-            "id": {"dataType":"double","required":true},
-            "createdAt": {"dataType":"datetime","required":true},
-            "updatedAt": {"dataType":"datetime","required":true},
-            "deletedAt": {"dataType":"datetime","required":true},
-            "title": {"dataType":"string","required":true},
-            "statement": {"dataType":"string","required":true},
-            "difficulty": {"dataType":"double","required":true},
-            "timeLimit": {"dataType":"double","required":true},
-            "memoryLimit": {"dataType":"double","required":true},
-            "inputFormat": {"dataType":"string","required":true},
-            "outputFormat": {"dataType":"string","required":true},
-            "solutionText": {"dataType":"string","required":true},
-            "owner": {"ref":"User","required":true},
-            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
-            "testcases": {"dataType":"array","array":{"dataType":"refObject","ref":"Testcase"},"required":true},
-            "isPublished": {"dataType":"boolean","required":true},
-            "associatedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "User": {
         "dataType": "refObject",
         "properties": {
@@ -102,6 +78,30 @@ const models: TsoaRoute.Models = {
             "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
             "organizedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},
             "participatedContest": {"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Problem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "deletedAt": {"dataType":"datetime","required":true},
+            "title": {"dataType":"string","required":true},
+            "statement": {"dataType":"string","required":true},
+            "difficulty": {"dataType":"double","required":true},
+            "timeLimit": {"dataType":"double","required":true},
+            "memoryLimit": {"dataType":"double","required":true},
+            "inputFormat": {"dataType":"string","required":true},
+            "outputFormat": {"dataType":"string","required":true},
+            "solutionText": {"dataType":"string","required":true},
+            "owner": {"ref":"User","required":true},
+            "submissions": {"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},
+            "testcases": {"dataType":"array","array":{"dataType":"refObject","ref":"Testcase"},"required":true},
+            "isPublished": {"dataType":"boolean","required":true},
+            "associatedContests": {"dataType":"array","array":{"dataType":"refObject","ref":"ProblemInContest"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -211,6 +211,11 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ApiResponse_User-Array_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"dataType":"array","array":{"dataType":"refObject","ref":"User"}},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_User.Exclude_keyofUser.password__": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"id":{"dataType":"double","required":true},"handle":{"dataType":"string","required":true},"avatar_image":{"dataType":"string","required":true},"bio":{"dataType":"string","required":true},"email":{"dataType":"string","required":true},"role":{"ref":"Role","required":true},"isBan":{"dataType":"boolean","required":true},"rating":{"dataType":"double","required":true},"lastTimeChangeHandle":{"dataType":"double","required":true},"lastTimeChangeImage":{"dataType":"double","required":true},"country":{"dataType":"string","required":true},"problems":{"dataType":"array","array":{"dataType":"refObject","ref":"Problem"},"required":true},"submissions":{"dataType":"array","array":{"dataType":"refObject","ref":"Submission"},"required":true},"organizedContests":{"dataType":"array","array":{"dataType":"refObject","ref":"Contest"},"required":true},"participatedContest":{"dataType":"array","array":{"dataType":"refObject","ref":"ContestParticipation"},"required":true},"createdAt":{"dataType":"datetime","required":true},"updatedAt":{"dataType":"datetime","required":true},"deletedAt":{"dataType":"datetime","required":true}},"validators":{}},
@@ -249,11 +254,6 @@ const models: TsoaRoute.Models = {
     "LoginRequest": {
         "dataType": "refAlias",
         "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"handle":{"dataType":"string"},"email":{"dataType":"string"}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ApiResponse_User-Array_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"error":{"dataType":"string"},"data":{"dataType":"array","array":{"dataType":"refObject","ref":"User"}},"status":{"dataType":"double","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "NewProblemRequest": {
@@ -445,6 +445,35 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/user/leaderboard',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getLeaderboard)),
+
+            async function UserController_getLeaderboard(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new UserController();
+
+              await templateService.apiHandler({
+                methodName: 'getLeaderboard',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/user/:id',
             authenticateMiddleware([{"jwt":["USER"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
@@ -617,37 +646,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'login',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/user/leaderboard',
-            ...(fetchMiddlewares<RequestHandler>(UserController)),
-            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getLeaderboard)),
-
-            async function UserController_getLeaderboard(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    limit: {"default":10,"in":"query","name":"limit","dataType":"double"},
-                    offset: {"default":0,"in":"query","name":"offset","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
-
-                const controller = new UserController();
-
-              await templateService.apiHandler({
-                methodName: 'getLeaderboard',
                 controller,
                 response,
                 next,
@@ -1436,6 +1434,38 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'registerToContest',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/contest/:id/unregister',
+            authenticateMiddleware([{"jwt":["USER"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ContestController)),
+            ...(fetchMiddlewares<RequestHandler>(ContestController.prototype.unregisterFromContest)),
+
+            async function ContestController_unregisterFromContest(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                    body: {"in":"body","name":"body","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"userId":{"dataType":"double","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new ContestController();
+
+              await templateService.apiHandler({
+                methodName: 'unregisterFromContest',
                 controller,
                 response,
                 next,

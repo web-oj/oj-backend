@@ -10,6 +10,11 @@ export interface IContestService {
     userId: number,
   ): Promise<ContestParticipation>;
 
+  removeContestParticipation(
+    contestId: number,
+    userId: number,
+  ): Promise<void>;
+
   addProblem(
     contestId: number,
     problemId: number,

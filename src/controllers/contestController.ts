@@ -512,6 +512,50 @@ export class ContestController extends Controller {
     }
   }
 
+  @Post("{id}/unregister")
+  @Tags("Contest")
+  @Security("jwt", [Role.User])
+  public async unregisterFromContest(
+    @Path() id: number,
+    @Body() body: { userId: number },
+  ): Promise<ApiResponse<null>> {
+    const { userId } = body;
+
+    try {
+      const res = await this.contestService.getContest(id);
+      if (!res) {
+        this.setStatus(404);
+        return {
+          message: "Contest not found",
+          status: 404,
+        };
+      }
+
+      const user = await this.userService.getUserById(userId);
+      if (!user) {
+        this.setStatus(404);
+        return {
+          message: "User not found",
+          status: 404,
+        };
+      }
+
+      await this.contestService.removeContestParticipation(id, userId);
+      this.setStatus(200);
+      return {
+        message: "Unregistered successfully",
+        status: 200,
+      };
+    } catch (err) {
+      this.setStatus(400);
+      return {
+        message: "Unregistration failed",
+        status: 400,
+        error: `Error unregistering from contest ${err}`,
+      };
+    }
+  }
+
   @Post("{id}/problem")
   @Tags("Contest")
   @Security("jwt", [Role.User])

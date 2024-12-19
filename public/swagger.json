@@ -128,98 +128,6 @@
 				],
 				"type": "string"
 			},
-			"Problem": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"deletedAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"title": {
-						"type": "string"
-					},
-					"statement": {
-						"type": "string"
-					},
-					"difficulty": {
-						"type": "number",
-						"format": "double"
-					},
-					"timeLimit": {
-						"type": "number",
-						"format": "double"
-					},
-					"memoryLimit": {
-						"type": "number",
-						"format": "double"
-					},
-					"inputFormat": {
-						"type": "string"
-					},
-					"outputFormat": {
-						"type": "string"
-					},
-					"solutionText": {
-						"type": "string"
-					},
-					"owner": {
-						"$ref": "#/components/schemas/User"
-					},
-					"submissions": {
-						"items": {
-							"$ref": "#/components/schemas/Submission"
-						},
-						"type": "array"
-					},
-					"testcases": {
-						"items": {
-							"$ref": "#/components/schemas/Testcase"
-						},
-						"type": "array"
-					},
-					"isPublished": {
-						"type": "boolean"
-					},
-					"associatedContests": {
-						"items": {
-							"$ref": "#/components/schemas/ProblemInContest"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"id",
-					"createdAt",
-					"updatedAt",
-					"deletedAt",
-					"title",
-					"statement",
-					"difficulty",
-					"timeLimit",
-					"memoryLimit",
-					"inputFormat",
-					"outputFormat",
-					"solutionText",
-					"owner",
-					"submissions",
-					"testcases",
-					"isPublished",
-					"associatedContests"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"User": {
 				"properties": {
 					"id": {
@@ -319,6 +227,98 @@
 					"submissions",
 					"organizedContests",
 					"participatedContest"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Problem": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"deletedAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"title": {
+						"type": "string"
+					},
+					"statement": {
+						"type": "string"
+					},
+					"difficulty": {
+						"type": "number",
+						"format": "double"
+					},
+					"timeLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"memoryLimit": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputFormat": {
+						"type": "string"
+					},
+					"outputFormat": {
+						"type": "string"
+					},
+					"solutionText": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/User"
+					},
+					"submissions": {
+						"items": {
+							"$ref": "#/components/schemas/Submission"
+						},
+						"type": "array"
+					},
+					"testcases": {
+						"items": {
+							"$ref": "#/components/schemas/Testcase"
+						},
+						"type": "array"
+					},
+					"isPublished": {
+						"type": "boolean"
+					},
+					"associatedContests": {
+						"items": {
+							"$ref": "#/components/schemas/ProblemInContest"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"createdAt",
+					"updatedAt",
+					"deletedAt",
+					"title",
+					"statement",
+					"difficulty",
+					"timeLimit",
+					"memoryLimit",
+					"inputFormat",
+					"outputFormat",
+					"solutionText",
+					"owner",
+					"submissions",
+					"testcases",
+					"isPublished",
+					"associatedContests"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -656,6 +656,31 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ApiResponse_User-Array_": {
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/User"
+						},
+						"type": "array"
+					},
+					"status": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"status",
+					"message"
+				],
+				"type": "object"
+			},
 			"Pick_User.Exclude_keyofUser.password__": {
 				"properties": {
 					"id": {
@@ -859,31 +884,6 @@
 				},
 				"required": [
 					"password"
-				],
-				"type": "object"
-			},
-			"ApiResponse_User-Array_": {
-				"properties": {
-					"error": {
-						"type": "string"
-					},
-					"data": {
-						"items": {
-							"$ref": "#/components/schemas/User"
-						},
-						"type": "array"
-					},
-					"status": {
-						"type": "number",
-						"format": "double"
-					},
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"status",
-					"message"
 				],
 				"type": "object"
 			},
@@ -1324,6 +1324,28 @@
 				]
 			}
 		},
+		"/user/leaderboard": {
+			"get": {
+				"operationId": "GetLeaderboard",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_User-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/user/{id}": {
 			"get": {
 				"operationId": "GetUserById",
@@ -1493,49 +1515,6 @@
 						}
 					}
 				}
-			}
-		},
-		"/user/leaderboard": {
-			"get": {
-				"operationId": "GetLeaderboard",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiResponse_User-Array_"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"User"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"default": 10,
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "offset",
-						"required": false,
-						"schema": {
-							"default": 0,
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
 			}
 		},
 		"/submission": {
@@ -2838,6 +2817,63 @@
 		"/contest/{id}/register": {
 			"post": {
 				"operationId": "RegisterToContest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse_null_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Contest"
+				],
+				"security": [
+					{
+						"jwt": [
+							"USER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"userId": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"userId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/contest/{id}/unregister": {
+			"post": {
+				"operationId": "UnregisterFromContest",
 				"responses": {
 					"200": {
 						"description": "Ok",
