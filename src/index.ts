@@ -7,6 +7,11 @@ import cors from "cors";
 import { env } from "./config/config";
 import { mysqlDataSource } from "./database/MysqlDataSource";
 import { RegisterRoutes } from "./routes/routes";
+import next from 'next';
+
+const nextApp = next({ dev: false, dir: './build' });
+
+const handle = nextApp.getRequestHandler();
 
 // import UserRouter from "./routes/userRouter";
 
@@ -20,14 +25,16 @@ export default async function initApp() {
   app.use(morgan("tiny"));
   app.use(express.static("public"));
   app.use(cors());
+
+  const router = express.Router();
   
-  app.get("/ping", async (_req, res) => {
+  router.get("/ping", async (_req, res) => {
     res.send({
       message: "hello",
     });
   });
 
-  app.use(
+  router.use(
     "/docs",
     swaggerUi.serve,
     swaggerUi.setup(undefined, {
@@ -37,16 +44,25 @@ export default async function initApp() {
     }),
   );
 
-  RegisterRoutes(app);
+  RegisterRoutes(router);
+
+  app.use('/api', router);
 
   return app;
 }
 
 if (require.main === module) {
   const PORT = env.port;
-  initApp().then((app) => {
-    app.listen(PORT, () => {
-      console.log("Server is running on port", PORT);
-    });
+  nextApp.prepare().then(() => {
+    initApp().then((app) => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+      });
+  
+      app.all("*", (req, res) => {
+        return handle(req, res);
+      });
+    });  
   });
 }
+
