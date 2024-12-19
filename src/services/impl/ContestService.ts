@@ -434,7 +434,7 @@ export class ContestService implements IContestService {
     } 
     // Ensure the moss script has execution permissions
     const mossScriptPath = path.join(currentDir, 'moss/moss');
-    exec(`chmod +x ${mossScriptPath}`, (chmodError) => {
+    exec(`chmod ug+x ${mossScriptPath}`, (chmodError) => {
       if (chmodError) {
         console.error(`Error setting execution permissions for moss script: ${chmodError.message}`);
         return;
