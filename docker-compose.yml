@@ -33,6 +33,7 @@ services:
       - APP_PORT=${APP_PORT}
       - JUDGE0_HOST_NAME=${JUDGE0_HOST_NAME}
       - JUDGE0_API_KEY=${JUDGE0_API_KEY}
+      - MOSS_API_URL=${MOSS_API_URL}
     depends_on:
       - db
 volumes:
