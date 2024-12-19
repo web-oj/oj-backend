@@ -441,7 +441,7 @@ export class ContestService implements IContestService {
       }
 
       // Run MOSS
-      const command = `${mossScriptPath} -l cc ${dir}/*.cpp`;
+      const command = `perl ${mossScriptPath} -l cc ${dir}/*.cpp`;
       exec(command, async (error, stdout, stderr) => {
         if (error) {
           console.error(`Error running MOSS: ${error.message}`);
