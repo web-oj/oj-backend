@@ -479,6 +479,14 @@
 						"type": "string",
 						"format": "date-time"
 					},
+					"problemId": {
+						"type": "number",
+						"format": "double"
+					},
+					"contestId": {
+						"type": "number",
+						"format": "double"
+					},
 					"problem": {
 						"$ref": "#/components/schemas/Problem"
 					},
@@ -495,6 +503,8 @@
 					"createdAt",
 					"updatedAt",
 					"deletedAt",
+					"problemId",
+					"contestId",
 					"problem",
 					"contest",
 					"score"

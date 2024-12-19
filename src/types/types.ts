@@ -150,13 +150,13 @@ export type IContestRepository = Repository<Contest> & {
 
 export type ProblemInContestQueryOptions = {
   query: {
-    contest: Contest;
-    problem: Problem;
+    contestId?: number;
+    problemId?: number;
   }
 }
 
 export type IProblemInContestRepository = Repository<ProblemInContest> & {
-  getProblemInContest(options: ProblemInContestQueryOptions): Promise<ProblemInContest | null>;
+  getProblemInContest(options: ProblemInContestQueryOptions): Promise<ProblemInContest[]>;
 };
 
 export type ProblemQueryOptions = {

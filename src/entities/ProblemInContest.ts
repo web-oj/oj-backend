@@ -9,6 +9,12 @@ export class ProblemInContest extends BaseEntityWithTimestamps {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  problemId: number;
+
+  @Column()
+  contestId: number;
+
   @ManyToOne(() => Problem, (problem) => problem.associatedContests)
   problem: Problem;
 

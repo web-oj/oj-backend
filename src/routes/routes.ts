@@ -152,6 +152,8 @@ const models: TsoaRoute.Models = {
             "createdAt": {"dataType":"datetime","required":true},
             "updatedAt": {"dataType":"datetime","required":true},
             "deletedAt": {"dataType":"datetime","required":true},
+            "problemId": {"dataType":"double","required":true},
+            "contestId": {"dataType":"double","required":true},
             "problem": {"ref":"Problem","required":true},
             "contest": {"ref":"Contest","required":true},
             "score": {"dataType":"double","required":true},

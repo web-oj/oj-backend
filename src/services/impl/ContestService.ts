@@ -148,23 +148,23 @@ export class ContestService implements IContestService {
     }
     const problemInContest = await this.problemInContestRepo.getProblemInContest({
       query: {
-        contest: contest,
-        problem: problem,
+        contestId: contest.id,
+        problemId: problem.id,
       },
     });
-    if (!problemInContest) {
+    if (problemInContest.length !== 1) {
       throw new Error(`Problem with ID ${problemId} not associated with contest with ID ${contestId}`);
     }
     const updatedData: Partial<ProblemInContest> = {
       score,
     };
     try {
-      await this.problemInContestRepo.update(problemInContest.id, updatedData);
+      await this.problemInContestRepo.update(problemInContest[0].id, updatedData);
     } catch (err) {
       throw new Error(`Error updating problem score: ${err}`);
     }
-    problemInContest.score = score;
-    return problemInContest;
+    problemInContest[0].score = score;
+    return problemInContest[0];
   }
 
   async editUserScoreInContest(
@@ -299,11 +299,16 @@ export class ContestService implements IContestService {
     if (!contest) {
       throw new Error(`Contest with ID ${contestId} not found`);
     }
-    const problemsInContest = this.problemInContestRepo.find({
-      where: {
-        contest,
-      },
+    console.log(contest);
+    const problemsInContest = await this.problemInContestRepo.getProblemInContest({
+      query: {
+        contestId: contest.id,
+      }
     });
+    if (!problemsInContest) {
+      return [];
+    }
+    console.log(problemsInContest);
     return problemsInContest;
   }
 

@@ -5,8 +5,8 @@ import { Repository } from "typeorm";
 
 
 export const ProblemInContestRepository: IProblemInContestRepository = mysqlDataSource.getRepository(ProblemInContest).extend({
-  getProblemInContest(options: ProblemInContestQueryOptions): Promise<ProblemInContest | null> {
-    return this.findOne({
+  getProblemInContest(options: ProblemInContestQueryOptions): Promise<ProblemInContest[]> {
+    return this.find({
       where: { ...options.query },
       relations: ["problem", "contest"],
       loadEagerRelations: true,
