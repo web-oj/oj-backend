@@ -4,4 +4,3 @@ node_modules
 .prettierrc
 public/swagger.json
 *.cpp
-build

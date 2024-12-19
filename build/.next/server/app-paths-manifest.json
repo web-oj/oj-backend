@@ -1,0 +1,23 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js",
+  "/(dashboard)/leaderboard/page": "app/(dashboard)/leaderboard/page.js",
+  "/(dashboard)/submissions/[id]/page": "app/(dashboard)/submissions/[id]/page.js",
+  "/(dashboard)/submissions/create/page": "app/(dashboard)/submissions/create/page.js",
+  "/(dashboard)/submissions/edit/[id]/page": "app/(dashboard)/submissions/edit/[id]/page.js",
+  "/(landing)/login/page": "app/(landing)/login/page.js",
+  "/(landing)/register/page": "app/(landing)/register/page.js",
+  "/--TEMPLATE--/page": "app/--TEMPLATE--/page.js",
+  "/(dashboard)/ide/page": "app/(dashboard)/ide/page.js",
+  "/(dashboard)/(user)/profiles/[id]/page": "app/(dashboard)/(user)/profiles/[id]/page.js",
+  "/(dashboard)/(user)/profile/page": "app/(dashboard)/(user)/profile/page.js",
+  "/(dashboard)/contests/edit/[id]/page": "app/(dashboard)/contests/edit/[id]/page.js",
+  "/(dashboard)/contests/page": "app/(dashboard)/contests/page.js",
+  "/(dashboard)/problems/edit/[id]/page": "app/(dashboard)/problems/edit/[id]/page.js",
+  "/(dashboard)/problems/page": "app/(dashboard)/problems/page.js",
+  "/(dashboard)/contests/[id]/page": "app/(dashboard)/contests/[id]/page.js",
+  "/(dashboard)/problems/[id]/page": "app/(dashboard)/problems/[id]/page.js",
+  "/(dashboard)/contests/create/page": "app/(dashboard)/contests/create/page.js",
+  "/(dashboard)/problems/create/page": "app/(dashboard)/problems/create/page.js"
+}
