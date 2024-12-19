@@ -218,21 +218,13 @@ export class ContestService implements IContestService {
     });
   }
 
-  async getContest(id: number, options?: {
-    loadProblems?: boolean;
-    loadParticipations?: boolean;
-  }): Promise<Contest | null> {
-    const relations: string[] = [];
-    if (options?.loadProblems) {
-      relations.push("problemsInContest");
-    }
-    if (options?.loadParticipations) {
-      relations.push("participations");
-    }
-    return this.contestRepo.findOne({ 
-      where: { id},
-      relations: relations,
-     });
+  async getContest(id: number): Promise<Contest | null> {
+    return this.contestRepo.getContest({
+      query: {
+        id,
+      },
+      relations: ["problemsInContest", "participations", "submissions", "organizer"],
+    })
   }
 
   async getContestByTitle(title: string): Promise<Contest | null> {
